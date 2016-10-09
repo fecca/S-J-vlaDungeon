@@ -127,7 +127,7 @@ public class MapGenerator : MonoBehaviour
 			{
 				for (var j = 0; j < wallRegion.Count; j++)
 				{
-					map[wallRegion[j].TileX, wallRegion[j].TileY] = 1;
+					map[wallRegion[j].Coordinates.X, wallRegion[j].Coordinates.Y] = 1;
 				}
 			}
 		}
@@ -145,7 +145,7 @@ public class MapGenerator : MonoBehaviour
 			{
 				for (var j = 0; j < roomRegion.Count; j++)
 				{
-					map[roomRegion[j].TileX, roomRegion[j].TileY] = 0;
+					map[roomRegion[j].Coordinates.X, roomRegion[j].Coordinates.Y] = 0;
 				}
 			}
 			else
@@ -161,9 +161,9 @@ public class MapGenerator : MonoBehaviour
 		ConnectClosestRooms(survivingRooms);
 	}
 
-	private List<List<Coordinates>> GetRegions(int tileType)
+	private List<List<Tile>> GetRegions(int tileType)
 	{
-		var regions = new List<List<Coordinates>>(64);
+		var regions = new List<List<Tile>>(64);
 		var mapFlags = new int[Width, Height];
 
 		for (var x = 0; x < Width; x++)
@@ -177,7 +177,7 @@ public class MapGenerator : MonoBehaviour
 
 					for (var i = 0; i < newRegion.Count; i++)
 					{
-						mapFlags[newRegion[i].TileX, newRegion[i].TileY] = 1;
+						mapFlags[newRegion[i].Coordinates.X, newRegion[i].Coordinates.Y] = 1;
 					}
 				}
 			}
@@ -186,14 +186,14 @@ public class MapGenerator : MonoBehaviour
 		return regions;
 	}
 
-	private List<Coordinates> GetRegionTiles(int startX, int startY)
+	private List<Tile> GetRegionTiles(int startX, int startY)
 	{
-		var tiles = new List<Coordinates>(1024);
+		var tiles = new List<Tile>(1024);
 		var mapFlags = new int[Width, Height];
 		var tileType = map[startX, startY];
-		var queue = new Queue<Coordinates>();
+		var queue = new Queue<Tile>();
 
-		queue.Enqueue(new Coordinates(startX, startY));
+		queue.Enqueue(new Tile(startX, startY));
 		mapFlags[startX, startY] = 1;
 
 		while (queue.Count > 0)
@@ -201,16 +201,16 @@ public class MapGenerator : MonoBehaviour
 			var tile = queue.Dequeue();
 			tiles.Add(tile);
 
-			for (var x = tile.TileX - 1; x <= tile.TileX + 1; x++)
+			for (var x = tile.Coordinates.X - 1; x <= tile.Coordinates.X + 1; x++)
 			{
-				for (var y = tile.TileY - 1; y <= tile.TileY + 1; y++)
+				for (var y = tile.Coordinates.Y - 1; y <= tile.Coordinates.Y + 1; y++)
 				{
-					if (IsInMapRange(x, y) && (y == tile.TileY || x == tile.TileX))
+					if (IsInMapRange(x, y) && (y == tile.Coordinates.Y || x == tile.Coordinates.X))
 					{
 						if (mapFlags[x, y] == 0 && map[x, y] == tileType)
 						{
 							mapFlags[x, y] = 1;
-							queue.Enqueue(new Coordinates(x, y));
+							queue.Enqueue(new Tile(x, y));
 						}
 					}
 				}
@@ -246,11 +246,11 @@ public class MapGenerator : MonoBehaviour
 		}
 
 		var bestDistance = 0;
-		var bestTileA = new Coordinates();
-		var bestTileB = new Coordinates();
-		var bestRoomA = new Room();
-		var bestRoomB = new Room();
 		var possibleConnectionFound = false;
+		Tile bestTileA = null;
+		Tile bestTileB = null;
+		Room bestRoomA = null;
+		Room bestRoomB = null;
 
 		for (var i = 0; i < roomListA.Count; i++)
 		{
@@ -276,8 +276,8 @@ public class MapGenerator : MonoBehaviour
 					{
 						var tileA = roomListA[i].EdgeTiles[tileIndexA];
 						var tileB = roomListB[j].EdgeTiles[tileIndexB];
-						var distanceX = (tileA.TileX - tileB.TileX) * (tileA.TileX - tileB.TileX);
-						var distanceY = (tileA.TileY - tileB.TileY) * (tileA.TileY - tileB.TileY);
+						var distanceX = (tileA.Coordinates.X - tileB.Coordinates.X) * (tileA.Coordinates.X - tileB.Coordinates.X);
+						var distanceY = (tileA.Coordinates.Y - tileB.Coordinates.Y) * (tileA.Coordinates.Y - tileB.Coordinates.Y);
 						var distanceBetweenRooms = distanceX + distanceY;
 
 						if (distanceBetweenRooms < bestDistance || !possibleConnectionFound)
@@ -311,7 +311,7 @@ public class MapGenerator : MonoBehaviour
 		}
 	}
 
-	private void CreatePassage(Room roomA, Room roomB, Coordinates tileA, Coordinates tileB)
+	private void CreatePassage(Room roomA, Room roomB, Tile tileA, Tile tileB)
 	{
 		if (roomA.IsAccessibleFromMainRoom)
 		{
@@ -324,7 +324,7 @@ public class MapGenerator : MonoBehaviour
 		roomA.ConnectedRooms.Add(roomB);
 		roomB.ConnectedRooms.Add(roomA);
 
-		var line = GetLine(tileA, tileB);
+		var line = GetLine(tileA.Coordinates, tileB.Coordinates);
 		for (var i = 0; i < line.Count; i++)
 		{
 			CreateCorridor(line[i], CorridorThickness);
@@ -339,8 +339,8 @@ public class MapGenerator : MonoBehaviour
 			{
 				if (x * x + y * y <= r * r)
 				{
-					var drawX = c.TileX + x;
-					var drawY = c.TileY + y;
+					var drawX = c.X + x;
+					var drawY = c.Y + y;
 					if (IsInMapRange(drawX, drawY))
 					{
 						map[drawX, drawY] = 1;
@@ -354,11 +354,11 @@ public class MapGenerator : MonoBehaviour
 	{
 		var line = new List<Coordinates>(64);
 
-		var x = from.TileX;
-		var y = from.TileY;
+		var x = from.X;
+		var y = from.Y;
 
-		var deltaX = to.TileX - from.TileX;
-		var deltaY = to.TileY - from.TileY;
+		var deltaX = to.X - from.X;
+		var deltaY = to.Y - from.Y;
 
 		var step = Math.Sign(deltaX);
 		var gradientStep = Math.Sign(deltaY);
@@ -409,11 +409,28 @@ public class MapGenerator : MonoBehaviour
 
 	private Vector3 CoordinatesToWorldPoint(Coordinates tile)
 	{
-		return new Vector3(-Width / 2f + 0.5f + tile.TileX, 2, -Height / 2f + 0.5f + tile.TileY);
+		return new Vector3(-Width / 2f + 0.5f + tile.X, 2, -Height / 2f + 0.5f + tile.Y);
 	}
 
 	private bool IsInMapRange(int x, int y)
 	{
 		return x >= 0 && x < Width && y >= 0 && y < Height;
+	}
+
+	private void OnDrawGizmos()
+	{
+		if (map == null)
+		{
+			return;
+		}
+
+		for (var x = 0; x < map.GetLength(0); x++)
+		{
+			for (var y = 0; y < map.GetLength(1); y++)
+			{
+				Gizmos.color = map[x, y] == 1 ? Color.white : Color.gray;
+				Gizmos.DrawCube(new Vector3(x, 0, y), Vector3.one * 0.2f);
+			}
+		}
 	}
 }

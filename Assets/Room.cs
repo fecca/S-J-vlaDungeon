@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 public class Room : IComparable<Room>
 {
-	public List<Coordinates> Tiles;
-	public List<Coordinates> EdgeTiles;
+	public List<Tile> Tiles;
+	public List<Tile> EdgeTiles;
 	public List<Room> ConnectedRooms;
 	public int RoomSize;
 	public bool IsMainRoom;
@@ -12,20 +12,20 @@ public class Room : IComparable<Room>
 
 	public Room() { }
 
-	public Room(List<Coordinates> roomTiles, int[,] map)
+	public Room(List<Tile> roomTiles, int[,] map)
 	{
 		Tiles = roomTiles;
 		RoomSize = Tiles.Count;
 		ConnectedRooms = new List<Room>(64);
-		EdgeTiles = new List<Coordinates>(1024);
+		EdgeTiles = new List<Tile>(1024);
 
 		for (var i = 0; i < Tiles.Count; i++)
 		{
-			for (var x = Tiles[i].TileX - 1; x <= Tiles[i].TileX + 1; x++)
+			for (var x = Tiles[i].Coordinates.X - 1; x <= Tiles[i].Coordinates.X + 1; x++)
 			{
-				for (var y = Tiles[i].TileY - 1; y <= Tiles[i].TileY + 1; y++)
+				for (var y = Tiles[i].Coordinates.Y - 1; y <= Tiles[i].Coordinates.Y + 1; y++)
 				{
-					if (x == Tiles[i].TileX || y == Tiles[i].TileY)
+					if (x == Tiles[i].Coordinates.X || y == Tiles[i].Coordinates.Y)
 					{
 						if (map[x, y] == 1)
 						{

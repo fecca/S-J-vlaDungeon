@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class MeshGenerator : MonoBehaviour
@@ -13,20 +12,20 @@ public class MeshGenerator : MonoBehaviour
 	[SerializeField]
 	private bool RandomizeEdgeVertexPositions = false;
 
-	private List<Vector3> _vertices;
-	private List<int> _triangles;
-	private Dictionary<int, List<Triangle>> _triangleDictionary;
-	private List<List<int>> _outlines;
-	private HashSet<int> _checkedVertices;
+	private List<Vector3> _vertices = new List<Vector3>(16184);
+	private List<int> _triangles = new List<int>(32768);
+	private Dictionary<int, List<Triangle>> _triangleDictionary = new Dictionary<int, List<Triangle>>(16184);
+	private List<List<int>> _outlines = new List<List<int>>(1024);
+	private HashSet<int> _checkedVertices = new HashSet<int>();
 
 	public void GenerateMesh(int[,] map, float squareSize)
 	{
 		var squareGrid = new SquareGrid(map, squareSize);
-		_vertices = new List<Vector3>(16184);
-		_triangles = new List<int>(32768);
-		_triangleDictionary = new Dictionary<int, List<Triangle>>(16184);
-		_outlines = new List<List<int>>(1024);
-		_checkedVertices = new HashSet<int>();
+		_vertices.Clear();
+		_triangles.Clear();
+		_triangleDictionary.Clear();
+		_outlines.Clear();
+		_checkedVertices.Clear();
 
 		for (var x = 0; x < squareGrid.Squares.GetLength(0); x++)
 		{
@@ -38,74 +37,79 @@ public class MeshGenerator : MonoBehaviour
 
 		CreateMesh();
 
-		CreateWallMesh();
+		//CreateWallMesh();
 	}
 
 	private void CreateMesh()
 	{
 		var mesh = new Mesh();
-		GetComponent<MeshFilter>().mesh = mesh;
-
 		mesh.vertices = _vertices.ToArray();
 		mesh.triangles = _triangles.ToArray();
 		mesh.RecalculateNormals();
+
+		var meshFilter = GetComponent<MeshFilter>();
+		meshFilter.mesh = mesh;
 	}
 
 	private void TriangulateSquare(Square square)
 	{
 		switch (square.Configuration)
 		{
-			// 1 point
+			// 0 points
+			case 0:
+				break;
+
+			// 1 points
 			case 1:
-				MeshFromPoints(square.TopLeft, square.TopRight, square.BottomRight, square.CenterBottom, square.CenterLeft);
+				BuildmeshFromPoints(square.BottomLeft, square.CenterLeft, square.CenterBottom);// square.TopLeft, square.TopRight, square.BottomRight, square.CenterBottom, square.CenterLeft);
 				break;
 			case 2:
-				MeshFromPoints(square.TopLeft, square.TopRight, square.CenterRight, square.CenterBottom, square.BottomLeft);
+				BuildmeshFromPoints(square.BottomRight, square.CenterBottom, square.CenterRight);// square.TopLeft, square.TopRight, square.CenterRight, square.CenterBottom, square.BottomLeft);
 				break;
 			case 4:
-				MeshFromPoints(square.TopLeft, square.CenterTop, square.CenterRight, square.BottomRight, square.BottomLeft);
+				BuildmeshFromPoints(square.TopRight, square.CenterRight, square.CenterTop);//square.TopLeft, square.CenterTop, square.CenterRight, square.BottomRight, square.BottomLeft);
 				break;
 			case 8:
-				MeshFromPoints(square.CenterTop, square.TopRight, square.BottomRight, square.BottomLeft, square.CenterLeft);
+				BuildmeshFromPoints(square.TopLeft, square.CenterTop, square.CenterLeft);//square.CenterTop, square.TopRight, square.BottomRight, square.BottomLeft, square.CenterLeft);
 				break;
 
-			// 2 point
+			// 2 points
 			case 3:
-				MeshFromPoints(square.TopLeft, square.TopRight, square.CenterRight, square.CenterLeft);
+				BuildmeshFromPoints(square.BottomLeft, square.CenterLeft, square.CenterRight, square.BottomRight);//square.TopLeft, square.TopRight, square.CenterRight, square.CenterLeft);
 				break;
 			case 6:
-				MeshFromPoints(square.TopLeft, square.CenterTop, square.CenterBottom, square.BottomLeft);
-				break;
-			case 9:
-				MeshFromPoints(square.CenterTop, square.TopRight, square.BottomRight, square.CenterBottom);
+				BuildmeshFromPoints(square.BottomRight, square.CenterBottom, square.CenterTop, square.TopRight);//square.TopLeft, square.CenterTop, square.CenterBottom, square.BottomLeft);
 				break;
 			case 12:
-				MeshFromPoints(square.CenterRight, square.BottomRight, square.BottomLeft, square.CenterLeft);
+				BuildmeshFromPoints(square.TopRight, square.CenterRight, square.CenterLeft, square.TopLeft);//square.CenterRight, square.BottomRight, square.BottomLeft, square.CenterLeft);
+				break;
+			case 9:
+				BuildmeshFromPoints(square.TopLeft, square.CenterTop, square.CenterBottom, square.BottomLeft);//square.CenterTop, square.TopRight, square.BottomRight, square.CenterBottom);
 				break;
 			case 5:
-				MeshFromPoints(square.TopLeft, square.CenterTop, square.CenterRight, square.BottomRight, square.CenterBottom, square.CenterLeft);
+				BuildmeshFromPoints(square.BottomLeft, square.CenterBottom, square.CenterRight, square.TopRight, square.CenterTop, square.CenterLeft);//square.TopLeft, square.CenterTop, square.CenterRight, square.BottomRight, square.CenterBottom, square.CenterLeft);
 				break;
 			case 10:
-				MeshFromPoints(square.CenterTop, square.TopRight, square.CenterRight, square.CenterBottom, square.BottomLeft, square.CenterLeft);
+				BuildmeshFromPoints(square.BottomRight, square.CenterRight, square.CenterTop, square.TopLeft, square.CenterLeft, square.CenterBottom);//square.CenterTop, square.TopRight, square.CenterRight, square.CenterBottom, square.BottomLeft, square.CenterLeft);
 				break;
 
-			// 3 point
-			case 7:
-				MeshFromPoints(square.TopLeft, square.CenterTop, square.CenterLeft);
-				break;
+			//// 3 points
 			case 11:
-				MeshFromPoints(square.TopRight, square.CenterRight, square.CenterTop);
+				BuildmeshFromPoints(square.BottomLeft, square.TopLeft, square.CenterTop, square.CenterRight, square.BottomRight);//square.TopRight, square.CenterRight, square.CenterTop);
 				break;
-			case 13:
-				MeshFromPoints(square.BottomRight, square.CenterBottom, square.CenterRight);
+			case 7:
+				BuildmeshFromPoints(square.BottomRight, square.BottomLeft, square.CenterLeft, square.CenterTop, square.TopRight);//square.TopLeft, square.CenterTop, square.CenterLeft);
 				break;
 			case 14:
-				MeshFromPoints(square.CenterLeft, square.CenterBottom, square.BottomLeft);
+				BuildmeshFromPoints(square.TopRight, square.BottomRight, square.CenterBottom, square.CenterLeft, square.TopLeft);//square.CenterLeft, square.CenterBottom, square.BottomLeft);
+				break;
+			case 13:
+				BuildmeshFromPoints(square.TopLeft, square.TopRight, square.CenterRight, square.CenterBottom, square.BottomLeft);//square.BottomRight, square.CenterBottom, square.CenterRight);
 				break;
 
 			// 4 points
-			case 0:
-				MeshFromPoints(square.TopLeft, square.TopRight, square.BottomRight, square.BottomLeft);
+			case 15:
+				BuildmeshFromPoints(square.TopLeft, square.TopRight, square.BottomRight, square.BottomLeft);//square.TopLeft, square.TopRight, square.BottomRight, square.BottomLeft);
 				_checkedVertices.Add(square.TopLeft.VertexIndex);
 				_checkedVertices.Add(square.TopRight.VertexIndex);
 				_checkedVertices.Add(square.BottomRight.VertexIndex);
@@ -114,25 +118,31 @@ public class MeshGenerator : MonoBehaviour
 		}
 	}
 
-	private void MeshFromPoints(params Node[] points)
+	private void BuildmeshFromPoints(params Node[] points)
 	{
 		AssignVertices(points);
 
-		if (points.Length >= 3)
+		if (points.Length == 3)
 		{
-			CreateTriangles(points[0], points[1], points[2]);
+			CreateTriangle(points[0], points[1], points[2]);
 		}
-		if (points.Length >= 4)
+		if (points.Length == 4)
 		{
-			CreateTriangles(points[0], points[2], points[3]);
+			CreateTriangle(points[0], points[1], points[2]);
+			CreateTriangle(points[0], points[2], points[3]);
 		}
-		if (points.Length >= 5)
+		if (points.Length == 5)
 		{
-			CreateTriangles(points[0], points[3], points[4]);
+			CreateTriangle(points[0], points[1], points[2]);
+			CreateTriangle(points[0], points[2], points[3]);
+			CreateTriangle(points[0], points[3], points[4]);
 		}
-		if (points.Length >= 6)
+		if (points.Length == 6)
 		{
-			CreateTriangles(points[0], points[4], points[5]);
+			CreateTriangle(points[0], points[1], points[2]);
+			CreateTriangle(points[0], points[2], points[3]);
+			CreateTriangle(points[0], points[3], points[4]);
+			CreateTriangle(points[0], points[4], points[5]);
 		}
 	}
 
@@ -156,68 +166,69 @@ public class MeshGenerator : MonoBehaviour
 		}
 	}
 
-	private void CreateTriangles(Node a, Node b, Node c)
+	private void CreateTriangle(Node a, Node b, Node c)
 	{
 		_triangles.Add(a.VertexIndex);
 		_triangles.Add(b.VertexIndex);
 		_triangles.Add(c.VertexIndex);
 
 		Triangle triangle = new Triangle(a.VertexIndex, b.VertexIndex, c.VertexIndex);
+
 		AddTriangleToDictionary(triangle.VertexIndexA, triangle);
 		AddTriangleToDictionary(triangle.VertexIndexB, triangle);
 		AddTriangleToDictionary(triangle.VertexIndexC, triangle);
 	}
 
-	private void CreateWallMesh()
-	{
-		CalculateMeshOutlines();
+	//private void CreateWallMesh()
+	//{
+	//	CalculateMeshOutlines();
 
-		var wallVertices = new List<Vector3>(8092);
-		var wallTriangles = new List<int>(4096);
-		var wallMesh = new Mesh();
-		var SegmentHeight = (float)WallHeight / WallSegments;
+	//	var wallVertices = new List<Vector3>(8092);
+	//	var wallTriangles = new List<int>(4096);
+	//	var wallMesh = new Mesh();
+	//	var SegmentHeight = (float)WallHeight / WallSegments;
 
-		for (var i = 0; i < _outlines.Count; i++)
-		{
-			var outline = _outlines[i];
-			for (var j = 0; j < outline.Count - 1; j++)
-			{
-				var topRight = _vertices[outline[j]];
-				var topLeft = _vertices[outline[j + 1]];
-				var bottomRight = topRight;
-				var bottomLeft = topLeft;
+	//	for (var i = 0; i < _outlines.Count; i++)
+	//	{
+	//		var outline = _outlines[i];
+	//		for (var j = 0; j < outline.Count - 1; j++)
+	//		{
+	//			var topRight = _vertices[outline[j]];
+	//			var topLeft = _vertices[outline[j + 1]];
+	//			var bottomRight = topRight;
+	//			var bottomLeft = topLeft;
 
-				for (var k = 0; k < WallSegments; k++)
-				{
-					topRight = bottomRight;
-					topLeft = bottomLeft;
-					bottomRight += Vector3.up * SegmentHeight;
-					bottomLeft += Vector3.up * SegmentHeight;
+	//			for (var k = 0; k < WallSegments; k++)
+	//			{
+	//				topRight = bottomRight;
+	//				topLeft = bottomLeft;
+	//				bottomRight += Vector3.up * SegmentHeight;
+	//				bottomLeft += Vector3.up * SegmentHeight;
 
-					wallVertices.Add(topRight);
-					wallTriangles.Add(wallVertices.Count - 1);
-					wallVertices.Add(bottomRight);
-					wallTriangles.Add(wallVertices.Count - 1);
-					wallVertices.Add(bottomLeft);
-					wallTriangles.Add(wallVertices.Count - 1);
+	//				wallVertices.Add(topRight);
+	//				wallTriangles.Add(wallVertices.Count - 1);
+	//				wallVertices.Add(bottomRight);
+	//				wallTriangles.Add(wallVertices.Count - 1);
+	//				wallVertices.Add(bottomLeft);
+	//				wallTriangles.Add(wallVertices.Count - 1);
 
-					wallVertices.Add(bottomLeft);
-					wallTriangles.Add(wallVertices.Count - 1);
-					wallVertices.Add(topLeft);
-					wallTriangles.Add(wallVertices.Count - 1);
-					wallVertices.Add(topRight);
-					wallTriangles.Add(wallVertices.Count - 1);
-				}
-			}
-		}
+	//				wallVertices.Add(bottomLeft);
+	//				wallTriangles.Add(wallVertices.Count - 1);
+	//				wallVertices.Add(topLeft);
+	//				wallTriangles.Add(wallVertices.Count - 1);
+	//				wallVertices.Add(topRight);
+	//				wallTriangles.Add(wallVertices.Count - 1);
+	//			}
+	//		}
+	//	}
 
-		wallMesh.vertices = wallVertices.ToArray();
-		wallMesh.triangles = wallTriangles.ToArray();
-		Walls.mesh = wallMesh;
+	//	wallMesh.vertices = wallVertices.ToArray();
+	//	wallMesh.triangles = wallTriangles.ToArray();
+	//	Walls.mesh = wallMesh;
 
-		var collider = gameObject.GetComponent<MeshCollider>();
-		collider.sharedMesh = wallMesh;
-	}
+	//	var collider = gameObject.GetComponent<MeshCollider>();
+	//	collider.sharedMesh = wallMesh;
+	//}
 
 	private void CalculateMeshOutlines()
 	{

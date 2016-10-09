@@ -17,8 +17,8 @@ public class SquareGrid
 		{
 			for (var y = 0; y < nodeCountY; y++)
 			{
-				var position = new Vector3(-mapWidth / 2 + x * squareSize + squareSize / 2, 0, -mapHeight / 2 + y * squareSize + squareSize / 2);
-				controlNodes[x, y] = new ControlNode(position, map[x, y] == 0, squareSize);
+				var position = new Vector3(x * squareSize, 0, y * squareSize);
+				controlNodes[x, y] = new ControlNode(position, map[x, y] == 1, squareSize);
 			}
 		}
 
