@@ -22,21 +22,26 @@
 		CenterBottom = BottomLeft.RightNode;
 		CenterLeft = BottomLeft.AboveNode;
 
-		if (TopLeft.Active)
+		ConfigureSquare();
+	}
+
+	private void ConfigureSquare()
+	{
+		if (BottomLeft.Active)
 		{
-			Configuration += 8;
-		}
-		if (TopRight.Active)
-		{
-			Configuration += 4;
+			Configuration += 1;
 		}
 		if (BottomRight.Active)
 		{
 			Configuration += 2;
 		}
-		if (BottomLeft.Active)
+		if (TopRight.Active)
 		{
-			Configuration += 1;
+			Configuration += 4;
+		}
+		if (TopLeft.Active)
+		{
+			Configuration += 8;
 		}
 	}
 }

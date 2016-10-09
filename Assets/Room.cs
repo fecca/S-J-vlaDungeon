@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
-public class Room
+public class Room : IComparable<Room>
 {
 	public List<Coordinates> Tiles;
 	public List<Coordinates> EdgeTiles;
 	public List<Room> ConnectedRooms;
 	public int RoomSize;
+	public bool IsMainRoom;
+	public bool IsAccessibleFromMainRoom;
 
 	public Room() { }
 
@@ -13,8 +16,8 @@ public class Room
 	{
 		Tiles = roomTiles;
 		RoomSize = Tiles.Count;
-		ConnectedRooms = new List<Room>();
-		EdgeTiles = new List<Coordinates>();
+		ConnectedRooms = new List<Room>(64);
+		EdgeTiles = new List<Coordinates>(1024);
 
 		for (var i = 0; i < Tiles.Count; i++)
 		{
@@ -37,5 +40,22 @@ public class Room
 	public bool IsConnected(Room otherRoom)
 	{
 		return ConnectedRooms.Contains(otherRoom);
+	}
+
+	public int CompareTo(Room otherRoom)
+	{
+		return otherRoom.RoomSize.CompareTo(RoomSize);
+	}
+
+	public void SetAccessibleFromMainRoom()
+	{
+		if (!IsAccessibleFromMainRoom)
+		{
+			IsAccessibleFromMainRoom = true;
+			for (var i = 0; i < ConnectedRooms.Count; i++)
+			{
+				ConnectedRooms[i].IsAccessibleFromMainRoom = true;
+			}
+		}
 	}
 }
