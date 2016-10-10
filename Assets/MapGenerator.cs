@@ -55,10 +55,30 @@ public class MapGenerator : MonoBehaviour
 
 	private void SetupTileConfigurations()
 	{
-		var squareGrid = new SquareGrid(_map, TileSize);
-
+		CreateSquares();
 		var meshGenerator = GetComponent<MeshGenerator>();
-		meshGenerator.GenerateMesh(squareGrid.Squares, TileSize);
+		meshGenerator.GenerateMesh(_map, TileSize);
+	}
+
+	private void CreateSquares()
+	{
+		var controlNodes = new ControlNode[Width, Height];
+		for (var x = 0; x < Width; x++)
+		{
+			for (var y = 0; y < Height; y++)
+			{
+				var position = new Vector3(x * TileSize, 0, y * TileSize);
+				controlNodes[x, y] = new ControlNode(position, _map[x, y].Type == TileType.Floor, TileSize);
+			}
+		}
+
+		for (var x = 0; x < Width - 1; x++)
+		{
+			for (var y = 0; y < Height - 1; y++)
+			{
+				_map[x, y].ConfigurationSquare = new ConfigurationSquare(controlNodes[x, y + 1], controlNodes[x + 1, y + 1], controlNodes[x + 1, y], controlNodes[x, y]);
+			}
+		}
 	}
 
 	private void RandomFillMap()
@@ -426,20 +446,20 @@ public class MapGenerator : MonoBehaviour
 		return x >= 0 && x < Width && y >= 0 && y < Height;
 	}
 
-	private void OnDrawGizmos()
-	{
-		if (_map == null)
-		{
-			return;
-		}
+	//private void OnDrawGizmos()
+	//{
+	//	if (_map == null)
+	//	{
+	//		return;
+	//	}
 
-		for (var x = 0; x < _map.GetLength(0); x++)
-		{
-			for (var y = 0; y < _map.GetLength(1); y++)
-			{
-				Gizmos.color = _map[x, y].Type == TileType.Floor ? Color.white : Color.gray;
-				Gizmos.DrawCube(new Vector3(x * TileSize, 0, y * TileSize), Vector3.one * 0.2f);
-			}
-		}
-	}
+	//	for (var x = 0; x < _map.GetLength(0); x++)
+	//	{
+	//		for (var y = 0; y < _map.GetLength(1); y++)
+	//		{
+	//			Gizmos.color = _map[x, y].Type == TileType.Floor ? Color.white : Color.gray;
+	//			Gizmos.DrawCube(new Vector3(x * TileSize, 0, y * TileSize), Vector3.one * 0.2f);
+	//		}
+	//	}
+	//}
 }
