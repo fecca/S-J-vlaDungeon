@@ -245,24 +245,20 @@ public class MeshGenerator : MonoBehaviour
 		{
 			for (var y = 0; y < map.GetLength(1); y++)
 			{
-				if (x > 16 && x < 24 && y > 16 && y < 24)
-				{
-					continue;
-				}
-
 				var tile = map[x, y];
 				if (tile.CoreVertices.Count > 0)
 				{
+					var randomHeight = Vector3.up * Random.Range(0.9f, 1.1f);
 					wallVertices.Add(tile.CoreVertices[0]);
 					wallVertices.Add(tile.CoreVertices[1]);
-					wallVertices.Add(tile.CoreVertices[1] + Vector3.up);
+					wallVertices.Add(tile.CoreVertices[1] + randomHeight);
 
 					wallTriangles.Add(wallVertices.Count - 3);
 					wallTriangles.Add(wallVertices.Count - 2);
 					wallTriangles.Add(wallVertices.Count - 1);
 
-					wallVertices.Add(tile.CoreVertices[1] + Vector3.up);
-					wallVertices.Add(tile.CoreVertices[0] + Vector3.up);
+					wallVertices.Add(tile.CoreVertices[1] + randomHeight);
+					wallVertices.Add(tile.CoreVertices[0] + Vector3.up * Random.Range(0.9f, 1.1f));
 					wallVertices.Add(tile.CoreVertices[0]);
 
 					wallTriangles.Add(wallVertices.Count - 3);
