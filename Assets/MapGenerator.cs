@@ -23,8 +23,10 @@ public class MapGenerator : MonoBehaviour
 	private int CorridorThickness = 2;
 	[SerializeField]
 	private int SmoothingLoops = 5;
+	[SerializeField]
+	private int TileSize = 1;
 
-	private int[,] map;
+	private Tile[,] _map;
 
 	private void Start()
 	{
@@ -41,15 +43,22 @@ public class MapGenerator : MonoBehaviour
 
 	private void GenerateMap()
 	{
-		map = new int[Width, Height];
+		_map = new Tile[Width, Height];
 
 		RandomFillMap();
-		SmoothMap();
-		ProcessWalls();
-		ProcessRooms();
+		GenerateClusters();
+		FilterWalls();
+		var rooms = FilterRooms();
+		ConnectClosestRooms(rooms);
+		SetupTileConfigurations();
+	}
+
+	private void SetupTileConfigurations()
+	{
+		var squareGrid = new SquareGrid(_map, TileSize);
 
 		var meshGenerator = GetComponent<MeshGenerator>();
-		meshGenerator.GenerateMesh(map, 1);
+		meshGenerator.GenerateMesh(squareGrid.Squares, TileSize);
 	}
 
 	private void RandomFillMap()
@@ -66,17 +75,17 @@ public class MapGenerator : MonoBehaviour
 			{
 				if (x == 0 || x == Width - 1 || y == 0 || y == Height - 1)
 				{
-					map[x, y] = 0;
+					_map[x, y] = new Tile(x, y, TileType.Wall);
 				}
 				else
 				{
-					map[x, y] = rng.Next(0, 100) < RandomFillPercent ? 1 : 0;
+					_map[x, y] = new Tile(x, y, rng.Next(0, 100) < RandomFillPercent ? TileType.Floor : TileType.Wall);
 				}
 			}
 		}
 	}
 
-	private void SmoothMap()
+	private void GenerateClusters()
 	{
 		for (var i = 0; i < SmoothingLoops; i++)
 		{
@@ -86,11 +95,11 @@ public class MapGenerator : MonoBehaviour
 				{
 					if (GetNumberOfNeighbouringTiles(x, y) > 4)
 					{
-						map[x, y] = 1;
+						_map[x, y].Type = TileType.Floor;
 					}
 					else if (GetNumberOfNeighbouringTiles(x, y) < 4)
 					{
-						map[x, y] = 0;
+						_map[x, y].Type = TileType.Wall;
 					}
 				}
 			}
@@ -108,7 +117,7 @@ public class MapGenerator : MonoBehaviour
 				{
 					if (x != xPosition || y != yPosition)
 					{
-						neighbouringTiles += map[x, y];
+						neighbouringTiles += _map[x, y].Type == TileType.Floor ? 1 : 0;
 					}
 				}
 			}
@@ -117,9 +126,9 @@ public class MapGenerator : MonoBehaviour
 		return neighbouringTiles;
 	}
 
-	private void ProcessWalls()
+	private void FilterWalls()
 	{
-		var wallRegions = GetRegions(0);
+		var wallRegions = GetRegions(TileType.Wall);
 		for (var i = 0; i < wallRegions.Count; i++)
 		{
 			var wallRegion = wallRegions[i];
@@ -127,17 +136,17 @@ public class MapGenerator : MonoBehaviour
 			{
 				for (var j = 0; j < wallRegion.Count; j++)
 				{
-					map[wallRegion[j].Coordinates.X, wallRegion[j].Coordinates.Y] = 1;
+					_map[wallRegion[j].Coordinates.X, wallRegion[j].Coordinates.Y].Type = TileType.Floor;
 				}
 			}
 		}
 	}
 
-	private void ProcessRooms()
+	private List<Room> FilterRooms()
 	{
 		var survivingRooms = new List<Room>(64);
 
-		var roomRegions = GetRegions(1);
+		var roomRegions = GetRegions(TileType.Floor);
 		for (var i = 0; i < roomRegions.Count; i++)
 		{
 			var roomRegion = roomRegions[i];
@@ -145,39 +154,36 @@ public class MapGenerator : MonoBehaviour
 			{
 				for (var j = 0; j < roomRegion.Count; j++)
 				{
-					map[roomRegion[j].Coordinates.X, roomRegion[j].Coordinates.Y] = 0;
+					_map[roomRegion[j].Coordinates.X, roomRegion[j].Coordinates.Y].Type = TileType.Wall;
 				}
 			}
 			else
 			{
-				survivingRooms.Add(new Room(roomRegion, map));
+				survivingRooms.Add(new Room(roomRegion, _map));
 			}
 		}
 
 		survivingRooms.Sort();
-		survivingRooms[0].IsMainRoom = true;
-		survivingRooms[0].IsAccessibleFromMainRoom = true;
-
-		ConnectClosestRooms(survivingRooms);
+		return survivingRooms;
 	}
 
-	private List<List<Tile>> GetRegions(int tileType)
+	private List<List<Tile>> GetRegions(TileType tileType)
 	{
 		var regions = new List<List<Tile>>(64);
-		var mapFlags = new int[Width, Height];
+		var mapFlags = new bool[Width, Height];
 
 		for (var x = 0; x < Width; x++)
 		{
 			for (var y = 0; y < Height; y++)
 			{
-				if (mapFlags[x, y] == 0 && map[x, y] == tileType)
+				if (!mapFlags[x, y] && _map[x, y].Type == tileType)
 				{
 					var newRegion = GetRegionTiles(x, y);
 					regions.Add(newRegion);
 
 					for (var i = 0; i < newRegion.Count; i++)
 					{
-						mapFlags[newRegion[i].Coordinates.X, newRegion[i].Coordinates.Y] = 1;
+						mapFlags[newRegion[i].Coordinates.X, newRegion[i].Coordinates.Y] = true;
 					}
 				}
 			}
@@ -189,12 +195,12 @@ public class MapGenerator : MonoBehaviour
 	private List<Tile> GetRegionTiles(int startX, int startY)
 	{
 		var tiles = new List<Tile>(1024);
-		var mapFlags = new int[Width, Height];
-		var tileType = map[startX, startY];
+		var mapFlags = new bool[Width, Height];
+		var tileType = _map[startX, startY].Type;
 		var queue = new Queue<Tile>();
 
-		queue.Enqueue(new Tile(startX, startY));
-		mapFlags[startX, startY] = 1;
+		queue.Enqueue(new Tile(startX, startY, tileType));
+		mapFlags[startX, startY] = true;
 
 		while (queue.Count > 0)
 		{
@@ -207,10 +213,10 @@ public class MapGenerator : MonoBehaviour
 				{
 					if (IsInMapRange(x, y) && (y == tile.Coordinates.Y || x == tile.Coordinates.X))
 					{
-						if (mapFlags[x, y] == 0 && map[x, y] == tileType)
+						if (!mapFlags[x, y] && _map[x, y].Type == tileType)
 						{
-							mapFlags[x, y] = 1;
-							queue.Enqueue(new Tile(x, y));
+							mapFlags[x, y] = true;
+							queue.Enqueue(new Tile(x, y, tileType));
 						}
 					}
 				}
@@ -222,6 +228,9 @@ public class MapGenerator : MonoBehaviour
 
 	private void ConnectClosestRooms(List<Room> allRooms, bool forceAccessibilityFromMainRoom = false)
 	{
+		allRooms[0].IsMainRoom = true;
+		allRooms[0].IsAccessibleFromMainRoom = true;
+
 		var roomListA = new List<Room>(64);
 		var roomListB = new List<Room>(64);
 
@@ -343,7 +352,7 @@ public class MapGenerator : MonoBehaviour
 					var drawY = c.Y + y;
 					if (IsInMapRange(drawX, drawY))
 					{
-						map[drawX, drawY] = 1;
+						_map[drawX, drawY].Type = TileType.Floor;
 					}
 				}
 			}
@@ -419,17 +428,17 @@ public class MapGenerator : MonoBehaviour
 
 	private void OnDrawGizmos()
 	{
-		if (map == null)
+		if (_map == null)
 		{
 			return;
 		}
 
-		for (var x = 0; x < map.GetLength(0); x++)
+		for (var x = 0; x < _map.GetLength(0); x++)
 		{
-			for (var y = 0; y < map.GetLength(1); y++)
+			for (var y = 0; y < _map.GetLength(1); y++)
 			{
-				Gizmos.color = map[x, y] == 1 ? Color.white : Color.gray;
-				Gizmos.DrawCube(new Vector3(x, 0, y), Vector3.one * 0.2f);
+				Gizmos.color = _map[x, y].Type == TileType.Floor ? Color.white : Color.gray;
+				Gizmos.DrawCube(new Vector3(x * TileSize, 0, y * TileSize), Vector3.one * 0.2f);
 			}
 		}
 	}

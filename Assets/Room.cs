@@ -12,7 +12,7 @@ public class Room : IComparable<Room>
 
 	public Room() { }
 
-	public Room(List<Tile> roomTiles, int[,] map)
+	public Room(List<Tile> roomTiles, Tile[,] map)
 	{
 		Tiles = roomTiles;
 		RoomSize = Tiles.Count;
@@ -27,7 +27,7 @@ public class Room : IComparable<Room>
 				{
 					if (x == Tiles[i].Coordinates.X || y == Tiles[i].Coordinates.Y)
 					{
-						if (map[x, y] == 1)
+						if (map[x, y].Type == TileType.Floor)
 						{
 							EdgeTiles.Add(Tiles[i]);
 						}
@@ -42,11 +42,6 @@ public class Room : IComparable<Room>
 		return ConnectedRooms.Contains(otherRoom);
 	}
 
-	public int CompareTo(Room otherRoom)
-	{
-		return otherRoom.RoomSize.CompareTo(RoomSize);
-	}
-
 	public void SetAccessibleFromMainRoom()
 	{
 		if (!IsAccessibleFromMainRoom)
@@ -57,5 +52,10 @@ public class Room : IComparable<Room>
 				ConnectedRooms[i].IsAccessibleFromMainRoom = true;
 			}
 		}
+	}
+
+	public int CompareTo(Room otherRoom)
+	{
+		return otherRoom.RoomSize.CompareTo(RoomSize);
 	}
 }

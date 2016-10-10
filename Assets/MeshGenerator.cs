@@ -14,24 +14,24 @@ public class MeshGenerator : MonoBehaviour
 
 	private List<Vector3> _vertices = new List<Vector3>(16184);
 	private List<int> _triangles = new List<int>(32768);
-	private Dictionary<int, List<Triangle>> _triangleDictionary = new Dictionary<int, List<Triangle>>(16184);
+	//private Dictionary<int, List<Triangle>> _triangleDictionary = new Dictionary<int, List<Triangle>>(16184);
 	private List<List<int>> _outlines = new List<List<int>>(1024);
 	private HashSet<int> _checkedVertices = new HashSet<int>();
 
-	public void GenerateMesh(int[,] map, float squareSize)
+	public void GenerateMesh(Square[,] squares, float squareSize)
 	{
-		var squareGrid = new SquareGrid(map, squareSize);
+		//var squareGrid = new SquareGrid(map, squareSize);
 		_vertices.Clear();
 		_triangles.Clear();
-		_triangleDictionary.Clear();
+		//_triangleDictionary.Clear();
 		_outlines.Clear();
 		_checkedVertices.Clear();
 
-		for (var x = 0; x < squareGrid.Squares.GetLength(0); x++)
+		for (var x = 0; x < squares.GetLength(0); x++)
 		{
-			for (var y = 0; y < squareGrid.Squares.GetLength(1); y++)
+			for (var y = 0; y < squares.GetLength(1); y++)
 			{
-				TriangulateSquare(squareGrid.Squares[x, y]);
+				TriangulateSquare(squares[x, y]);
 			}
 		}
 
@@ -172,11 +172,11 @@ public class MeshGenerator : MonoBehaviour
 		_triangles.Add(b.VertexIndex);
 		_triangles.Add(c.VertexIndex);
 
-		Triangle triangle = new Triangle(a.VertexIndex, b.VertexIndex, c.VertexIndex);
+		//Triangle triangle = new Triangle(a.VertexIndex, b.VertexIndex, c.VertexIndex);
 
-		AddTriangleToDictionary(triangle.VertexIndexA, triangle);
-		AddTriangleToDictionary(triangle.VertexIndexB, triangle);
-		AddTriangleToDictionary(triangle.VertexIndexC, triangle);
+		//AddTriangleToDictionary(triangle.VertexIndexA, triangle);
+		//AddTriangleToDictionary(triangle.VertexIndexB, triangle);
+		//AddTriangleToDictionary(triangle.VertexIndexC, triangle);
 	}
 
 	//private void CreateWallMesh()
@@ -230,85 +230,85 @@ public class MeshGenerator : MonoBehaviour
 	//	collider.sharedMesh = wallMesh;
 	//}
 
-	private void CalculateMeshOutlines()
-	{
-		for (var vertexIndex = 0; vertexIndex < _vertices.Count; vertexIndex++)
-		{
-			if (!_checkedVertices.Contains(vertexIndex))
-			{
-				var newOutlineVertex = GetConnectedOutlineVertex(vertexIndex);
-				if (newOutlineVertex != -1)
-				{
-					_checkedVertices.Add(vertexIndex);
-					_outlines.Add(new List<int>() { vertexIndex });
-					FollowOutline(newOutlineVertex, _outlines.Count - 1);
-					_outlines[_outlines.Count - 1].Add(vertexIndex);
-				}
-			}
-		}
-	}
+	//private void CalculateMeshOutlines()
+	//{
+	//	for (var vertexIndex = 0; vertexIndex < _vertices.Count; vertexIndex++)
+	//	{
+	//		if (!_checkedVertices.Contains(vertexIndex))
+	//		{
+	//			var newOutlineVertex = GetConnectedOutlineVertex(vertexIndex);
+	//			if (newOutlineVertex != -1)
+	//			{
+	//				_checkedVertices.Add(vertexIndex);
+	//				_outlines.Add(new List<int>() { vertexIndex });
+	//				FollowOutline(newOutlineVertex, _outlines.Count - 1);
+	//				_outlines[_outlines.Count - 1].Add(vertexIndex);
+	//			}
+	//		}
+	//	}
+	//}
 
-	private int GetConnectedOutlineVertex(int vertexIndex)
-	{
-		var trianglesContainingVertex = _triangleDictionary[vertexIndex];
-		for (var i = 0; i < trianglesContainingVertex.Count; i++)
-		{
-			var triangle = trianglesContainingVertex[i];
-			for (var j = 0; j < 3; j++)
-			{
-				var vertexB = triangle[j];
-				if (vertexB != vertexIndex && !_checkedVertices.Contains(vertexB))
-				{
-					if (IsOutlineEdge(vertexIndex, vertexB))
-					{
-						return vertexB;
-					}
-				}
-			}
-		}
+	//private int GetConnectedOutlineVertex(int vertexIndex)
+	//{
+	//	var trianglesContainingVertex = _triangleDictionary[vertexIndex];
+	//	for (var i = 0; i < trianglesContainingVertex.Count; i++)
+	//	{
+	//		var triangle = trianglesContainingVertex[i];
+	//		for (var j = 0; j < 3; j++)
+	//		{
+	//			var vertexB = triangle[j];
+	//			if (vertexB != vertexIndex && !_checkedVertices.Contains(vertexB))
+	//			{
+	//				if (IsOutlineEdge(vertexIndex, vertexB))
+	//				{
+	//					return vertexB;
+	//				}
+	//			}
+	//		}
+	//	}
 
-		return -1;
-	}
+	//	return -1;
+	//}
 
-	private void AddTriangleToDictionary(int vertexIndexKey, Triangle triangle)
-	{
-		if (_triangleDictionary.ContainsKey(vertexIndexKey))
-		{
-			_triangleDictionary[vertexIndexKey].Add(triangle);
-		}
-		else
-		{
-			_triangleDictionary.Add(vertexIndexKey, new List<Triangle>(16) { triangle });
-		}
-	}
+	//private void AddTriangleToDictionary(int vertexIndexKey, Triangle triangle)
+	//{
+	//	if (_triangleDictionary.ContainsKey(vertexIndexKey))
+	//	{
+	//		_triangleDictionary[vertexIndexKey].Add(triangle);
+	//	}
+	//	else
+	//	{
+	//		_triangleDictionary.Add(vertexIndexKey, new List<Triangle>(16) { triangle });
+	//	}
+	//}
 
-	private bool IsOutlineEdge(int vertexA, int vertexB)
-	{
-		var trianglesContainingVertexA = _triangleDictionary[vertexA];
-		var sharedTriangleCount = 0;
-		for (var i = 0; i < trianglesContainingVertexA.Count; i++)
-		{
-			if (trianglesContainingVertexA[i].Contains(vertexB))
-			{
-				sharedTriangleCount++;
-				if (sharedTriangleCount > 1)
-				{
-					break;
-				}
-			}
-		}
+	//private bool IsOutlineEdge(int vertexA, int vertexB)
+	//{
+	//	var trianglesContainingVertexA = _triangleDictionary[vertexA];
+	//	var sharedTriangleCount = 0;
+	//	for (var i = 0; i < trianglesContainingVertexA.Count; i++)
+	//	{
+	//		if (trianglesContainingVertexA[i].Contains(vertexB))
+	//		{
+	//			sharedTriangleCount++;
+	//			if (sharedTriangleCount > 1)
+	//			{
+	//				break;
+	//			}
+	//		}
+	//	}
 
-		return sharedTriangleCount == 1;
-	}
+	//	return sharedTriangleCount == 1;
+	//}
 
-	private void FollowOutline(int vertexIndex, int outlineIndex)
-	{
-		_outlines[outlineIndex].Add(vertexIndex);
-		_checkedVertices.Add(vertexIndex);
-		var nextVertexIndex = GetConnectedOutlineVertex(vertexIndex);
-		if (nextVertexIndex != -1)
-		{
-			FollowOutline(nextVertexIndex, outlineIndex);
-		}
-	}
+	//private void FollowOutline(int vertexIndex, int outlineIndex)
+	//{
+	//	_outlines[outlineIndex].Add(vertexIndex);
+	//	_checkedVertices.Add(vertexIndex);
+	//	var nextVertexIndex = GetConnectedOutlineVertex(vertexIndex);
+	//	if (nextVertexIndex != -1)
+	//	{
+	//		FollowOutline(nextVertexIndex, outlineIndex);
+	//	}
+	//}
 }
