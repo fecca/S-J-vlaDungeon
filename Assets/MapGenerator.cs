@@ -5,6 +5,8 @@ using UnityEngine;
 public class MapGenerator : MonoBehaviour
 {
 	[SerializeField]
+	private bool DrawGizmos = false;
+	[SerializeField]
 	private string Seed = "Seed";
 	[SerializeField]
 	private bool UseRandomSeed = true;
@@ -446,20 +448,25 @@ public class MapGenerator : MonoBehaviour
 		return x >= 0 && x < Width && y >= 0 && y < Height;
 	}
 
-	//private void OnDrawGizmos()
-	//{
-	//	if (_map == null)
-	//	{
-	//		return;
-	//	}
+	private void OnDrawGizmos()
+	{
+		if (!DrawGizmos)
+		{
+			return;
+		}
 
-	//	for (var x = 0; x < _map.GetLength(0); x++)
-	//	{
-	//		for (var y = 0; y < _map.GetLength(1); y++)
-	//		{
-	//			Gizmos.color = _map[x, y].Type == TileType.Floor ? Color.white : Color.gray;
-	//			Gizmos.DrawCube(new Vector3(x * TileSize, 0, y * TileSize), Vector3.one * 0.2f);
-	//		}
-	//	}
-	//}
+		if (_map == null)
+		{
+			return;
+		}
+
+		for (var x = 0; x < _map.GetLength(0); x++)
+		{
+			for (var y = 0; y < _map.GetLength(1); y++)
+			{
+				Gizmos.color = _map[x, y].Type == TileType.Floor ? Color.white : Color.gray;
+				Gizmos.DrawCube(new Vector3(x * TileSize, 0, y * TileSize), Vector3.one * 0.2f);
+			}
+		}
+	}
 }

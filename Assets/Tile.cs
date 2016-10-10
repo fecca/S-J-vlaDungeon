@@ -14,7 +14,7 @@ public class Tile
 		Type = type;
 	}
 
-	public void AddVertices(params Vector3[] vertices)
+	public void AddWallVertices(params Vector3[] vertices)
 	{
 		for (var i = 0; i < vertices.Length; i++)
 		{
