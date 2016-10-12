@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Game : MonoBehaviour
 {
@@ -8,12 +7,12 @@ public class Game : MonoBehaviour
 	[SerializeField]
 	private MeshGenerator MeshGenerator = null;
 	[SerializeField]
-	private PlayerController PlayerController = null;
+	private PlayerController Controller = null;
 
 	private void Start()
 	{
 		var map = MapGenerator.GenerateMap();
 		MeshGenerator.GenerateMeshes(map);
-		PlayerController.SetPosition(MapGenerator.GetPlayerPosition());
+		Controller.SetPosition(MapGenerator.GetPlayerPosition());
 	}
 }

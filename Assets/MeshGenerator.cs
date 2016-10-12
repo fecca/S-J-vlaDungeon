@@ -226,6 +226,8 @@ public class MeshGenerator : MonoBehaviour
 
 		var meshCollider = Floor.AddComponent<MeshCollider>();
 		meshCollider.sharedMesh = mesh;
+
+		_floorMesh = mesh;
 	}
 
 	private void CreateWallMesh()
@@ -242,16 +244,18 @@ public class MeshGenerator : MonoBehaviour
 		meshCollider.sharedMesh = mesh;
 	}
 
+	private Mesh _floorMesh;
 	private void UpdateGrid(float width, float height)
 	{
 		var mapWidth = width * Constants.TileSize;
 		var mapHeight = height * Constants.TileSize;
 
 		var graph = (GridGraph)AstarPath.active.astarData.CreateGraph(typeof(GridGraph));
+		//graph.sourceMesh = _floorMesh;
 		graph.center = new Vector3(mapWidth / 2f, 0, mapHeight / 2f);
 		graph.width = Mathf.CeilToInt(mapWidth) / 2;
 		graph.Depth = Mathf.CeilToInt(mapHeight) / 2;
-		graph.nodeSize = 2;
+		graph.nodeSize = Constants.TileSize;
 		graph.collision.type = ColliderType.Sphere;
 		graph.collision.diameter = 2;
 		graph.collision.mask = LayerMask.NameToLayer("Obstacles");
