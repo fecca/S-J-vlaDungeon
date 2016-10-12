@@ -250,17 +250,21 @@ public class MeshGenerator : MonoBehaviour
 		var mapWidth = width * Constants.TileSize;
 		var mapHeight = height * Constants.TileSize;
 
-		var graph = (GridGraph)AstarPath.active.astarData.CreateGraph(typeof(GridGraph));
-		//graph.sourceMesh = _floorMesh;
-		graph.center = new Vector3(mapWidth / 2f, 0, mapHeight / 2f);
-		graph.width = Mathf.CeilToInt(mapWidth) / 2;
-		graph.Depth = Mathf.CeilToInt(mapHeight) / 2;
-		graph.nodeSize = Constants.TileSize;
-		graph.collision.type = ColliderType.Sphere;
-		graph.collision.diameter = 2;
-		graph.collision.mask = LayerMask.NameToLayer("Obstacles");
-		graph.UpdateSizeFromWidthDepth();
-		AstarPath.active.astarData.AddGraph(graph);
+		var navMesh = (NavMeshGraph)AstarPath.active.astarData.CreateGraph(typeof(NavMeshGraph));
+		navMesh.sourceMesh = _floorMesh;
+		AstarPath.active.astarData.AddGraph(navMesh);
+
+		//var graph = (GridGraph)AstarPath.active.astarData.CreateGraph(typeof(GridGraph));
+		//graph.center = new Vector3(mapWidth / 2f, 0, mapHeight / 2f);
+		//graph.width = Mathf.CeilToInt(mapWidth) / 2;
+		//graph.Depth = Mathf.CeilToInt(mapHeight) / 2;
+		//graph.nodeSize = Constants.TileSize;
+		//graph.collision.type = ColliderType.Sphere;
+		//graph.collision.diameter = 2;
+		//graph.collision.mask = LayerMask.NameToLayer("Obstacles");
+		//graph.UpdateSizeFromWidthDepth();
+		//AstarPath.active.astarData.AddGraph(graph);
+
 		GameObject.Find("A-star").GetComponent<AstarPath>().Scan();
 	}
 }
