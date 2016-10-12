@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Pathfinding;
 using UnityEngine;
 
 public class MeshGenerator : MonoBehaviour
@@ -6,47 +7,71 @@ public class MeshGenerator : MonoBehaviour
 	[SerializeField]
 	private GameObject Walls = null;
 	[SerializeField]
+	private GameObject Floor = null;
+	[SerializeField]
 	private int WallHeight = 2;
 	[SerializeField]
 	private int WallSegments = 1;
 	[SerializeField]
 	private bool RandomizeEdgeVertexPositions = false;
 
-	private List<Vector3> _vertices = new List<Vector3>(16184);
-	private List<int> _triangles = new List<int>(32768);
+	private readonly List<Vector3> _floorVertices = new List<Vector3>(16184);
+	private readonly List<int> _floorTriangles = new List<int>(32768);
 
-	public void GenerateMesh(Tile[,] map, float squareSize)
+	private readonly List<Vector3> _wallVertices = new List<Vector3>(16184);
+	private readonly List<int> _wallTriangles = new List<int>(32768);
+
+	public void GenerateMeshes(Tile[,] map, float tileSize)
 	{
-		_vertices.Clear();
-		_triangles.Clear();
+		GenerateFloorMesh(map);
+		GenerateWallMesh(map, tileSize);
 
+		UpdateGrid(map.GetLength(0) * tileSize, map.GetLength(1) * tileSize);
+	}
+
+	private void UpdateGrid(float width, float height)
+	{
+		GridGraph graph = (GridGraph)AstarPath.active.astarData.CreateGraph(typeof(GridGraph));
+		graph.width = Mathf.CeilToInt(width);
+		graph.Depth = Mathf.CeilToInt(height);
+		graph.center = new Vector3(width / 2f, 0, height / 2f);
+		graph.UpdateSizeFromWidthDepth();
+		AstarPath.active.astarData.AddGraph(graph);
+		GameObject.Find("A-star").GetComponent<AstarPath>().Scan();
+	}
+
+	private void GenerateFloorMesh(Tile[,] map)
+	{
+		_floorVertices.Clear();
+		_floorTriangles.Clear();
 		for (var x = 0; x < map.GetLength(0) - 1; x++)
 		{
 			for (var y = 0; y < map.GetLength(1) - 1; y++)
 			{
-				TriangulateSquare(map[x, y]);
+				TriangulateFloor(map[x, y]);
 			}
 		}
 
-		CreateMesh();
-		CreateWallMesh(map);
+		CreateFloorMesh();
 	}
 
-	private void CreateMesh()
+	private void GenerateWallMesh(Tile[,] map, float tileSize)
 	{
-		var mesh = new Mesh();
-		mesh.vertices = _vertices.ToArray();
-		mesh.triangles = _triangles.ToArray();
-		mesh.RecalculateNormals();
+		_wallVertices.Clear();
+		_wallTriangles.Clear();
+		var wallTop = Vector3.up * WallHeight * tileSize;
+		for (var x = 0; x < map.GetLength(0); x++)
+		{
+			for (var y = 0; y < map.GetLength(1); y++)
+			{
+				TriangulateWall(map[x, y], tileSize, wallTop);
+			}
+		}
 
-		var meshFilter = GetComponent<MeshFilter>();
-		meshFilter.mesh = mesh;
-
-		var collider = gameObject.AddComponent<MeshCollider>();
-		collider.sharedMesh = mesh;
+		CreateWallMesh();
 	}
 
-	private void TriangulateSquare(Tile tile)
+	private void TriangulateFloor(Tile tile)
 	{
 		var square = tile.ConfigurationSquare;
 		switch (square.Configuration)
@@ -159,7 +184,7 @@ public class MeshGenerator : MonoBehaviour
 			var point = points[i];
 			if (point.VertexIndex == -1)
 			{
-				point.VertexIndex = _vertices.Count;
+				point.VertexIndex = _floorVertices.Count;
 
 				if (RandomizeEdgeVertexPositions)
 				{
@@ -167,55 +192,65 @@ public class MeshGenerator : MonoBehaviour
 					point.Position += Vector3.forward * Random.Range(-0.1f, 0.1f);
 				}
 
-				_vertices.Add(point.Position);
+				_floorVertices.Add(point.Position);
 			}
 		}
 	}
 
 	private void CreateTriangle(Node a, Node b, Node c)
 	{
-		_triangles.Add(a.VertexIndex);
-		_triangles.Add(b.VertexIndex);
-		_triangles.Add(c.VertexIndex);
+		_floorTriangles.Add(a.VertexIndex);
+		_floorTriangles.Add(b.VertexIndex);
+		_floorTriangles.Add(c.VertexIndex);
 	}
 
-	private void CreateWallMesh(Tile[,] map)
+	private void TriangulateWall(Tile tile, float tileSize, Vector3 wallTop)
 	{
-		var wallVertices = new List<Vector3>(8092);
-		var wallTriangles = new List<int>(4096);
-		var wallMesh = new Mesh();
-
-		for (var x = 0; x < map.GetLength(0); x++)
+		if (tile.IsWallTile)
 		{
-			for (var y = 0; y < map.GetLength(1); y++)
-			{
-				var tile = map[x, y];
-				if (tile.CoreVertices.Count > 0)
-				{
-					wallVertices.Add(tile.CoreVertices[0]);
-					wallVertices.Add(tile.CoreVertices[1]);
-					wallVertices.Add(tile.CoreVertices[1] + Vector3.up);
+			_wallVertices.Add(tile.CoreVertices[0]);
+			_wallVertices.Add(tile.CoreVertices[1]);
+			_wallVertices.Add(tile.CoreVertices[1] + wallTop);
 
-					wallTriangles.Add(wallVertices.Count - 3);
-					wallTriangles.Add(wallVertices.Count - 2);
-					wallTriangles.Add(wallVertices.Count - 1);
+			_wallTriangles.Add(_wallVertices.Count - 3);
+			_wallTriangles.Add(_wallVertices.Count - 2);
+			_wallTriangles.Add(_wallVertices.Count - 1);
 
-					wallVertices.Add(tile.CoreVertices[1] + Vector3.up);
-					wallVertices.Add(tile.CoreVertices[0] + Vector3.up);
-					wallVertices.Add(tile.CoreVertices[0]);
+			_wallVertices.Add(tile.CoreVertices[1] + wallTop);
+			_wallVertices.Add(tile.CoreVertices[0] + wallTop);
+			_wallVertices.Add(tile.CoreVertices[0]);
 
-					wallTriangles.Add(wallVertices.Count - 3);
-					wallTriangles.Add(wallVertices.Count - 2);
-					wallTriangles.Add(wallVertices.Count - 1);
-				}
-			}
+			_wallTriangles.Add(_wallVertices.Count - 3);
+			_wallTriangles.Add(_wallVertices.Count - 2);
+			_wallTriangles.Add(_wallVertices.Count - 1);
 		}
+	}
 
-		wallMesh.vertices = wallVertices.ToArray();
-		wallMesh.triangles = wallTriangles.ToArray();
-		Walls.GetComponent<MeshFilter>().mesh = wallMesh;
+	private void CreateFloorMesh()
+	{
+		var mesh = new Mesh();
+		mesh.SetVertices(_floorVertices);
+		mesh.SetTriangles(_floorTriangles, 0);
+		mesh.RecalculateNormals();
 
-		var collider = Walls.AddComponent<MeshCollider>();
-		collider.sharedMesh = wallMesh;
+		var meshFilter = Floor.GetComponent<MeshFilter>();
+		meshFilter.mesh = mesh;
+
+		var meshCollider = Floor.AddComponent<MeshCollider>();
+		meshCollider.sharedMesh = mesh;
+	}
+
+	private void CreateWallMesh()
+	{
+		var mesh = new Mesh();
+		mesh.SetVertices(_wallVertices);
+		mesh.SetTriangles(_wallTriangles, 0);
+		mesh.RecalculateNormals();
+
+		var meshFilter = Walls.GetComponent<MeshFilter>();
+		meshFilter.mesh = mesh;
+
+		var meshCollider = Walls.AddComponent<MeshCollider>();
+		meshCollider.sharedMesh = mesh;
 	}
 }

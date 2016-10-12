@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MapGenerator : MonoBehaviour
@@ -25,15 +26,9 @@ public class MapGenerator : MonoBehaviour
 	private int CorridorThickness = 2;
 	[SerializeField]
 	private int SmoothingLoops = 5;
-	[SerializeField]
-	private int TileSize = 1;
 
 	private Tile[,] _map;
-
-	private void Start()
-	{
-		GenerateMap();
-	}
+	private List<Room> SurvivingRooms = new List<Room>(128);
 
 	private void Update()
 	{
@@ -43,23 +38,18 @@ public class MapGenerator : MonoBehaviour
 		}
 	}
 
-	private void GenerateMap()
+	public Tile[,] GenerateMap()
 	{
 		_map = new Tile[Width, Height];
 
 		RandomFillMap();
 		GenerateClusters();
 		FilterWalls();
-		var rooms = FilterRooms();
-		ConnectClosestRooms(rooms);
-		SetupTileConfigurations();
-	}
-
-	private void SetupTileConfigurations()
-	{
+		FilterRooms();
+		ConnectClosestRooms(SurvivingRooms);
 		CreateSquares();
-		var meshGenerator = GetComponent<MeshGenerator>();
-		meshGenerator.GenerateMesh(_map, TileSize);
+
+		return _map;
 	}
 
 	private void CreateSquares()
@@ -69,8 +59,8 @@ public class MapGenerator : MonoBehaviour
 		{
 			for (var y = 0; y < Height; y++)
 			{
-				var position = new Vector3(x * TileSize, 0, y * TileSize);
-				controlNodes[x, y] = new ControlNode(position, _map[x, y].Type == TileType.Floor, TileSize);
+				var position = new Vector3(x * Constants.TileSize, 0, y * Constants.TileSize);
+				controlNodes[x, y] = new ControlNode(position, _map[x, y].Type == TileType.Floor, Constants.TileSize);
 			}
 		}
 
@@ -164,10 +154,8 @@ public class MapGenerator : MonoBehaviour
 		}
 	}
 
-	private List<Room> FilterRooms()
+	private void FilterRooms()
 	{
-		var survivingRooms = new List<Room>(64);
-
 		var roomRegions = GetRegions(TileType.Floor);
 		for (var i = 0; i < roomRegions.Count; i++)
 		{
@@ -181,12 +169,11 @@ public class MapGenerator : MonoBehaviour
 			}
 			else
 			{
-				survivingRooms.Add(new Room(roomRegion, _map));
+				SurvivingRooms.Add(new Room(roomRegion, _map));
 			}
 		}
 
-		survivingRooms.Sort();
-		return survivingRooms;
+		SurvivingRooms.Sort();
 	}
 
 	private List<List<Tile>> GetRegions(TileType tileType)
@@ -465,8 +452,17 @@ public class MapGenerator : MonoBehaviour
 			for (var y = 0; y < _map.GetLength(1); y++)
 			{
 				Gizmos.color = _map[x, y].Type == TileType.Floor ? Color.white : Color.gray;
-				Gizmos.DrawCube(new Vector3(x * TileSize, 0, y * TileSize), Vector3.one * 0.2f);
+				Gizmos.DrawCube(new Vector3(x * Constants.TileSize, 0, y * Constants.TileSize), Vector3.one * 0.2f);
 			}
 		}
+	}
+
+	public Vector3 GetPlayerPosition()
+	{
+		var room = SurvivingRooms.First();
+		var tile = room.Tiles.GetRandomElement();
+		var position = new Vector3(tile.Coordinates.X * Constants.TileSize, 0, tile.Coordinates.Y * Constants.TileSize);
+
+		return position;
 	}
 }
