@@ -13,20 +13,7 @@ public class Game : MonoBehaviour
 	private void Start()
 	{
 		var map = MapGenerator.GenerateMap();
-		MeshGenerator.GenerateMeshes(map, Constants.TileSize);
+		MeshGenerator.GenerateMeshes(map);
 		PlayerController.SetPosition(MapGenerator.GetPlayerPosition());
-	}
-}
-
-public class Constants
-{
-	public const int TileSize = 5;
-}
-
-public static class Extensions
-{
-	public static T GetRandomElement<T>(this IList<T> collection)
-	{
-		return collection[Random.Range(0, collection.Count)];
 	}
 }
