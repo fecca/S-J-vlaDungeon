@@ -1,19 +1,31 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+//public class PathFinderAgent
+//{
+//	private PathFinder _pathFinder;
+//	public PathFinderAgent()
+//	{
+//		_pathFinder = new PathFinder();
+//	}
+//}
+
 public class PlayerController : MonoBehaviour
 {
 	[SerializeField]
-	private LayerMask GroundLayer;
+	private LayerMask GroundLayer = 0;
+	[SerializeField]
+	private float MovementSpeed = 5.0f;
 
 	private PathFinder _pathFinder;
 	private LinkedList<PathNode> _path = new LinkedList<PathNode>();
+	//private PathFinderAgent _agent;
 
 	public void Initialize(Vector3 position, PathFinder pathFinder)
 	{
 		position.y = 5;
 		transform.position = position;
-
+		//_agent = new PathFinderAgent();
 		_pathFinder = pathFinder;
 	}
 
@@ -50,9 +62,9 @@ public class PlayerController : MonoBehaviour
 	{
 		var targetNode = _path.First;
 		var targetPosition = new Vector3(targetNode.Value.Tile.Coordinates.X, transform.position.y, targetNode.Value.Tile.Coordinates.Y);
-		transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * 20f);
+		transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * MovementSpeed);
 
-		if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
+		if (Vector3.Distance(transform.position, targetPosition) < 0.02f)
 		{
 			_path.Remove(targetNode);
 		}
