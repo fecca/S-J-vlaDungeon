@@ -25,8 +25,6 @@ public class MeshGenerator : MonoBehaviour
 	{
 		GenerateFloorMesh(map);
 		GenerateWallMesh(map);
-
-		UpdateGrid(map.GetLength(0), map.GetLength(1));
 	}
 
 	private void GenerateFloorMesh(Tile[,] map)
@@ -194,7 +192,7 @@ public class MeshGenerator : MonoBehaviour
 
 	private void TriangulateWall(Tile tile)
 	{
-		if (tile.IsWallTile)
+		if (tile.IsConfigured)
 		{
 			_wallVertices.Add(tile.CoreVertices[0]);
 			_wallVertices.Add(tile.CoreVertices[1]);
@@ -226,8 +224,6 @@ public class MeshGenerator : MonoBehaviour
 
 		var meshCollider = Floor.AddComponent<MeshCollider>();
 		meshCollider.sharedMesh = mesh;
-
-		_floorMesh = mesh;
 	}
 
 	private void CreateWallMesh()
@@ -242,29 +238,5 @@ public class MeshGenerator : MonoBehaviour
 
 		var meshCollider = Walls.AddComponent<MeshCollider>();
 		meshCollider.sharedMesh = mesh;
-	}
-
-	private Mesh _floorMesh;
-	private void UpdateGrid(float width, float height)
-	{
-		var mapWidth = width * Constants.TileSize;
-		var mapHeight = height * Constants.TileSize;
-
-		var navMesh = (NavMeshGraph)AstarPath.active.astarData.CreateGraph(typeof(NavMeshGraph));
-		navMesh.sourceMesh = _floorMesh;
-		AstarPath.active.astarData.AddGraph(navMesh);
-
-		//var graph = (GridGraph)AstarPath.active.astarData.CreateGraph(typeof(GridGraph));
-		//graph.center = new Vector3(mapWidth / 2f, 0, mapHeight / 2f);
-		//graph.width = Mathf.CeilToInt(mapWidth) / 2;
-		//graph.Depth = Mathf.CeilToInt(mapHeight) / 2;
-		//graph.nodeSize = Constants.TileSize;
-		//graph.collision.type = ColliderType.Sphere;
-		//graph.collision.diameter = 2;
-		//graph.collision.mask = LayerMask.NameToLayer("Obstacles");
-		//graph.UpdateSizeFromWidthDepth();
-		//AstarPath.active.astarData.AddGraph(graph);
-
-		GameObject.Find("A-star").GetComponent<AstarPath>().Scan();
 	}
 }

@@ -44,4 +44,9 @@
 			Configuration += 8;
 		}
 	}
+
+	public override string ToString()
+	{
+		return Configuration.ToString();
+	}
 }

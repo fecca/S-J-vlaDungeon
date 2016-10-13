@@ -59,8 +59,8 @@ public class MapGenerator : MonoBehaviour
 		{
 			for (var y = 0; y < Height; y++)
 			{
-				var position = new Vector3(x * Constants.TileSize, 0, y * Constants.TileSize);
-				controlNodes[x, y] = new ControlNode(position, _map[x, y].Type == TileType.Floor, Constants.TileSize);
+				var position = new Vector3(x * Constants.TileSize - Constants.TileSize / 2f, 0, y * Constants.TileSize - Constants.TileSize / 2f);
+				controlNodes[x, y] = new ControlNode(position, _map[x, y].Type == TileType.Floor);
 			}
 		}
 
@@ -425,14 +425,36 @@ public class MapGenerator : MonoBehaviour
 		return line;
 	}
 
-	private Vector3 CoordinatesToWorldPoint(Coordinates tile)
-	{
-		return new Vector3(-Width / 2f + 0.5f + tile.X, 2, -Height / 2f + 0.5f + tile.Y);
-	}
-
 	private bool IsInMapRange(int x, int y)
 	{
 		return x >= 0 && x < Width && y >= 0 && y < Height;
+	}
+
+	public Vector3 GetPlayerPosition()
+	{
+		var room = SurvivingRooms.First();
+		var tile = room.Tiles.GetRandomElement();
+		var position = new Vector3(tile.Coordinates.X * Constants.TileSize, 0, tile.Coordinates.Y * Constants.TileSize);
+
+		return position;
+	}
+
+	public List<Tile> GetWalkableTiles()
+	{
+		var walkableTiles = new List<Tile>();
+		for (var x = 0; x < _map.GetLength(0); x++)
+		{
+			for (var y = 0; y < _map.GetLength(1); y++)
+			{
+				var tile = _map[x, y];
+				if (tile.Type == TileType.Floor && !tile.IsConfigured)
+				{
+					walkableTiles.Add(tile);
+				}
+			}
+		}
+
+		return walkableTiles;
 	}
 
 	private void OnDrawGizmos()
@@ -452,17 +474,12 @@ public class MapGenerator : MonoBehaviour
 			for (var y = 0; y < _map.GetLength(1); y++)
 			{
 				Gizmos.color = _map[x, y].Type == TileType.Floor ? Color.white : Color.gray;
+				if (x == 1 && y == 19)
+				{
+					Gizmos.color = Color.red;
+				}
 				Gizmos.DrawCube(new Vector3(x * Constants.TileSize, 0, y * Constants.TileSize), Vector3.one * 0.2f);
 			}
 		}
-	}
-
-	public Vector3 GetPlayerPosition()
-	{
-		var room = SurvivingRooms.First();
-		var tile = room.Tiles.GetRandomElement();
-		var position = new Vector3(tile.Coordinates.X * Constants.TileSize, 0, tile.Coordinates.Y * Constants.TileSize);
-
-		return position;
 	}
 }

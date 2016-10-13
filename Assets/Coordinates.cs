@@ -8,4 +8,9 @@
 		X = tileX;
 		Y = tileY;
 	}
+
+	public override string ToString()
+	{
+		return X + "; " + Y;
+	}
 }

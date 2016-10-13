@@ -6,10 +6,11 @@ public class ControlNode : Node
 	public Node AboveNode;
 	public Node RightNode;
 
-	public ControlNode(Vector3 position, bool active, float squareSize) : base(position)
+	public ControlNode(Vector3 position, bool active) : base(position)
 	{
 		Active = active;
-		AboveNode = new Node(position + Vector3.forward * squareSize / 2f);
-		RightNode = new Node(position + Vector3.right * squareSize / 2f);
+		
+		AboveNode = new Node(position + Vector3.forward * Constants.TileSize / 2f);
+		RightNode = new Node(position + Vector3.right * Constants.TileSize / 2f);
 	}
 }
