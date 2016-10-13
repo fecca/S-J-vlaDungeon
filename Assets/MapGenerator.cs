@@ -30,14 +30,6 @@ public class MapGenerator : MonoBehaviour
 	private Tile[,] _map;
 	private List<Room> SurvivingRooms = new List<Room>(128);
 
-	private void Update()
-	{
-		if (Input.GetMouseButtonDown(0))
-		{
-			GenerateMap();
-		}
-	}
-
 	public Tile[,] GenerateMap()
 	{
 		_map = new Tile[Width, Height];
@@ -474,7 +466,7 @@ public class MapGenerator : MonoBehaviour
 			for (var y = 0; y < _map.GetLength(1); y++)
 			{
 				Gizmos.color = _map[x, y].Type == TileType.Floor ? Color.white : Color.gray;
-				if (x == 1 && y == 19)
+				if (x == 10 && y == 10)
 				{
 					Gizmos.color = Color.red;
 				}

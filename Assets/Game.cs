@@ -7,7 +7,7 @@ public class Game : MonoBehaviour
 	[SerializeField]
 	private MeshGenerator MeshGenerator = null;
 	[SerializeField]
-	private PlayerController Controller = null;
+	private PlayerController Player = null;
 	[SerializeField]
 	private PathFinder PathFinder = null;
 
@@ -16,6 +16,6 @@ public class Game : MonoBehaviour
 		var map = MapGenerator.GenerateMap();
 		PathFinder.RegisterMap(map);
 		MeshGenerator.GenerateMeshes(map);
-		Controller.SetPosition(MapGenerator.GetPlayerPosition());
+		Player.Initialize(MapGenerator.GetPlayerPosition(), PathFinder);
 	}
 }

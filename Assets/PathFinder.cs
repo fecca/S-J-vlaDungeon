@@ -4,27 +4,28 @@ using UnityEngine;
 
 public class PathFinder : MonoBehaviour
 {
-	private Tile[,] _tiles;
+	private Tile[,] _map;
 	private LinkedList<PathNode> _path;
 
-	public void RegisterMap(Tile[,] tiles)
+	public void RegisterMap(Tile[,] map)
 	{
-		_tiles = tiles;
+		_map = map;
 
-		_path = GetPath(_tiles[11, 8], _tiles[10, 17]);
+		//_path = GetPath(_map[11, 8], _map[10, 17]);
+	}
+
+	public LinkedList<PathNode> GetPath(Vector2 from, Vector2 to)
+	{
+		return GetPath(_map[(int)from.x, (int)from.y], _map[(int)to.x, (int)to.y]);
 	}
 
 	public LinkedList<PathNode> GetPath(Tile from, Tile to)
 	{
 		var fromNode = new PathNode(from);
-		if (!fromNode.IsWalkable)
-		{
-			throw new System.Exception("From-node is invalid.");
-		}
 		var toNode = new PathNode(to);
-		if (!toNode.IsWalkable)
+		if (!fromNode.IsWalkable || !toNode.IsWalkable)
 		{
-			throw new System.Exception("To-node is invalid.");
+			return null;
 		}
 
 		var open = new List<PathNode>();
@@ -119,12 +120,12 @@ public class PathFinder : MonoBehaviour
 
 				var neighbourX = node.Tile.Coordinates.X + x;
 				var neighbourY = node.Tile.Coordinates.Y + y;
-				if (neighbourX < 0 || neighbourX >= _tiles.GetLength(0) || neighbourY < 0 || neighbourY >= _tiles.GetLength(1))
+				if (neighbourX < 0 || neighbourX >= _map.GetLength(0) || neighbourY < 0 || neighbourY >= _map.GetLength(1))
 				{
 					continue;
 				}
 
-				neighbours.Add(new PathNode(_tiles[neighbourX, neighbourY]));
+				neighbours.Add(new PathNode(_map[neighbourX, neighbourY]));
 			}
 		}
 
@@ -133,26 +134,17 @@ public class PathFinder : MonoBehaviour
 
 	private void OnDrawGizmos()
 	{
-		if (_tiles != null)
+		if (_map != null)
 		{
-			foreach (var tile in _tiles)
+			foreach (var tile in _map)
 			{
 				if (tile.IsConfigured || tile.Type != TileType.Floor)
 				{
 					continue;
 				}
 
-				Gizmos.color = Color.green;
-				Gizmos.DrawCube(new Vector3(tile.Coordinates.X, 0, tile.Coordinates.Y), Vector3.one * 0.25f);
-			}
-		}
-
-		if (_path != null)
-		{
-			for (var iteration = _path.First; iteration != null; iteration = iteration.Next)
-			{
-				Gizmos.color = Color.blue;
-				Gizmos.DrawCube(new Vector3(iteration.Value.Tile.Coordinates.X, 0, iteration.Value.Tile.Coordinates.Y), Vector3.one * 0.25f);
+				Gizmos.color = tile.Coordinates.X == 20 && tile.Coordinates.Y == 9 ? Color.red : Color.green;
+				Gizmos.DrawCube(new Vector3(tile.Coordinates.X, -0.5f, tile.Coordinates.Y), Vector3.one * 0.25f);
 			}
 		}
 	}
