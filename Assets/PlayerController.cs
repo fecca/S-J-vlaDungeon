@@ -27,11 +27,16 @@ public class PlayerController : MonoBehaviour
 			{
 				var point = new Vector2((int)hit.point.x, (int)hit.point.z);
 				var playerPosition = new Vector2(transform.position.x, transform.position.z);
-				if (_path.Count > 1)
+				PathNode unfinishedNode = null;
+				if (_path.Count > 0)
 				{
-					playerPosition = new Vector3(_path.First.Next.Value.Tile.Coordinates.X, transform.position.y, _path.First.Next.Value.Tile.Coordinates.Y);
+					unfinishedNode = _path.First.Value;
 				}
 				_path = _pathFinder.GetPath(playerPosition, point);
+				if (unfinishedNode != null)
+				{
+					_path.AddFirst(unfinishedNode);
+				}
 			}
 		}
 
