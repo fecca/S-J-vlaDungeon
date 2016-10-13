@@ -3,7 +3,13 @@
 public class CameraController : MonoBehaviour
 {
 	[SerializeField]
-	private GameObject Player = null;
+	private LayerMask GroundLayer = 0;
+	private PlayerController _player = null;
+
+	private void Start()
+	{
+		_player = FindObjectOfType<PlayerController>();
+	}
 
 	private void Update()
 	{
@@ -17,6 +23,17 @@ public class CameraController : MonoBehaviour
 		}
 		Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, 5, 20);
 
-		transform.position = Vector3.Lerp(transform.position, Player.transform.position + Vector3.up * 250f + Vector3.forward * -250, Time.deltaTime * 1.5f);
+		transform.position = Vector3.Lerp(transform.position, _player.transform.position + Vector3.up * 250f + Vector3.forward * -250, Time.deltaTime * 1.5f);
+
+		if (Input.GetMouseButtonUp(0))
+		{
+			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			RaycastHit hit;
+			if (Physics.Raycast(ray, out hit, 500f, GroundLayer))
+			{
+				var targetPosition = new Vector2((int)hit.point.x, (int)hit.point.z);
+				_player.MoveTo(targetPosition);
+			}
+		}
 	}
 }

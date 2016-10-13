@@ -47,7 +47,7 @@ public class MapGenerator : MonoBehaviour
 	{
 		var room = SurvivingRooms.First();
 		var tile = room.Tiles.GetRandomElement(-1);
-		var position = new Vector3(tile.Coordinates.X * Constants.TileSize, 0, tile.Coordinates.Y * Constants.TileSize);
+		var position = new Vector3(tile.Coordinates.X * Constants.TileSize, 5, tile.Coordinates.Y * Constants.TileSize);
 
 		return position;
 	}
