@@ -1,6 +1,4 @@
-﻿using System;
-
-public class PathNode
+﻿public class PathNode
 {
 	public Tile Tile;
 	public PathNode Parent;

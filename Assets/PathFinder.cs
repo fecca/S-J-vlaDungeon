@@ -5,7 +5,7 @@ using UnityEngine;
 public class PathFinder : MonoBehaviour
 {
 	private Tile[,] _map;
-	private LinkedList<PathNode> _path;
+	private LinkedList<PathNode> _path = new LinkedList<PathNode>();
 
 	public void RegisterMap(Tile[,] map)
 	{
@@ -13,19 +13,18 @@ public class PathFinder : MonoBehaviour
 
 		//_path = GetPath(_map[11, 8], _map[10, 17]);
 	}
-
 	public LinkedList<PathNode> GetPath(Vector2 from, Vector2 to)
 	{
-		return GetPath(_map[(int)from.x, (int)from.y], _map[(int)to.x, (int)to.y]);
+		return GetPath(_map[Mathf.RoundToInt(from.x), Mathf.RoundToInt(from.y)], _map[Mathf.RoundToInt(to.x), Mathf.RoundToInt(to.y)]);
 	}
-
 	public LinkedList<PathNode> GetPath(Tile from, Tile to)
 	{
 		var fromNode = new PathNode(from);
 		var toNode = new PathNode(to);
 		if (!fromNode.IsWalkable || !toNode.IsWalkable)
 		{
-			return null;
+			_path.Clear();
+			return _path;
 		}
 
 		var open = new List<PathNode>();
@@ -79,21 +78,6 @@ public class PathFinder : MonoBehaviour
 		return RetracePath(closed.First(), closed.Last());
 	}
 
-	private LinkedList<PathNode> RetracePath(PathNode from, PathNode to)
-	{
-		var path = new LinkedList<PathNode>();
-		path.AddFirst(to);
-
-		var current = to.Parent;
-		while (current != null)
-		{
-			path.AddFirst(current);
-			current = current.Parent;
-		}
-
-		return path;
-	}
-
 	private int GetDistance(PathNode from, PathNode to)
 	{
 		var distanceX = Mathf.Abs(from.Tile.Coordinates.X - to.Tile.Coordinates.X);
@@ -105,7 +89,6 @@ public class PathFinder : MonoBehaviour
 		}
 		return distanceX * Constants.DiagonalTileWeight + (distanceY - distanceX) * Constants.HorizontalTileWeight;
 	}
-
 	private List<PathNode> GetNeighbours(PathNode node)
 	{
 		var neighbours = new List<PathNode>();
@@ -131,6 +114,20 @@ public class PathFinder : MonoBehaviour
 
 		return neighbours;
 	}
+	private LinkedList<PathNode> RetracePath(PathNode from, PathNode to)
+	{
+		var path = new LinkedList<PathNode>();
+		path.AddFirst(to);
+
+		var current = to.Parent;
+		while (current != null)
+		{
+			path.AddFirst(current);
+			current = current.Parent;
+		}
+
+		return path;
+	}
 
 	private void OnDrawGizmos()
 	{
@@ -143,8 +140,8 @@ public class PathFinder : MonoBehaviour
 					continue;
 				}
 
-				Gizmos.color = tile.Coordinates.X == 20 && tile.Coordinates.Y == 9 ? Color.red : Color.green;
-				Gizmos.DrawCube(new Vector3(tile.Coordinates.X, -0.5f, tile.Coordinates.Y), Vector3.one * 0.25f);
+				Gizmos.color = Color.green;
+				//Gizmos.DrawCube(new Vector3(tile.Coordinates.X, 0.5f, tile.Coordinates.Y), Vector3.one * 0.25f);
 			}
 		}
 	}

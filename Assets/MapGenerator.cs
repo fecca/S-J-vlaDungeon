@@ -43,6 +43,31 @@ public class MapGenerator : MonoBehaviour
 
 		return _map;
 	}
+	public Vector3 GetPlayerPosition()
+	{
+		var room = SurvivingRooms.First();
+		var tile = room.Tiles.GetRandomElement(-1);
+		var position = new Vector3(tile.Coordinates.X * Constants.TileSize, 0, tile.Coordinates.Y * Constants.TileSize);
+
+		return position;
+	}
+	public List<Tile> GetWalkableTiles()
+	{
+		var walkableTiles = new List<Tile>();
+		for (var x = 0; x < _map.GetLength(0); x++)
+		{
+			for (var y = 0; y < _map.GetLength(1); y++)
+			{
+				var tile = _map[x, y];
+				if (tile.Type == TileType.Floor && !tile.IsConfigured)
+				{
+					walkableTiles.Add(tile);
+				}
+			}
+		}
+
+		return walkableTiles;
+	}
 
 	private void CreateSquares()
 	{
@@ -64,7 +89,6 @@ public class MapGenerator : MonoBehaviour
 			}
 		}
 	}
-
 	private void RandomFillMap()
 	{
 		if (UseRandomSeed)
@@ -88,7 +112,6 @@ public class MapGenerator : MonoBehaviour
 			}
 		}
 	}
-
 	private void GenerateClusters()
 	{
 		for (var i = 0; i < SmoothingLoops; i++)
@@ -109,27 +132,6 @@ public class MapGenerator : MonoBehaviour
 			}
 		}
 	}
-
-	private int GetNumberOfNeighbouringTiles(int xPosition, int yPosition)
-	{
-		var neighbouringTiles = 0;
-		for (var x = xPosition - 1; x <= xPosition + 1; x++)
-		{
-			for (var y = yPosition - 1; y <= yPosition + 1; y++)
-			{
-				if (IsInMapRange(x, y))
-				{
-					if (x != xPosition || y != yPosition)
-					{
-						neighbouringTiles += _map[x, y].Type == TileType.Floor ? 1 : 0;
-					}
-				}
-			}
-		}
-
-		return neighbouringTiles;
-	}
-
 	private void FilterWalls()
 	{
 		var wallRegions = GetRegions(TileType.Wall);
@@ -145,7 +147,6 @@ public class MapGenerator : MonoBehaviour
 			}
 		}
 	}
-
 	private void FilterRooms()
 	{
 		var roomRegions = GetRegions(TileType.Floor);
@@ -167,66 +168,6 @@ public class MapGenerator : MonoBehaviour
 
 		SurvivingRooms.Sort();
 	}
-
-	private List<List<Tile>> GetRegions(TileType tileType)
-	{
-		var regions = new List<List<Tile>>(64);
-		var mapFlags = new bool[Width, Height];
-
-		for (var x = 0; x < Width; x++)
-		{
-			for (var y = 0; y < Height; y++)
-			{
-				if (!mapFlags[x, y] && _map[x, y].Type == tileType)
-				{
-					var newRegion = GetRegionTiles(x, y);
-					regions.Add(newRegion);
-
-					for (var i = 0; i < newRegion.Count; i++)
-					{
-						mapFlags[newRegion[i].Coordinates.X, newRegion[i].Coordinates.Y] = true;
-					}
-				}
-			}
-		}
-
-		return regions;
-	}
-
-	private List<Tile> GetRegionTiles(int startX, int startY)
-	{
-		var tiles = new List<Tile>(1024);
-		var mapFlags = new bool[Width, Height];
-		var tileType = _map[startX, startY].Type;
-		var queue = new Queue<Tile>();
-
-		queue.Enqueue(new Tile(startX, startY, tileType));
-		mapFlags[startX, startY] = true;
-
-		while (queue.Count > 0)
-		{
-			var tile = queue.Dequeue();
-			tiles.Add(tile);
-
-			for (var x = tile.Coordinates.X - 1; x <= tile.Coordinates.X + 1; x++)
-			{
-				for (var y = tile.Coordinates.Y - 1; y <= tile.Coordinates.Y + 1; y++)
-				{
-					if (IsInMapRange(x, y) && (y == tile.Coordinates.Y || x == tile.Coordinates.X))
-					{
-						if (!mapFlags[x, y] && _map[x, y].Type == tileType)
-						{
-							mapFlags[x, y] = true;
-							queue.Enqueue(new Tile(x, y, tileType));
-						}
-					}
-				}
-			}
-		}
-
-		return tiles;
-	}
-
 	private void ConnectClosestRooms(List<Room> allRooms, bool forceAccessibilityFromMainRoom = false)
 	{
 		allRooms[0].IsMainRoom = true;
@@ -320,7 +261,6 @@ public class MapGenerator : MonoBehaviour
 			ConnectClosestRooms(allRooms, true);
 		}
 	}
-
 	private void CreatePassage(Room roomA, Room roomB, Tile tileA, Tile tileB)
 	{
 		if (roomA.IsAccessibleFromMainRoom)
@@ -340,7 +280,6 @@ public class MapGenerator : MonoBehaviour
 			CreateCorridor(line[i], CorridorThickness);
 		}
 	}
-
 	private void CreateCorridor(Coordinates c, int r)
 	{
 		for (var x = -r; x <= r; x++)
@@ -360,6 +299,86 @@ public class MapGenerator : MonoBehaviour
 		}
 	}
 
+	private bool IsInMapRange(int x, int y)
+	{
+		return x >= 0 && x < Width && y >= 0 && y < Height;
+	}
+	private int GetNumberOfNeighbouringTiles(int xPosition, int yPosition)
+	{
+		var neighbouringTiles = 0;
+		for (var x = xPosition - 1; x <= xPosition + 1; x++)
+		{
+			for (var y = yPosition - 1; y <= yPosition + 1; y++)
+			{
+				if (IsInMapRange(x, y))
+				{
+					if (x != xPosition || y != yPosition)
+					{
+						neighbouringTiles += _map[x, y].Type == TileType.Floor ? 1 : 0;
+					}
+				}
+			}
+		}
+
+		return neighbouringTiles;
+	}
+	private List<List<Tile>> GetRegions(TileType tileType)
+	{
+		var regions = new List<List<Tile>>(64);
+		var mapFlags = new bool[Width, Height];
+
+		for (var x = 0; x < Width; x++)
+		{
+			for (var y = 0; y < Height; y++)
+			{
+				if (!mapFlags[x, y] && _map[x, y].Type == tileType)
+				{
+					var newRegion = GetRegionTiles(x, y);
+					regions.Add(newRegion);
+
+					for (var i = 0; i < newRegion.Count; i++)
+					{
+						mapFlags[newRegion[i].Coordinates.X, newRegion[i].Coordinates.Y] = true;
+					}
+				}
+			}
+		}
+
+		return regions;
+	}
+	private List<Tile> GetRegionTiles(int startX, int startY)
+	{
+		var tiles = new List<Tile>(1024);
+		var mapFlags = new bool[Width, Height];
+		var tileType = _map[startX, startY].Type;
+		var queue = new Queue<Tile>();
+
+		queue.Enqueue(new Tile(startX, startY, tileType));
+		mapFlags[startX, startY] = true;
+
+		while (queue.Count > 0)
+		{
+			var tile = queue.Dequeue();
+			tiles.Add(tile);
+
+			for (var x = tile.Coordinates.X - 1; x <= tile.Coordinates.X + 1; x++)
+			{
+				for (var y = tile.Coordinates.Y - 1; y <= tile.Coordinates.Y + 1; y++)
+				{
+					if (IsInMapRange(x, y) && (y == tile.Coordinates.Y || x == tile.Coordinates.X))
+					{
+						if (!mapFlags[x, y] && _map[x, y].Type == tileType)
+						{
+							mapFlags[x, y] = true;
+							queue.Enqueue(new Tile(x, y, tileType));
+						}
+					}
+				}
+			}
+		}
+
+		return tiles;
+	}
 	private List<Coordinates> GetLine(Coordinates from, Coordinates to)
 	{
 		var line = new List<Coordinates>(64);
@@ -415,38 +434,6 @@ public class MapGenerator : MonoBehaviour
 		}
 
 		return line;
-	}
-
-	private bool IsInMapRange(int x, int y)
-	{
-		return x >= 0 && x < Width && y >= 0 && y < Height;
-	}
-
-	public Vector3 GetPlayerPosition()
-	{
-		var room = SurvivingRooms.First();
-		var tile = room.Tiles.GetRandomElement();
-		var position = new Vector3(tile.Coordinates.X * Constants.TileSize, 0, tile.Coordinates.Y * Constants.TileSize);
-
-		return position;
-	}
-
-	public List<Tile> GetWalkableTiles()
-	{
-		var walkableTiles = new List<Tile>();
-		for (var x = 0; x < _map.GetLength(0); x++)
-		{
-			for (var y = 0; y < _map.GetLength(1); y++)
-			{
-				var tile = _map[x, y];
-				if (tile.Type == TileType.Floor && !tile.IsConfigured)
-				{
-					walkableTiles.Add(tile);
-				}
-			}
-		}
-
-		return walkableTiles;
 	}
 
 	private void OnDrawGizmos()

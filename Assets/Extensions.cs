@@ -3,8 +3,8 @@ using UnityEngine;
 
 public static class Extensions
 {
-	public static T GetRandomElement<T>(this IList<T> collection)
+	public static T GetRandomElement<T>(this IList<T> collection, int margin)
 	{
-		return collection[Random.Range(0, collection.Count)];
+		return collection[Random.Range(0 + margin, collection.Count - margin)];
 	}
 }
