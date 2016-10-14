@@ -10,17 +10,15 @@ public class PathFinder : MonoBehaviour
 	public void RegisterMap(Tile[,] map)
 	{
 		_map = map;
-
-		//_path = GetPath(_map[11, 8], _map[10, 17]);
 	}
 	public LinkedList<PathNode> GetPath(Vector2 from, Vector2 to)
 	{
 		return GetPath(_map[Mathf.RoundToInt(from.x), Mathf.RoundToInt(from.y)], _map[Mathf.RoundToInt(to.x), Mathf.RoundToInt(to.y)]);
 	}
-	public LinkedList<PathNode> GetPath(Tile from, Tile to)
+	public LinkedList<PathNode> GetPath(Tile startTile, Tile endTile)
 	{
-		var fromNode = new PathNode(from);
-		var toNode = new PathNode(to);
+		var fromNode = new PathNode(startTile);
+		var toNode = new PathNode(endTile);
 		if (!fromNode.IsWalkable || !toNode.IsWalkable)
 		{
 			_path.Clear();
@@ -38,7 +36,8 @@ public class PathFinder : MonoBehaviour
 			{
 				var openTile = open[i];
 				if (openTile.FCost < current.FCost
-					|| openTile.FCost == current.FCost && openTile.HCost < current.HCost)
+					|| openTile.FCost == current.FCost
+					&& openTile.HCost < current.HCost)
 				{
 					current = openTile;
 				}
@@ -46,7 +45,7 @@ public class PathFinder : MonoBehaviour
 			open.Remove(current);
 			closed.Add(current);
 
-			if (current.Tile == to)
+			if (current.Tile == endTile)
 			{
 				break;
 			}
@@ -75,7 +74,7 @@ public class PathFinder : MonoBehaviour
 			}
 		}
 
-		return RetracePath(closed.First(), closed.Last());
+		return RetracePath(closed.Last());
 	}
 
 	private int GetDistance(PathNode from, PathNode to)
@@ -114,12 +113,12 @@ public class PathFinder : MonoBehaviour
 
 		return neighbours;
 	}
-	private LinkedList<PathNode> RetracePath(PathNode from, PathNode to)
+	private LinkedList<PathNode> RetracePath(PathNode lastNode)
 	{
 		var path = new LinkedList<PathNode>();
-		path.AddFirst(to);
+		path.AddFirst(lastNode);
 
-		var current = to.Parent;
+		var current = lastNode.Parent;
 		while (current != null)
 		{
 			path.AddFirst(current);
