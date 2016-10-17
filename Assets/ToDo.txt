@@ -1,0 +1,4 @@
+- Constant for number of path nodes per tile
+- Smoothen movement
+- Increase performance when calculating path
+- Increase performance when generating map/mesh
