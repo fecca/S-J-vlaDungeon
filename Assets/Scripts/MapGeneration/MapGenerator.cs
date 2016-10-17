@@ -59,7 +59,7 @@ public class MapGenerator : MonoBehaviour
 			for (var y = 0; y < _map.GetLength(1); y++)
 			{
 				var tile = _map[x, y];
-				if (tile.Type == TileType.Floor && !tile.IsConfigured)
+				if (tile.IsWalkable)
 				{
 					walkableTiles.Add(tile);
 				}
@@ -69,26 +69,6 @@ public class MapGenerator : MonoBehaviour
 		return walkableTiles;
 	}
 
-	private void CreateSquares()
-	{
-		var controlNodes = new ControlNode[Width, Height];
-		for (var x = 0; x < Width; x++)
-		{
-			for (var y = 0; y < Height; y++)
-			{
-				var position = new Vector3(x * Constants.TileSize - Constants.TileSize / 2f, 0, y * Constants.TileSize - Constants.TileSize / 2f);
-				controlNodes[x, y] = new ControlNode(position, _map[x, y].Type == TileType.Floor);
-			}
-		}
-
-		for (var x = 0; x < Width - 1; x++)
-		{
-			for (var y = 0; y < Height - 1; y++)
-			{
-				_map[x, y].ConfigurationSquare = new ConfigurationSquare(controlNodes[x, y + 1], controlNodes[x + 1, y + 1], controlNodes[x + 1, y], controlNodes[x, y]);
-			}
-		}
-	}
 	private void RandomFillMap()
 	{
 		if (UseRandomSeed)
@@ -434,6 +414,26 @@ public class MapGenerator : MonoBehaviour
 		}
 
 		return line;
+	}
+	private void CreateSquares()
+	{
+		var controlNodes = new ControlNode[Width, Height];
+		for (var x = 0; x < Width; x++)
+		{
+			for (var y = 0; y < Height; y++)
+			{
+				var position = new Vector3(x * Constants.TileSize - 0.5f, 0, y * Constants.TileSize - 0.5f);
+				controlNodes[x, y] = new ControlNode(position, _map[x, y].Type == TileType.Floor);
+			}
+		}
+
+		for (var x = 0; x < Width - 1; x++)
+		{
+			for (var y = 0; y < Height - 1; y++)
+			{
+				_map[x, y].ConfigurationSquare = new ConfigurationSquare(controlNodes[x, y + 1], controlNodes[x + 1, y + 1], controlNodes[x + 1, y], controlNodes[x, y]);
+			}
+		}
 	}
 
 	private void OnDrawGizmos()

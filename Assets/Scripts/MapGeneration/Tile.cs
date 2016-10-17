@@ -8,9 +8,16 @@ public class Tile
 	public ConfigurationSquare ConfigurationSquare;
 	public List<Vector3> CoreVertices = new List<Vector3>(4);
 
-	public bool IsConfigured
+	public bool IsWallTile
 	{
-		get { return ConfigurationSquare != null && ConfigurationSquare.Configuration > 0 && ConfigurationSquare.Configuration < 15; }
+		get
+		{
+			return ConfigurationSquare != null && ConfigurationSquare.Configuration > 0 && ConfigurationSquare.Configuration < 15;
+		}
+	}
+	public bool IsWalkable
+	{
+		get { return Type == TileType.Floor && ConfigurationSquare != null && ConfigurationSquare.Configuration == 15; }
 	}
 
 	public Tile(int x, int y, TileType type)
@@ -30,7 +37,7 @@ public class Tile
 		return "Type: " + Type +
 			", Coordinates: " + Coordinates +
 			", CoreVertices: " + CoreVertices.Count +
-			", IsConfigured: " + IsConfigured +
+			", IsConfigured: " + IsWalkable +
 			", Configuration: " + ConfigurationSquare;
 	}
 }

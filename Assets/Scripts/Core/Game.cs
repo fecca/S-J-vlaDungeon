@@ -8,15 +8,14 @@ public class Game : MonoBehaviour
 	private MeshGenerator MeshGenerator = null;
 	[SerializeField]
 	private PlayerController Player = null;
+	[SerializeField]
+	private PathFinder PathFinder = null;
 
 	private void Start()
 	{
 		var map = MapGenerator.GenerateMap();
-		FindObjectOfType<PathFinder>().RegisterMap(map);
+		PathFinder.RegisterMap(map);
 		MeshGenerator.GenerateMeshes(map);
 		Player.SetPosition(MapGenerator.GetPlayerPosition());
-
-		var enemy = FindObjectOfType<Enemy>();
-		enemy.SetPosition(MapGenerator.GetPlayerPosition());
 	}
 }

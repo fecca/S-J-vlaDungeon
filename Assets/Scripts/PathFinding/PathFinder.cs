@@ -4,40 +4,39 @@ using UnityEngine;
 
 public class PathFinder : MonoBehaviour
 {
-	private Tile[,] _map;
-	private LinkedList<PathNode> _path = new LinkedList<PathNode>();
+	private PathfindingNode[,] _map;
+	private LinkedList<PathfindingNode> _path = new LinkedList<PathfindingNode>();
 
 	public void RegisterMap(Tile[,] map)
 	{
-		_map = map;
+		CreateNodes(map);
 	}
-	public LinkedList<PathNode> GetPath(Vector2 from, Vector2 to)
+	public LinkedList<PathfindingNode> GetPath(Vector2 from, Vector2 to)
 	{
-		return GetPath(_map[Mathf.RoundToInt(from.x), Mathf.RoundToInt(from.y)], _map[Mathf.RoundToInt(to.x), Mathf.RoundToInt(to.y)]);
+		var startNode = _map[Mathf.RoundToInt(from.x), Mathf.RoundToInt(from.y)].Copy();
+		var endNode = _map[Mathf.RoundToInt(to.x), Mathf.RoundToInt(to.y)].Copy();
+
+		return GetPath(startNode, endNode);
 	}
-	public LinkedList<PathNode> GetPath(Tile startTile, Tile endTile)
+	public LinkedList<PathfindingNode> GetPath(PathfindingNode startNode, PathfindingNode endNode)
 	{
-		var fromNode = new PathNode(startTile);
-		var toNode = new PathNode(endTile);
-		if (!fromNode.IsWalkable || !toNode.IsWalkable)
+		if (!startNode.Walkable || !endNode.Walkable)
 		{
 			_path.Clear();
 			return _path;
 		}
 
-		var open = new List<PathNode>();
-		var closed = new List<PathNode>();
+		var open = new List<PathfindingNode>();
+		var closed = new List<PathfindingNode>();
 
-		open.Add(fromNode);
+		open.Add(startNode);
 		while (open.Count > 0)
 		{
 			var current = open[0];
 			for (var i = 0; i < open.Count; i++)
 			{
 				var openTile = open[i];
-				if (openTile.FCost < current.FCost
-					|| openTile.FCost == current.FCost
-					&& openTile.HCost < current.HCost)
+				if (openTile.FCost < current.FCost || openTile.FCost == current.FCost && openTile.HCost < current.HCost)
 				{
 					current = openTile;
 				}
@@ -45,7 +44,7 @@ public class PathFinder : MonoBehaviour
 			open.Remove(current);
 			closed.Add(current);
 
-			if (current.Tile == endTile)
+			if (current.Equals(endNode))
 			{
 				break;
 			}
@@ -54,7 +53,7 @@ public class PathFinder : MonoBehaviour
 			for (var i = 0; i < neighbours.Count; i++)
 			{
 				var neighbour = neighbours[i];
-				if (!neighbour.IsWalkable || closed.Contains(neighbour))
+				if (!neighbour.Walkable || closed.Contains(neighbour))
 				{
 					continue;
 				}
@@ -62,8 +61,10 @@ public class PathFinder : MonoBehaviour
 				var newMovementCostToNeighbour = current.GCost + GetDistance(current, neighbour);
 				if (newMovementCostToNeighbour < neighbour.GCost || !open.Contains(neighbour))
 				{
+					var distance = GetDistance(neighbour, endNode);
 					neighbour.GCost = newMovementCostToNeighbour;
-					neighbour.HCost = GetDistance(neighbour, toNode);
+					neighbour.HCost = distance;
+					neighbour.FCost = newMovementCostToNeighbour + distance;
 					neighbour.Parent = current;
 
 					if (!open.Contains(neighbour))
@@ -77,10 +78,31 @@ public class PathFinder : MonoBehaviour
 		return RetracePath(closed.Last());
 	}
 
-	private int GetDistance(PathNode from, PathNode to)
+
+	private void CreateNodes(Tile[,] tiles)
 	{
-		var distanceX = Mathf.Abs(from.Tile.Coordinates.X - to.Tile.Coordinates.X);
-		var distanceY = Mathf.Abs(from.Tile.Coordinates.Y - to.Tile.Coordinates.Y);
+		_map = new PathfindingNode[tiles.GetLength(0) * Constants.TileSize, tiles.GetLength(1) * Constants.TileSize];
+
+		for (var x = 0; x < tiles.GetLength(0); x++)
+		{
+			for (var y = 0; y < tiles.GetLength(1); y++)
+			{
+				for (var tileSizeX = 1; tileSizeX < Constants.TileSize + 1; tileSizeX++)
+				{
+					for (var tileSizeY = 1; tileSizeY < Constants.TileSize + 1; tileSizeY++)
+					{
+						var xIndex = x * Constants.TileSize + (tileSizeX - 1);
+						var yIndex = y * Constants.TileSize + (tileSizeY - 1);
+						_map[xIndex, yIndex] = new PathfindingNode(xIndex, yIndex, tiles[x, y].IsWalkable);
+					}
+				}
+			}
+		}
+	}
+	private float GetDistance(PathfindingNode from, PathfindingNode to)
+	{
+		var distanceX = Mathf.Abs(from.X - to.X);
+		var distanceY = Mathf.Abs(from.Y - to.Y);
 
 		if (distanceX > distanceY)
 		{
@@ -88,9 +110,9 @@ public class PathFinder : MonoBehaviour
 		}
 		return distanceX * Constants.DiagonalTileWeight + (distanceY - distanceX) * Constants.HorizontalTileWeight;
 	}
-	private List<PathNode> GetNeighbours(PathNode node)
+	private List<PathfindingNode> GetNeighbours(PathfindingNode node)
 	{
-		var neighbours = new List<PathNode>();
+		var neighbours = new List<PathfindingNode>();
 		for (var x = -1; x <= 1; x++)
 		{
 			for (var y = -1; y <= 1; y++)
@@ -100,29 +122,31 @@ public class PathFinder : MonoBehaviour
 					continue;
 				}
 
-				var neighbourX = node.Tile.Coordinates.X + x;
-				var neighbourY = node.Tile.Coordinates.Y + y;
+				var neighbourX = (int)node.X + x;
+				var neighbourY = (int)node.Y + y;
 				if (neighbourX < 0 || neighbourX >= _map.GetLength(0) || neighbourY < 0 || neighbourY >= _map.GetLength(1))
 				{
 					continue;
 				}
 
-				neighbours.Add(new PathNode(_map[neighbourX, neighbourY]));
+				var actualNode = _map[neighbourX, neighbourY];
+				neighbours.Add(new PathfindingNode(actualNode.X, actualNode.Y, actualNode.Walkable));
 			}
 		}
 
 		return neighbours;
 	}
-	private LinkedList<PathNode> RetracePath(PathNode lastNode)
+	private LinkedList<PathfindingNode> RetracePath(PathfindingNode lastNode)
 	{
-		var path = new LinkedList<PathNode>();
+		var path = new LinkedList<PathfindingNode>();
 		path.AddFirst(lastNode);
 
-		var current = lastNode.Parent;
-		while (current != null)
+		var parent = lastNode.Parent;
+		while (parent != null)
 		{
-			path.AddFirst(current);
-			current = current.Parent;
+			path.AddFirst(parent);
+
+			parent = parent.Parent;
 		}
 
 		return path;
@@ -134,13 +158,8 @@ public class PathFinder : MonoBehaviour
 		{
 			foreach (var tile in _map)
 			{
-				if (tile.IsConfigured || tile.Type != TileType.Floor)
-				{
-					continue;
-				}
-
-				Gizmos.color = Color.green;
-				//Gizmos.DrawCube(new Vector3(tile.Coordinates.X, 0.5f, tile.Coordinates.Y), Vector3.one * 0.25f);
+				Gizmos.color = tile.Walkable ? Color.green : Color.red;
+				Gizmos.DrawCube(new Vector3(tile.X, 0.5f, tile.Y), Vector3.one * 0.25f);
 			}
 		}
 	}

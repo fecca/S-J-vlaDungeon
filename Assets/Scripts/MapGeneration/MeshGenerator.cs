@@ -192,7 +192,7 @@ public class MeshGenerator : MonoBehaviour
 
 	private void TriangulateWall(Tile tile)
 	{
-		if (tile.IsConfigured)
+		if (tile.IsWallTile)
 		{
 			_wallVertices.Add(tile.CoreVertices[0]);
 			_wallVertices.Add(tile.CoreVertices[1]);

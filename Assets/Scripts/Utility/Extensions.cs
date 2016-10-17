@@ -7,4 +7,8 @@ public static class Extensions
 	{
 		return collection[Random.Range(0 + margin, collection.Count - margin)];
 	}
+	public static PathfindingNode Copy(this PathfindingNode node)
+	{
+		return new PathfindingNode(node.X, node.Y, node.Walkable);
+	}
 }
