@@ -28,7 +28,7 @@ public class MapGenerator : MonoBehaviour
 	private int SmoothingLoops = 5;
 
 	private Tile[,] _map;
-	private List<Room> SurvivingRooms = new List<Room>(128);
+	private List<Room> _survivingRooms = new List<Room>(128);
 
 	public Tile[,] GenerateMap()
 	{
@@ -38,16 +38,20 @@ public class MapGenerator : MonoBehaviour
 		GenerateClusters();
 		FilterWalls();
 		FilterRooms();
-		ConnectClosestRooms(SurvivingRooms);
-		CreateSquares();
+		ConnectClosestRooms();
+		ConfigureTiles();
 
 		return _map;
 	}
 	public Vector3 GetPlayerPosition()
 	{
-		var room = SurvivingRooms.First();
-		var tile = room.Tiles.GetRandomElement(-1);
-		var position = new Vector3(tile.Coordinates.X * Constants.TileSize, 5, tile.Coordinates.Y * Constants.TileSize);
+		var room = _survivingRooms.First();
+		var tile = room.Tiles.GetRandomElement();
+		while (!tile.IsWalkable)
+		{
+			tile = room.Tiles.GetRandomElement();
+		}
+		var position = new Vector3(tile.WorldCoordinates.X, 5, tile.WorldCoordinates.Y);
 
 		return position;
 	}
@@ -122,7 +126,7 @@ public class MapGenerator : MonoBehaviour
 			{
 				for (var j = 0; j < wallRegion.Count; j++)
 				{
-					_map[wallRegion[j].Coordinates.X, wallRegion[j].Coordinates.Y].Type = TileType.Floor;
+					wallRegion[j].Type = TileType.Floor;
 				}
 			}
 		}
@@ -137,43 +141,43 @@ public class MapGenerator : MonoBehaviour
 			{
 				for (var j = 0; j < roomRegion.Count; j++)
 				{
-					_map[roomRegion[j].Coordinates.X, roomRegion[j].Coordinates.Y].Type = TileType.Wall;
+					roomRegion[j].Type = TileType.Wall;
 				}
 			}
 			else
 			{
-				SurvivingRooms.Add(new Room(roomRegion, _map));
+				_survivingRooms.Add(new Room(roomRegion, _map));
 			}
 		}
 
-		SurvivingRooms.Sort();
+		_survivingRooms.Sort();
 	}
-	private void ConnectClosestRooms(List<Room> allRooms, bool forceAccessibilityFromMainRoom = false)
+	private void ConnectClosestRooms(bool forceAccessibilityFromMainRoom = false)
 	{
-		allRooms[0].IsMainRoom = true;
-		allRooms[0].IsAccessibleFromMainRoom = true;
+		_survivingRooms[0].IsMainRoom = true;
+		_survivingRooms[0].IsAccessibleFromMainRoom = true;
 
 		var roomListA = new List<Room>(64);
 		var roomListB = new List<Room>(64);
 
 		if (forceAccessibilityFromMainRoom)
 		{
-			for (var i = 0; i < allRooms.Count; i++)
+			for (var i = 0; i < _survivingRooms.Count; i++)
 			{
-				if (allRooms[i].IsAccessibleFromMainRoom)
+				if (_survivingRooms[i].IsAccessibleFromMainRoom)
 				{
-					roomListB.Add(allRooms[i]);
+					roomListB.Add(_survivingRooms[i]);
 				}
 				else
 				{
-					roomListA.Add(allRooms[i]);
+					roomListA.Add(_survivingRooms[i]);
 				}
 			}
 		}
 		else
 		{
-			roomListA = allRooms;
-			roomListB = allRooms;
+			roomListA = _survivingRooms;
+			roomListB = _survivingRooms;
 		}
 
 		var bestDistance = 0;
@@ -201,14 +205,14 @@ public class MapGenerator : MonoBehaviour
 					continue;
 				}
 
-				for (var tileIndexA = 0; tileIndexA < roomListA[i].EdgeTiles.Count; tileIndexA++)
+				for (var tileIndexA = 0; tileIndexA < roomListA[i].Tiles.Count; tileIndexA++)
 				{
-					for (var tileIndexB = 0; tileIndexB < roomListB[j].EdgeTiles.Count; tileIndexB++)
+					for (var tileIndexB = 0; tileIndexB < roomListB[j].Tiles.Count; tileIndexB++)
 					{
-						var tileA = roomListA[i].EdgeTiles[tileIndexA];
-						var tileB = roomListB[j].EdgeTiles[tileIndexB];
-						var distanceX = (tileA.Coordinates.X - tileB.Coordinates.X) * (tileA.Coordinates.X - tileB.Coordinates.X);
-						var distanceY = (tileA.Coordinates.Y - tileB.Coordinates.Y) * (tileA.Coordinates.Y - tileB.Coordinates.Y);
+						var tileA = roomListA[i].Tiles[tileIndexA];
+						var tileB = roomListB[j].Tiles[tileIndexB];
+						var distanceX = (tileA.WorldCoordinates.X - tileB.WorldCoordinates.X) * (tileA.WorldCoordinates.X - tileB.WorldCoordinates.X);
+						var distanceY = (tileA.WorldCoordinates.Y - tileB.WorldCoordinates.Y) * (tileA.WorldCoordinates.Y - tileB.WorldCoordinates.Y);
 						var distanceBetweenRooms = distanceX + distanceY;
 
 						if (distanceBetweenRooms < bestDistance || !possibleConnectionFound)
@@ -233,12 +237,12 @@ public class MapGenerator : MonoBehaviour
 		if (possibleConnectionFound && forceAccessibilityFromMainRoom)
 		{
 			CreatePassage(bestRoomA, bestRoomB, bestTileA, bestTileB);
-			ConnectClosestRooms(allRooms, true);
+			ConnectClosestRooms(true);
 		}
 
 		if (!forceAccessibilityFromMainRoom)
 		{
-			ConnectClosestRooms(allRooms, true);
+			ConnectClosestRooms(true);
 		}
 	}
 	private void CreatePassage(Room roomA, Room roomB, Tile tileA, Tile tileB)
@@ -254,7 +258,7 @@ public class MapGenerator : MonoBehaviour
 		roomA.ConnectedRooms.Add(roomB);
 		roomB.ConnectedRooms.Add(roomA);
 
-		var line = GetLine(tileA.Coordinates, tileB.Coordinates);
+		var line = GetLine(tileA.WorldCoordinates, tileB.WorldCoordinates);
 		for (var i = 0; i < line.Count; i++)
 		{
 			CreateCorridor(line[i], CorridorThickness);
@@ -318,7 +322,7 @@ public class MapGenerator : MonoBehaviour
 
 					for (var i = 0; i < newRegion.Count; i++)
 					{
-						mapFlags[newRegion[i].Coordinates.X, newRegion[i].Coordinates.Y] = true;
+						mapFlags[newRegion[i].GridCoordinates.X, newRegion[i].GridCoordinates.Y] = true;
 					}
 				}
 			}
@@ -341,16 +345,16 @@ public class MapGenerator : MonoBehaviour
 			var tile = queue.Dequeue();
 			tiles.Add(tile);
 
-			for (var x = tile.Coordinates.X - 1; x <= tile.Coordinates.X + 1; x++)
+			for (var x = tile.GridCoordinates.X - 1; x <= tile.GridCoordinates.X + 1; x++)
 			{
-				for (var y = tile.Coordinates.Y - 1; y <= tile.Coordinates.Y + 1; y++)
+				for (var y = tile.GridCoordinates.Y - 1; y <= tile.GridCoordinates.Y + 1; y++)
 				{
-					if (IsInMapRange(x, y) && (y == tile.Coordinates.Y || x == tile.Coordinates.X))
+					if (IsInMapRange(x, y) && (y == tile.GridCoordinates.Y || x == tile.GridCoordinates.X))
 					{
 						if (!mapFlags[x, y] && _map[x, y].Type == tileType)
 						{
 							mapFlags[x, y] = true;
-							queue.Enqueue(new Tile(x, y, tileType));
+							queue.Enqueue(_map[x, y]);
 						}
 					}
 				}
@@ -361,6 +365,7 @@ public class MapGenerator : MonoBehaviour
 	}
 	private List<Coordinates> GetLine(Coordinates from, Coordinates to)
 	{
+		Debug.DrawLine(new Vector3(from.X, 1f, from.Y), new Vector3(to.X, 1f, to.Y), Color.yellow, 100f);
 		var line = new List<Coordinates>(64);
 
 		var x = from.X;
@@ -415,15 +420,17 @@ public class MapGenerator : MonoBehaviour
 
 		return line;
 	}
-	private void CreateSquares()
+	private void ConfigureTiles()
 	{
 		var controlNodes = new ControlNode[Width, Height];
 		for (var x = 0; x < Width; x++)
 		{
 			for (var y = 0; y < Height; y++)
 			{
-				var position = new Vector3(x * Constants.TileSize - 0.5f, 0, y * Constants.TileSize - 0.5f);
-				controlNodes[x, y] = new ControlNode(position, _map[x, y].Type == TileType.Floor);
+				var tile = _map[x, y];
+				var position = new Vector3(tile.WorldCoordinates.X, 0, tile.WorldCoordinates.Y);
+				var active = tile.Type == TileType.Floor;
+				controlNodes[x, y] = new ControlNode(position, active);
 			}
 		}
 
@@ -431,7 +438,8 @@ public class MapGenerator : MonoBehaviour
 		{
 			for (var y = 0; y < Height - 1; y++)
 			{
-				_map[x, y].ConfigurationSquare = new ConfigurationSquare(controlNodes[x, y + 1], controlNodes[x + 1, y + 1], controlNodes[x + 1, y], controlNodes[x, y]);
+				var tile = _map[x, y];
+				tile.SetConfiguration(controlNodes[x, y + 1], controlNodes[x + 1, y + 1], controlNodes[x + 1, y], controlNodes[x, y]);
 			}
 		}
 	}
@@ -448,16 +456,12 @@ public class MapGenerator : MonoBehaviour
 			return;
 		}
 
-		for (var x = 0; x < _map.GetLength(0); x++)
+		foreach (Room room in _survivingRooms)
 		{
-			for (var y = 0; y < _map.GetLength(1); y++)
+			foreach (Tile tile in room.Tiles)
 			{
-				Gizmos.color = _map[x, y].Type == TileType.Floor ? Color.white : Color.gray;
-				if (x == 10 && y == 10)
-				{
-					Gizmos.color = Color.red;
-				}
-				Gizmos.DrawCube(new Vector3(x * Constants.TileSize, 0, y * Constants.TileSize), Vector3.one * 0.2f);
+				Gizmos.color = Color.green;
+				Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X, 0, tile.WorldCoordinates.Y), Vector3.one * 0.2f);
 			}
 		}
 	}

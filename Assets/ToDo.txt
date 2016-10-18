@@ -2,3 +2,8 @@
 - Smoothen movement
 - Increase performance when calculating path
 - Increase performance when generating map/mesh
+- Identify edge tiles in rooms
+
+Bugs
+----
+- Room/Wall threshold not clearing all tiles

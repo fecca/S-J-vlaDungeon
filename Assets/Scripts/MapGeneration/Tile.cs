@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class Tile
 {
-	public Coordinates Coordinates;
+	public Coordinates GridCoordinates;
+	public Coordinates WorldCoordinates;
 	public TileType Type;
 	public ConfigurationSquare ConfigurationSquare;
 	public List<Vector3> CoreVertices = new List<Vector3>(4);
@@ -22,8 +23,17 @@ public class Tile
 
 	public Tile(int x, int y, TileType type)
 	{
-		Coordinates = new Coordinates(x, y);
+		GridCoordinates = new Coordinates(x, y);
+		WorldCoordinates = new Coordinates(x * Constants.TileSize, y * Constants.TileSize);
 		Type = type;
+	}
+	public void SetConfiguration(ControlNode topLeft, ControlNode topRight, ControlNode bottomRight, ControlNode bottomLeft)
+	{
+		ConfigurationSquare = new ConfigurationSquare(topLeft, topRight, bottomRight, bottomLeft);
+		if (ConfigurationSquare.Configuration > 0)
+		{
+			Type = TileType.Floor;
+		}
 	}
 	public void AddWallVertices(params Vector3[] vertices)
 	{
@@ -35,7 +45,7 @@ public class Tile
 	public override string ToString()
 	{
 		return "Type: " + Type +
-			", Coordinates: " + Coordinates +
+			", Coordinates: " + WorldCoordinates +
 			", CoreVertices: " + CoreVertices.Count +
 			", IsConfigured: " + IsWalkable +
 			", Configuration: " + ConfigurationSquare;

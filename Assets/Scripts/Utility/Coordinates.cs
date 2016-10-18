@@ -3,10 +3,10 @@
 	public int X;
 	public int Y;
 
-	public Coordinates(int tileX, int tileY)
+	public Coordinates(int x, int y)
 	{
-		X = tileX;
-		Y = tileY;
+		X = x;
+		Y = y;
 	}
 
 	public override string ToString()

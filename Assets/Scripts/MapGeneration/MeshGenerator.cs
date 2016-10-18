@@ -196,14 +196,14 @@ public class MeshGenerator : MonoBehaviour
 		{
 			_wallVertices.Add(tile.CoreVertices[0]);
 			_wallVertices.Add(tile.CoreVertices[1]);
-			_wallVertices.Add(tile.CoreVertices[1] + Vector3.up * WallHeight * Constants.TileSize);
+			_wallVertices.Add(tile.CoreVertices[1] + Vector3.up * WallHeight);
 
 			_wallTriangles.Add(_wallVertices.Count - 3);
 			_wallTriangles.Add(_wallVertices.Count - 2);
 			_wallTriangles.Add(_wallVertices.Count - 1);
 
-			_wallVertices.Add(tile.CoreVertices[1] + Vector3.up * WallHeight * Constants.TileSize);
-			_wallVertices.Add(tile.CoreVertices[0] + Vector3.up * WallHeight * Constants.TileSize);
+			_wallVertices.Add(tile.CoreVertices[1] + Vector3.up * WallHeight);
+			_wallVertices.Add(tile.CoreVertices[0] + Vector3.up * WallHeight);
 			_wallVertices.Add(tile.CoreVertices[0]);
 
 			_wallTriangles.Add(_wallVertices.Count - 3);

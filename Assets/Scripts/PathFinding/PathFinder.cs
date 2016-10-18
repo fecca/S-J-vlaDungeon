@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class PathFinder : MonoBehaviour
 {
-	private PathfindingNode[,] _map;
+	[SerializeField]
+	private bool DrawGizmos = false;
+
+	private PathfindingNode[,] _nodes;
 	private LinkedList<PathfindingNode> _path = new LinkedList<PathfindingNode>();
 
 	public void RegisterMap(Tile[,] map)
@@ -13,8 +16,8 @@ public class PathFinder : MonoBehaviour
 	}
 	public LinkedList<PathfindingNode> GetPath(Vector2 from, Vector2 to)
 	{
-		var startNode = _map[Mathf.RoundToInt(from.x), Mathf.RoundToInt(from.y)].Copy();
-		var endNode = _map[Mathf.RoundToInt(to.x), Mathf.RoundToInt(to.y)].Copy();
+		var startNode = _nodes[Mathf.RoundToInt(from.x), Mathf.RoundToInt(from.y)].Copy();
+		var endNode = _nodes[Mathf.RoundToInt(to.x), Mathf.RoundToInt(to.y)].Copy();
 
 		return GetPath(startNode, endNode);
 	}
@@ -81,20 +84,48 @@ public class PathFinder : MonoBehaviour
 
 	private void CreateNodes(Tile[,] tiles)
 	{
-		_map = new PathfindingNode[tiles.GetLength(0) * Constants.TileSize, tiles.GetLength(1) * Constants.TileSize];
+		_nodes = new PathfindingNode[tiles.GetLength(0) * 2, tiles.GetLength(1) * 2];
 
 		for (var x = 0; x < tiles.GetLength(0); x++)
 		{
 			for (var y = 0; y < tiles.GetLength(1); y++)
 			{
-				for (var tileSizeX = 1; tileSizeX < Constants.TileSize + 1; tileSizeX++)
+				var xIndex = x * 2;
+				var yIndex = y * 2;
+
+				_nodes[xIndex, yIndex] = new PathfindingNode(x + 0.25f, y + 0.25f, false);
+				_nodes[xIndex + 1, yIndex] = new PathfindingNode(x + 0.75f, y + 0.25f, false);
+				_nodes[xIndex, yIndex + 1] = new PathfindingNode(x + 0.25f, y + 0.75f, false);
+				_nodes[xIndex + 1, yIndex + 1] = new PathfindingNode(x + 0.75f, y + 0.75f, false);
+
+				var tile = tiles[x, y];
+				if (tile.ConfigurationSquare == null)
 				{
-					for (var tileSizeY = 1; tileSizeY < Constants.TileSize + 1; tileSizeY++)
-					{
-						var xIndex = x * Constants.TileSize + (tileSizeX - 1);
-						var yIndex = y * Constants.TileSize + (tileSizeY - 1);
-						_map[xIndex, yIndex] = new PathfindingNode(xIndex, yIndex, tiles[x, y].IsWalkable);
-					}
+					continue;
+				}
+
+				switch (tile.ConfigurationSquare.Configuration)
+				{
+					case 7:
+						_nodes[xIndex + 1, yIndex].Walkable = true;
+						break;
+					case 11:
+						_nodes[xIndex, yIndex].Walkable = true;
+						break;
+					case 13:
+						_nodes[xIndex, yIndex + 1].Walkable = true;
+						break;
+					case 14:
+						_nodes[xIndex + 1, yIndex + 1].Walkable = true;
+						break;
+					case 15:
+						_nodes[xIndex, yIndex].Walkable = true;
+						_nodes[xIndex + 1, yIndex].Walkable = true;
+						_nodes[xIndex, yIndex + 1].Walkable = true;
+						_nodes[xIndex + 1, yIndex + 1].Walkable = true;
+						break;
+					default:
+						break;
 				}
 			}
 		}
@@ -124,12 +155,12 @@ public class PathFinder : MonoBehaviour
 
 				var neighbourX = (int)node.X + x;
 				var neighbourY = (int)node.Y + y;
-				if (neighbourX < 0 || neighbourX >= _map.GetLength(0) || neighbourY < 0 || neighbourY >= _map.GetLength(1))
+				if (neighbourX < 0 || neighbourX >= _nodes.GetLength(0) || neighbourY < 0 || neighbourY >= _nodes.GetLength(1))
 				{
 					continue;
 				}
 
-				var actualNode = _map[neighbourX, neighbourY];
+				var actualNode = _nodes[neighbourX, neighbourY];
 				neighbours.Add(new PathfindingNode(actualNode.X, actualNode.Y, actualNode.Walkable));
 			}
 		}
@@ -154,12 +185,17 @@ public class PathFinder : MonoBehaviour
 
 	private void OnDrawGizmos()
 	{
-		if (_map != null)
+		if (!DrawGizmos)
 		{
-			foreach (var tile in _map)
+			return;
+		}
+
+		if (_nodes != null)
+		{
+			foreach (var tile in _nodes)
 			{
 				Gizmos.color = tile.Walkable ? Color.green : Color.red;
-				Gizmos.DrawCube(new Vector3(tile.X, 0.5f, tile.Y), Vector3.one * 0.25f);
+				Gizmos.DrawCube(new Vector3(tile.X, 0.5f, tile.Y), Vector3.one * 0.1f);
 			}
 		}
 	}

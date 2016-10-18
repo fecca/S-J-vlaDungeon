@@ -21,6 +21,10 @@
 		var otherNode = (PathfindingNode)other;
 		return X == otherNode.X && Y == otherNode.Y;
 	}
+	public override int GetHashCode()
+	{
+		return (X + ";" + Y).GetHashCode();
+	}
 	public override string ToString()
 	{
 		return X + ";" + Y;
