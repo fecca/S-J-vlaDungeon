@@ -3,6 +3,7 @@
 - Increase performance when calculating path
 - Increase performance when generating map/mesh
 - Identify edge tiles in rooms
+- Cache neighbouring tiles/nodes for faster pathfinding?
 
 Bugs
 ----

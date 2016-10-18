@@ -43,7 +43,7 @@ public class PathFinderAgent : MonoBehaviour
 	{
 		var targetNode = _path.First;
 
-		var targetPosition = new Vector3(targetNode.Value.X, transform.position.y, targetNode.Value.Y);
+		var targetPosition = new Vector3(targetNode.Value.WorldCoordinates.X, transform.position.y, targetNode.Value.WorldCoordinates.Y);
 		transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * MovementSpeed);
 
 		if (Vector3.Distance(transform.position, targetPosition) < 0.02f)
@@ -58,8 +58,8 @@ public class PathFinderAgent : MonoBehaviour
 		{
 			for (var iteration = _path.First; iteration != null; iteration = iteration.Next)
 			{
-				Gizmos.color = _randomColor;
-				Gizmos.DrawCube(new Vector3(iteration.Value.X, 1, iteration.Value.Y), Vector3.one * 0.25f);
+				Gizmos.color = Color.white;
+				Gizmos.DrawCube(new Vector3(iteration.Value.WorldCoordinates.X, 1, iteration.Value.WorldCoordinates.Y), Vector3.one * 0.25f);
 			}
 		}
 	}

@@ -16,8 +16,19 @@ public class PathFinder : MonoBehaviour
 	}
 	public LinkedList<PathfindingNode> GetPath(Vector2 from, Vector2 to)
 	{
-		var startNode = _nodes[Mathf.RoundToInt(from.x), Mathf.RoundToInt(from.y)].Copy();
-		var endNode = _nodes[Mathf.RoundToInt(to.x), Mathf.RoundToInt(to.y)].Copy();
+		var xNodeIndexFrom = Mathf.RoundToInt(from.x * 2);
+		var yNodeIndexFrom = Mathf.RoundToInt(from.y * 2);
+		var xNodeIndexTo = Mathf.RoundToInt(to.x * 2);
+		var yNodeIndexTo = Mathf.RoundToInt(to.y * 2);
+		var startNode = _nodes[xNodeIndexFrom, yNodeIndexFrom].Copy();
+		var endNode = _nodes[xNodeIndexTo, yNodeIndexTo].Copy();
+
+		Debug.Log(xNodeIndexFrom);
+		Debug.Log(yNodeIndexFrom);
+		Debug.Log(xNodeIndexTo);
+		Debug.Log(yNodeIndexTo);
+		Debug.Log(startNode);
+		Debug.Log(endNode);
 
 		return GetPath(startNode, endNode);
 	}
@@ -81,7 +92,6 @@ public class PathFinder : MonoBehaviour
 		return RetracePath(closed.Last());
 	}
 
-
 	private void CreateNodes(Tile[,] tiles)
 	{
 		_nodes = new PathfindingNode[tiles.GetLength(0) * 2, tiles.GetLength(1) * 2];
@@ -92,48 +102,50 @@ public class PathFinder : MonoBehaviour
 			{
 				var xIndex = x * 2;
 				var yIndex = y * 2;
-
-				_nodes[xIndex, yIndex] = new PathfindingNode(x + 0.25f, y + 0.25f, false);
-				_nodes[xIndex + 1, yIndex] = new PathfindingNode(x + 0.75f, y + 0.25f, false);
-				_nodes[xIndex, yIndex + 1] = new PathfindingNode(x + 0.25f, y + 0.75f, false);
-				_nodes[xIndex + 1, yIndex + 1] = new PathfindingNode(x + 0.75f, y + 0.75f, false);
-
 				var tile = tiles[x, y];
-				if (tile.ConfigurationSquare == null)
+				var topLeftWalkable = false;
+				var topRightWalkable = false;
+				var bottomRightWalkable = false;
+				var bottomLeftWalkable = false;
+
+				if (tile.ConfigurationSquare != null)
 				{
-					continue;
+					switch (tile.ConfigurationSquare.Configuration)
+					{
+						case 13:
+							topLeftWalkable = true;
+							break;
+						case 11:
+							bottomLeftWalkable = true;
+							break;
+						case 7:
+							bottomRightWalkable = true;
+							break;
+						case 14:
+							topRightWalkable = true;
+							break;
+						case 15:
+							topLeftWalkable = true;
+							topRightWalkable = true;
+							bottomRightWalkable = true;
+							bottomLeftWalkable = true;
+							break;
+						default:
+							break;
+					}
 				}
 
-				switch (tile.ConfigurationSquare.Configuration)
-				{
-					case 7:
-						_nodes[xIndex + 1, yIndex].Walkable = true;
-						break;
-					case 11:
-						_nodes[xIndex, yIndex].Walkable = true;
-						break;
-					case 13:
-						_nodes[xIndex, yIndex + 1].Walkable = true;
-						break;
-					case 14:
-						_nodes[xIndex + 1, yIndex + 1].Walkable = true;
-						break;
-					case 15:
-						_nodes[xIndex, yIndex].Walkable = true;
-						_nodes[xIndex + 1, yIndex].Walkable = true;
-						_nodes[xIndex, yIndex + 1].Walkable = true;
-						_nodes[xIndex + 1, yIndex + 1].Walkable = true;
-						break;
-					default:
-						break;
-				}
+				_nodes[xIndex, yIndex + 1] = new PathfindingNode(xIndex, yIndex + 1, topLeftWalkable);
+				_nodes[xIndex + 1, yIndex + 1] = new PathfindingNode(xIndex + 1, yIndex + 1, topRightWalkable);
+				_nodes[xIndex + 1, yIndex] = new PathfindingNode(xIndex + 1, yIndex, bottomRightWalkable);
+				_nodes[xIndex, yIndex] = new PathfindingNode(xIndex, yIndex, bottomLeftWalkable);
 			}
 		}
 	}
 	private float GetDistance(PathfindingNode from, PathfindingNode to)
 	{
-		var distanceX = Mathf.Abs(from.X - to.X);
-		var distanceY = Mathf.Abs(from.Y - to.Y);
+		var distanceX = Mathf.Abs(from.WorldCoordinates.X - to.WorldCoordinates.X);
+		var distanceY = Mathf.Abs(from.WorldCoordinates.Y - to.WorldCoordinates.Y);
 
 		if (distanceX > distanceY)
 		{
@@ -153,15 +165,14 @@ public class PathFinder : MonoBehaviour
 					continue;
 				}
 
-				var neighbourX = (int)node.X + x;
-				var neighbourY = (int)node.Y + y;
+				var neighbourX = (int)node.GridCoordinates.X + x;
+				var neighbourY = (int)node.GridCoordinates.Y + y;
 				if (neighbourX < 0 || neighbourX >= _nodes.GetLength(0) || neighbourY < 0 || neighbourY >= _nodes.GetLength(1))
 				{
 					continue;
 				}
 
-				var actualNode = _nodes[neighbourX, neighbourY];
-				neighbours.Add(new PathfindingNode(actualNode.X, actualNode.Y, actualNode.Walkable));
+				neighbours.Add(_nodes[neighbourX, neighbourY].Copy());
 			}
 		}
 
@@ -194,8 +205,8 @@ public class PathFinder : MonoBehaviour
 		{
 			foreach (var tile in _nodes)
 			{
-				Gizmos.color = tile.Walkable ? Color.green : Color.red;
-				Gizmos.DrawCube(new Vector3(tile.X, 0.5f, tile.Y), Vector3.one * 0.1f);
+				Gizmos.color = tile.Walkable ? Color.blue : Color.yellow;
+				Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X, 0.5f, tile.WorldCoordinates.Y), Vector3.one * 0.1f);
 			}
 		}
 	}

@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class Tile
 {
+	public TileType Type;
 	public Coordinates GridCoordinates;
 	public Coordinates WorldCoordinates;
-	public TileType Type;
 	public ConfigurationSquare ConfigurationSquare;
 	public List<Vector3> CoreVertices = new List<Vector3>(4);
 

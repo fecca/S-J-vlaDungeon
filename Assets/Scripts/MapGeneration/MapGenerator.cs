@@ -180,7 +180,7 @@ public class MapGenerator : MonoBehaviour
 			roomListB = _survivingRooms;
 		}
 
-		var bestDistance = 0;
+		var bestDistance = 0f;
 		var possibleConnectionFound = false;
 		Tile bestTileA = null;
 		Tile bestTileB = null;
@@ -272,8 +272,8 @@ public class MapGenerator : MonoBehaviour
 			{
 				if (x * x + y * y <= r * r)
 				{
-					var drawX = c.X + x;
-					var drawY = c.Y + y;
+					var drawX = (int)c.X + x;
+					var drawY = (int)c.Y + y;
 					if (IsInMapRange(drawX, drawY))
 					{
 						_map[drawX, drawY].Type = TileType.Floor;
@@ -317,12 +317,14 @@ public class MapGenerator : MonoBehaviour
 			{
 				if (!mapFlags[x, y] && _map[x, y].Type == tileType)
 				{
-					var newRegion = GetRegionTiles(x, y);
-					regions.Add(newRegion);
+					var regionTiles = GetRegionTiles(x, y);
+					regions.Add(regionTiles);
 
-					for (var i = 0; i < newRegion.Count; i++)
+					for (var i = 0; i < regionTiles.Count; i++)
 					{
-						mapFlags[newRegion[i].GridCoordinates.X, newRegion[i].GridCoordinates.Y] = true;
+						var xRegion = (int)regionTiles[i].GridCoordinates.X;
+						var yRegion = (int)regionTiles[i].GridCoordinates.Y;
+						mapFlags[xRegion, yRegion] = true;
 					}
 				}
 			}
@@ -345,9 +347,9 @@ public class MapGenerator : MonoBehaviour
 			var tile = queue.Dequeue();
 			tiles.Add(tile);
 
-			for (var x = tile.GridCoordinates.X - 1; x <= tile.GridCoordinates.X + 1; x++)
+			for (var x = (int)tile.GridCoordinates.X - 1; x <= tile.GridCoordinates.X + 1; x++)
 			{
-				for (var y = tile.GridCoordinates.Y - 1; y <= tile.GridCoordinates.Y + 1; y++)
+				for (var y = (int)tile.GridCoordinates.Y - 1; y <= tile.GridCoordinates.Y + 1; y++)
 				{
 					if (IsInMapRange(x, y) && (y == tile.GridCoordinates.Y || x == tile.GridCoordinates.X))
 					{
@@ -456,13 +458,19 @@ public class MapGenerator : MonoBehaviour
 			return;
 		}
 
-		foreach (Room room in _survivingRooms)
+		foreach (Tile tile in _map)
 		{
-			foreach (Tile tile in room.Tiles)
-			{
-				Gizmos.color = Color.green;
-				Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X, 0, tile.WorldCoordinates.Y), Vector3.one * 0.2f);
-			}
+			Gizmos.color = tile.Type == TileType.Floor ? Color.green : Color.red;
+			Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X, 0, tile.WorldCoordinates.Y), Vector3.one * 0.2f);
 		}
+
+		//foreach (Room room in _survivingRooms)
+		//{
+		//	foreach (Tile tile in room.Tiles)
+		//	{
+		//		Gizmos.color = Color.green;
+		//		Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X, 0, tile.WorldCoordinates.Y), Vector3.one * 0.2f);
+		//	}
+		//}
 	}
 }
