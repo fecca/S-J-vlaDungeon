@@ -1,8 +1,11 @@
-﻿public class PathfindingNode
+﻿using System.Collections.Generic;
+
+public class PathfindingNode
 {
 	public Coordinates GridCoordinates;
 	public Coordinates WorldCoordinates;
 	public PathfindingNode Parent;
+	public List<PathfindingNode> Neighbours = new List<PathfindingNode>();
 	public bool Walkable;
 
 	public float GCost { get; set; }

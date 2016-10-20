@@ -34,7 +34,7 @@ public class CameraController : MonoBehaviour
 			RaycastHit hit;
 			if (Physics.Raycast(ray, out hit, 500f, GroundLayer))
 			{
-				var targetPosition = new Vector2((int)hit.point.x, (int)hit.point.z);
+				var targetPosition = new Vector2(hit.point.x, hit.point.z);
 				_player.MoveTo(targetPosition);
 			}
 		}

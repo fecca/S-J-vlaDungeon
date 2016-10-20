@@ -9,6 +9,8 @@ public static class Extensions
 	}
 	public static PathfindingNode Copy(this PathfindingNode node)
 	{
-		return new PathfindingNode(node.GridCoordinates.X, node.GridCoordinates.Y, node.Walkable);
+		var newNode = new PathfindingNode(node.GridCoordinates.X, node.GridCoordinates.Y, node.Walkable);
+		newNode.Neighbours = node.Neighbours;
+		return newNode;
 	}
 }

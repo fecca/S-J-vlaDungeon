@@ -13,22 +13,21 @@ public class PathFinder : MonoBehaviour
 	public void RegisterMap(Tile[,] map)
 	{
 		CreateNodes(map);
+		GetNeighbours();
 	}
 	public LinkedList<PathfindingNode> GetPath(Vector2 from, Vector2 to)
 	{
-		var xNodeIndexFrom = Mathf.RoundToInt(from.x * 2);
-		var yNodeIndexFrom = Mathf.RoundToInt(from.y * 2);
-		var xNodeIndexTo = Mathf.RoundToInt(to.x * 2);
-		var yNodeIndexTo = Mathf.RoundToInt(to.y * 2);
-		var startNode = _nodes[xNodeIndexFrom, yNodeIndexFrom].Copy();
-		var endNode = _nodes[xNodeIndexTo, yNodeIndexTo].Copy();
+		var fromXFraction = from.x - (int)from.x;
+		var fromXNodeIndex = Mathf.RoundToInt((int)from.x * 2 + fromXFraction);
+		var fromYFraction = from.y - (int)from.y;
+		var fromYNodeIndex = Mathf.RoundToInt((int)from.y * 2 + fromYFraction);
+		var startNode = _nodes[fromXNodeIndex, fromYNodeIndex].Copy();
 
-		Debug.Log(xNodeIndexFrom);
-		Debug.Log(yNodeIndexFrom);
-		Debug.Log(xNodeIndexTo);
-		Debug.Log(yNodeIndexTo);
-		Debug.Log(startNode);
-		Debug.Log(endNode);
+		var toXFraction = to.x - (int)to.x;
+		var toXNodeIndex = Mathf.RoundToInt((int)to.x * 2 + toXFraction);
+		var toYFraction = to.y - (int)to.y;
+		var toYNodeIndex = Mathf.RoundToInt((int)to.y * 2 + toYFraction);
+		var endNode = _nodes[toXNodeIndex, toYNodeIndex].Copy();
 
 		return GetPath(startNode, endNode);
 	}
@@ -63,7 +62,7 @@ public class PathFinder : MonoBehaviour
 				break;
 			}
 
-			var neighbours = GetNeighbours(current);
+			var neighbours = current.Neighbours;// GetNeighbours(current);
 			for (var i = 0; i < neighbours.Count; i++)
 			{
 				var neighbour = neighbours[i];
@@ -142,6 +141,17 @@ public class PathFinder : MonoBehaviour
 			}
 		}
 	}
+	private void GetNeighbours()
+	{
+		for (int x = 0; x < _nodes.GetLength(0); x++)
+		{
+			for (int y = 0; y < _nodes.GetLength(1); y++)
+			{
+				var node = _nodes[x, y];
+				node.Neighbours = GetNeighbours(node);
+			}
+		}
+	}
 	private float GetDistance(PathfindingNode from, PathfindingNode to)
 	{
 		var distanceX = Mathf.Abs(from.WorldCoordinates.X - to.WorldCoordinates.X);
@@ -172,7 +182,7 @@ public class PathFinder : MonoBehaviour
 					continue;
 				}
 
-				neighbours.Add(_nodes[neighbourX, neighbourY].Copy());
+				neighbours.Add(_nodes[neighbourX, neighbourY]);
 			}
 		}
 
