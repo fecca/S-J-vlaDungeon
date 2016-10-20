@@ -9,9 +9,11 @@ public class PathFinder : MonoBehaviour
 
 	private PathfindingNode[,] _nodes;
 	private LinkedList<PathfindingNode> _path = new LinkedList<PathfindingNode>();
+	private int _tileSize;
 
-	public void RegisterMap(Tile[,] map)
+	public void RegisterMap(Tile[,] map, int tileSize)
 	{
+		_tileSize = tileSize;
 		CreateNodes(map);
 		GetNeighbours();
 	}
@@ -75,13 +77,13 @@ public class PathFinder : MonoBehaviour
 
 	private PathfindingNode GetNode(Vector2 worldPosition)
 	{
-		worldPosition /= Constants.TileSize;
+		worldPosition /= _tileSize;
 		var fromXFraction = worldPosition.x - (int)worldPosition.x;
 		var fromXNodeIndex = Mathf.RoundToInt((int)worldPosition.x * 2 + fromXFraction);
 		var fromYFraction = worldPosition.y - (int)worldPosition.y;
 		var fromYNodeIndex = Mathf.RoundToInt((int)worldPosition.y * 2 + fromYFraction);
 
-		return _nodes[fromXNodeIndex, fromYNodeIndex].Copy();
+		return new PathfindingNode(_nodes[fromXNodeIndex, fromYNodeIndex]);
 	}
 	private void CreateNodes(Tile[,] tiles)
 	{
@@ -126,10 +128,10 @@ public class PathFinder : MonoBehaviour
 					}
 				}
 
-				_nodes[xIndex, yIndex + 1] = new PathfindingNode(xIndex, yIndex + 1, topLeftWalkable);
-				_nodes[xIndex + 1, yIndex + 1] = new PathfindingNode(xIndex + 1, yIndex + 1, topRightWalkable);
-				_nodes[xIndex + 1, yIndex] = new PathfindingNode(xIndex + 1, yIndex, bottomRightWalkable);
-				_nodes[xIndex, yIndex] = new PathfindingNode(xIndex, yIndex, bottomLeftWalkable);
+				_nodes[xIndex, yIndex + 1] = new PathfindingNode(xIndex, yIndex + 1, topLeftWalkable, _tileSize);
+				_nodes[xIndex + 1, yIndex + 1] = new PathfindingNode(xIndex + 1, yIndex + 1, topRightWalkable, _tileSize);
+				_nodes[xIndex + 1, yIndex] = new PathfindingNode(xIndex + 1, yIndex, bottomRightWalkable, _tileSize);
+				_nodes[xIndex, yIndex] = new PathfindingNode(xIndex, yIndex, bottomLeftWalkable, _tileSize);
 			}
 		}
 	}

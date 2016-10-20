@@ -20,8 +20,6 @@ public class Enemy : MonoBehaviour
 			_timer = 0;
 			return;
 		}
-
-		//_agent.StartPath(transform.position);
 	}
 
 	public void SetPosition(Vector3 position)

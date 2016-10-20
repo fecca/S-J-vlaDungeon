@@ -21,10 +21,10 @@ public class Tile
 		get { return Type == TileType.Floor && ConfigurationSquare != null && ConfigurationSquare.Configuration == 15; }
 	}
 
-	public Tile(int x, int y, TileType type)
+	public Tile(int x, int y, TileType type, int tileSize)
 	{
 		GridCoordinates = new Coordinates(x, y);
-		WorldCoordinates = new Coordinates(x * Constants.TileSize, y * Constants.TileSize);
+		WorldCoordinates = new Coordinates(x * tileSize, y * tileSize);
 		Type = type;
 	}
 	public void SetConfiguration(ControlNode topLeft, ControlNode topRight, ControlNode bottomRight, ControlNode bottomLeft)

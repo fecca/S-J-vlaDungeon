@@ -2,10 +2,10 @@
 
 public class PathfindingNode : IHeapItem<PathfindingNode>
 {
+	public PathfindingNode Parent;
 	public Coordinates GridCoordinates;
 	public Coordinates WorldCoordinates;
-	public PathfindingNode Parent;
-	public List<PathfindingNode> Neighbours = new List<PathfindingNode>();
+	public List<PathfindingNode> Neighbours;
 	public bool Walkable;
 
 	public float GCost { get; set; }
@@ -13,11 +13,19 @@ public class PathfindingNode : IHeapItem<PathfindingNode>
 	public float FCost { get; set; }
 	public int HeapIndex { get; set; }
 
-	public PathfindingNode(float x, float y, bool walkable)
+	public PathfindingNode(float x, float y, bool walkable, int tileSize)
 	{
 		GridCoordinates = new Coordinates(x, y);
-		WorldCoordinates = new Coordinates((x / 2f + 0.25f) * Constants.TileSize, (y / 2f + 0.25f) * Constants.TileSize);
+		WorldCoordinates = new Coordinates((x / 2f + 0.25f) * tileSize, (y / 2f + 0.25f) * tileSize);
+		Neighbours = new List<PathfindingNode>();
 		Walkable = walkable;
+	}
+	public PathfindingNode(PathfindingNode copy)
+	{
+		GridCoordinates = copy.GridCoordinates;
+		WorldCoordinates = copy.WorldCoordinates;
+		Neighbours = copy.Neighbours;
+		Walkable = copy.Walkable;
 	}
 
 	public override bool Equals(object other)

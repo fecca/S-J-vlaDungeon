@@ -14,7 +14,7 @@ public class Game : MonoBehaviour
 	private void Start()
 	{
 		var map = MapGenerator.GenerateMap();
-		PathFinder.RegisterMap(map);
+		PathFinder.RegisterMap(map, MapGenerator.GetTileSize());
 		MeshGenerator.GenerateMeshes(map);
 		Player.SetPosition(MapGenerator.GetPlayerPosition());
 	}

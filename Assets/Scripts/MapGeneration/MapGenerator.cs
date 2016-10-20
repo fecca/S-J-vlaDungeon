@@ -15,8 +15,8 @@ public class MapGenerator : MonoBehaviour
 	private int Width = 64;
 	[SerializeField]
 	private int Height = 64;
-	//[SerializeField]
-	//private int TileSize = 1;
+	[SerializeField]
+	private int TileSize = 1;
 	[SerializeField]
 	[Range(45, 55)]
 	private int RandomFillPercent = 50;
@@ -74,6 +74,10 @@ public class MapGenerator : MonoBehaviour
 
 		return walkableTiles;
 	}
+	public int GetTileSize()
+	{
+		return TileSize;
+	}
 
 	private void RandomFillMap()
 	{
@@ -89,11 +93,12 @@ public class MapGenerator : MonoBehaviour
 			{
 				if (x == 0 || x == Width - 1 || y == 0 || y == Height - 1)
 				{
-					_map[x, y] = new Tile(x, y, TileType.Wall);
+					_map[x, y] = new Tile(x, y, TileType.Wall, TileSize);
 				}
 				else
 				{
-					_map[x, y] = new Tile(x, y, rng.Next(0, 100) < RandomFillPercent ? TileType.Floor : TileType.Wall);
+					var tileType = rng.Next(0, 100) < RandomFillPercent ? TileType.Floor : TileType.Wall;
+					_map[x, y] = new Tile(x, y, tileType, TileSize);
 				}
 			}
 		}
@@ -341,7 +346,7 @@ public class MapGenerator : MonoBehaviour
 		var tileType = _map[startX, startY].Type;
 		var queue = new Queue<Tile>();
 
-		queue.Enqueue(new Tile(startX, startY, tileType));
+		queue.Enqueue(new Tile(startX, startY, tileType, TileSize));
 		mapFlags[startX, startY] = true;
 
 		while (queue.Count > 0)
@@ -433,7 +438,7 @@ public class MapGenerator : MonoBehaviour
 				var tile = _map[x, y];
 				var position = new Vector3(tile.WorldCoordinates.X, 0, tile.WorldCoordinates.Y);
 				var active = tile.Type == TileType.Floor;
-				controlNodes[x, y] = new ControlNode(position, active);
+				controlNodes[x, y] = new ControlNode(position, active, TileSize);
 			}
 		}
 
@@ -464,14 +469,5 @@ public class MapGenerator : MonoBehaviour
 			Gizmos.color = tile.Type == TileType.Floor ? Color.green : Color.red;
 			Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X, 0, tile.WorldCoordinates.Y), Vector3.one * 0.2f);
 		}
-
-		//foreach (Room room in _survivingRooms)
-		//{
-		//	foreach (Tile tile in room.Tiles)
-		//	{
-		//		Gizmos.color = Color.green;
-		//		Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X, 0, tile.WorldCoordinates.Y), Vector3.one * 0.2f);
-		//	}
-		//}
 	}
 }

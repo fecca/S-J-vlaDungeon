@@ -24,15 +24,7 @@ public class PathFinderAgent : MonoBehaviour
 		{
 			unfinishedNode = _path.First.Value;
 		}
-
-		//System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
-		//stopWatch.Start();
-
 		_path = _pathFinder.GetPath(from, to);
-
-		//stopWatch.Stop();
-		//Debug.Log("GetPath() took " + stopWatch.ElapsedMilliseconds + "ms");
-
 		if (unfinishedNode != null)
 		{
 			_path.AddFirst(unfinishedNode);
