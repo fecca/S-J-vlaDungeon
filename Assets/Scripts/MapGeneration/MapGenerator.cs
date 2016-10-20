@@ -15,6 +15,8 @@ public class MapGenerator : MonoBehaviour
 	private int Width = 64;
 	[SerializeField]
 	private int Height = 64;
+	//[SerializeField]
+	//private int TileSize = 1;
 	[SerializeField]
 	[Range(45, 55)]
 	private int RandomFillPercent = 50;
@@ -258,7 +260,7 @@ public class MapGenerator : MonoBehaviour
 		roomA.ConnectedRooms.Add(roomB);
 		roomB.ConnectedRooms.Add(roomA);
 
-		var line = GetLine(tileA.WorldCoordinates, tileB.WorldCoordinates);
+		var line = GetLine(tileA.GridCoordinates, tileB.GridCoordinates);
 		for (var i = 0; i < line.Count; i++)
 		{
 			CreateCorridor(line[i], CorridorThickness);
@@ -367,7 +369,6 @@ public class MapGenerator : MonoBehaviour
 	}
 	private List<Coordinates> GetLine(Coordinates from, Coordinates to)
 	{
-		Debug.DrawLine(new Vector3(from.X, 1f, from.Y), new Vector3(to.X, 1f, to.Y), Color.yellow, 100f);
 		var line = new List<Coordinates>(64);
 
 		var x = from.X;

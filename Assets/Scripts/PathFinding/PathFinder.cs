@@ -17,17 +17,8 @@ public class PathFinder : MonoBehaviour
 	}
 	public LinkedList<PathfindingNode> GetPath(Vector2 from, Vector2 to)
 	{
-		var fromXFraction = from.x - (int)from.x;
-		var fromXNodeIndex = Mathf.RoundToInt((int)from.x * 2 + fromXFraction);
-		var fromYFraction = from.y - (int)from.y;
-		var fromYNodeIndex = Mathf.RoundToInt((int)from.y * 2 + fromYFraction);
-		var startNode = _nodes[fromXNodeIndex, fromYNodeIndex].Copy();
-
-		var toXFraction = to.x - (int)to.x;
-		var toXNodeIndex = Mathf.RoundToInt((int)to.x * 2 + toXFraction);
-		var toYFraction = to.y - (int)to.y;
-		var toYNodeIndex = Mathf.RoundToInt((int)to.y * 2 + toYFraction);
-		var endNode = _nodes[toXNodeIndex, toYNodeIndex].Copy();
+		var startNode = GetNode(from);
+		var endNode = GetNode(to);
 
 		return GetPath(startNode, endNode);
 	}
@@ -39,22 +30,13 @@ public class PathFinder : MonoBehaviour
 			return _path;
 		}
 
-		var open = new List<PathfindingNode>();
-		var closed = new List<PathfindingNode>();
+		var open = new Heap<PathfindingNode>(_nodes.GetLength(0) * _nodes.GetLength(1));
+		var closed = new HashSet<PathfindingNode>();
 
 		open.Add(startNode);
 		while (open.Count > 0)
 		{
-			var current = open[0];
-			for (var i = 0; i < open.Count; i++)
-			{
-				var openTile = open[i];
-				if (openTile.FCost < current.FCost || openTile.FCost == current.FCost && openTile.HCost < current.HCost)
-				{
-					current = openTile;
-				}
-			}
-			open.Remove(current);
+			var current = open.RemoveFirst();
 			closed.Add(current);
 
 			if (current.Equals(endNode))
@@ -62,7 +44,7 @@ public class PathFinder : MonoBehaviour
 				break;
 			}
 
-			var neighbours = current.Neighbours;// GetNeighbours(current);
+			var neighbours = current.Neighbours;
 			for (var i = 0; i < neighbours.Count; i++)
 			{
 				var neighbour = neighbours[i];
@@ -91,6 +73,16 @@ public class PathFinder : MonoBehaviour
 		return RetracePath(closed.Last());
 	}
 
+	private PathfindingNode GetNode(Vector2 worldPosition)
+	{
+		worldPosition /= Constants.TileSize;
+		var fromXFraction = worldPosition.x - (int)worldPosition.x;
+		var fromXNodeIndex = Mathf.RoundToInt((int)worldPosition.x * 2 + fromXFraction);
+		var fromYFraction = worldPosition.y - (int)worldPosition.y;
+		var fromYNodeIndex = Mathf.RoundToInt((int)worldPosition.y * 2 + fromYFraction);
+
+		return _nodes[fromXNodeIndex, fromYNodeIndex].Copy();
+	}
 	private void CreateNodes(Tile[,] tiles)
 	{
 		_nodes = new PathfindingNode[tiles.GetLength(0) * 2, tiles.GetLength(1) * 2];

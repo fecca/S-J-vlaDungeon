@@ -10,14 +10,6 @@ public class PathFinderAgent : MonoBehaviour
 	private PathFinder _pathFinder;
 	private Color _randomColor;
 
-	private void Update()
-	{
-		if (_path.Count > 0)
-		{
-			MoveAlongPath();
-		}
-	}
-
 	public void Setup(PathFinder pathFinder)
 	{
 		_path = new LinkedList<PathfindingNode>();
@@ -32,7 +24,15 @@ public class PathFinderAgent : MonoBehaviour
 		{
 			unfinishedNode = _path.First.Value;
 		}
+
+		//System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+		//stopWatch.Start();
+
 		_path = _pathFinder.GetPath(from, to);
+
+		//stopWatch.Stop();
+		//Debug.Log("GetPath() took " + stopWatch.ElapsedMilliseconds + "ms");
+
 		if (unfinishedNode != null)
 		{
 			_path.AddFirst(unfinishedNode);
@@ -52,6 +52,13 @@ public class PathFinderAgent : MonoBehaviour
 		}
 	}
 
+	private void FixedUpdate()
+	{
+		if (_path.Count > 0)
+		{
+			MoveAlongPath();
+		}
+	}
 	private void OnDrawGizmos()
 	{
 		if (_path != null)

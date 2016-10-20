@@ -11,6 +11,7 @@ public static class Extensions
 	{
 		var newNode = new PathfindingNode(node.GridCoordinates.X, node.GridCoordinates.Y, node.Walkable);
 		newNode.Neighbours = node.Neighbours;
+
 		return newNode;
 	}
 }

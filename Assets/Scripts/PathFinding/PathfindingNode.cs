@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-public class PathfindingNode
+public class PathfindingNode : IHeapItem<PathfindingNode>
 {
 	public Coordinates GridCoordinates;
 	public Coordinates WorldCoordinates;
@@ -11,11 +11,12 @@ public class PathfindingNode
 	public float GCost { get; set; }
 	public float HCost { get; set; }
 	public float FCost { get; set; }
+	public int HeapIndex { get; set; }
 
 	public PathfindingNode(float x, float y, bool walkable)
 	{
 		GridCoordinates = new Coordinates(x, y);
-		WorldCoordinates = new Coordinates(x / 2f + 0.25f, y / 2f + 0.25f);
+		WorldCoordinates = new Coordinates((x / 2f + 0.25f) * Constants.TileSize, (y / 2f + 0.25f) * Constants.TileSize);
 		Walkable = walkable;
 	}
 
@@ -32,5 +33,15 @@ public class PathfindingNode
 	public override string ToString()
 	{
 		return "Grid: [" + GridCoordinates.X + ";" + GridCoordinates.Y + "], World: [" + WorldCoordinates.X + ";" + WorldCoordinates.Y + "], Walkable: " + Walkable;
+	}
+	public int CompareTo(PathfindingNode other)
+	{
+		var compare = FCost.CompareTo(other.FCost);
+		if (compare == 0)
+		{
+			compare = HCost.CompareTo(other.HCost);
+		}
+
+		return -compare;
 	}
 }
