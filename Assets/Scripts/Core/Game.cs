@@ -2,20 +2,19 @@
 
 public class Game : MonoBehaviour
 {
-	[SerializeField]
-	private MapGenerator MapGenerator = null;
-	[SerializeField]
-	private MeshGenerator MeshGenerator = null;
-	[SerializeField]
-	private PlayerController Player = null;
-	[SerializeField]
-	private PathFinder PathFinder = null;
+	private MapGenerator _mapGenerator;
+	private MeshGenerator _meshGenerator;
+	private PathFinder _pathFinder;
+	private PlayerController _player;
 
 	private void Start()
 	{
-		var map = MapGenerator.GenerateMap();
-		PathFinder.RegisterMap(map, MapGenerator.GetTileSize());
-		MeshGenerator.GenerateMeshes(map);
-		Player.SetPosition(MapGenerator.GetPlayerPosition());
+		_mapGenerator = FindObjectOfType<MapGenerator>();
+		_meshGenerator = FindObjectOfType<MeshGenerator>();
+		_pathFinder = FindObjectOfType<PathFinder>();
+		_player = FindObjectOfType<PlayerController>();
+
+		_mapGenerator.GenerateMap(_meshGenerator, _pathFinder);
+		_player.SetPosition(_mapGenerator.GetPlayerPosition());
 	}
 }

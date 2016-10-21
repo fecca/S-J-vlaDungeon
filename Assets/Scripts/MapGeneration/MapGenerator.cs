@@ -32,7 +32,7 @@ public class MapGenerator : MonoBehaviour
 	private Tile[,] _map;
 	private List<Room> _survivingRooms = new List<Room>(128);
 
-	public Tile[,] GenerateMap()
+	public Tile[,] GenerateMap(MeshGenerator meshGenerator, PathFinder pathFinder)
 	{
 		_map = new Tile[Width, Height];
 
@@ -42,6 +42,9 @@ public class MapGenerator : MonoBehaviour
 		FilterRooms();
 		ConnectClosestRooms();
 		ConfigureTiles();
+
+		meshGenerator.GenerateMeshes(_map);
+		pathFinder.RegisterMap(_map, TileSize);
 
 		return _map;
 	}
@@ -153,7 +156,7 @@ public class MapGenerator : MonoBehaviour
 			}
 			else
 			{
-				_survivingRooms.Add(new Room(roomRegion, _map));
+				_survivingRooms.Add(new Room(roomRegion));
 			}
 		}
 
@@ -212,12 +215,12 @@ public class MapGenerator : MonoBehaviour
 					continue;
 				}
 
-				for (var tileIndexA = 0; tileIndexA < roomListA[i].Tiles.Count; tileIndexA++)
+				for (var tileIndexA = 0; tileIndexA < roomListA[i].EdgeTiles.Count; tileIndexA++)
 				{
-					for (var tileIndexB = 0; tileIndexB < roomListB[j].Tiles.Count; tileIndexB++)
+					for (var tileIndexB = 0; tileIndexB < roomListB[j].EdgeTiles.Count; tileIndexB++)
 					{
-						var tileA = roomListA[i].Tiles[tileIndexA];
-						var tileB = roomListB[j].Tiles[tileIndexB];
+						var tileA = roomListA[i].EdgeTiles[tileIndexA];
+						var tileB = roomListB[j].EdgeTiles[tileIndexB];
 						var distanceX = (tileA.WorldCoordinates.X - tileB.WorldCoordinates.X) * (tileA.WorldCoordinates.X - tileB.WorldCoordinates.X);
 						var distanceY = (tileA.WorldCoordinates.Y - tileB.WorldCoordinates.Y) * (tileA.WorldCoordinates.Y - tileB.WorldCoordinates.Y);
 						var distanceBetweenRooms = distanceX + distanceY;
@@ -464,10 +467,21 @@ public class MapGenerator : MonoBehaviour
 			return;
 		}
 
-		foreach (Tile tile in _map)
+		foreach (var tile in _map)
 		{
-			Gizmos.color = tile.Type == TileType.Floor ? Color.green : Color.red;
-			Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X, 0, tile.WorldCoordinates.Y), Vector3.one * 0.2f);
+			if (tile.IsWallTile || tile.IsWalkable)
+			{
+				if (tile.IsWallTile)
+				{
+					Gizmos.color = Color.red;
+					Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X + (TileSize / 2), 0, tile.WorldCoordinates.Y + (TileSize / 2)), Vector3.one * 0.95f);
+				}
+				else if (tile.IsWalkable)
+				{
+					Gizmos.color = Color.green;
+					Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X + (TileSize / 2), 0, tile.WorldCoordinates.Y + (TileSize / 2)), Vector3.one * 0.95f);
+				}
+			}
 		}
 	}
 }
