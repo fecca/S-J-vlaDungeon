@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
 		transform.position = position;
 	}
 
-	public void MoveTo(Vector2 targetPosition)
+	public void ClickedGround(Vector2 targetPosition)
 	{
 		_agent.StartPath(new Vector2(transform.position.x, transform.position.z), targetPosition);
 	}

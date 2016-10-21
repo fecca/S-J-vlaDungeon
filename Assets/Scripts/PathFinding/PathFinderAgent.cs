@@ -8,26 +8,26 @@ public class PathFinderAgent : MonoBehaviour
 
 	private LinkedList<PathfindingNode> _path;
 	private PathFinder _pathFinder;
-	private Color _randomColor;
+	private bool _pendingNewPath;
+	private Vector2 _pendingTo;
 
 	public void Setup(PathFinder pathFinder)
 	{
 		_path = new LinkedList<PathfindingNode>();
 		_pathFinder = pathFinder;
-		_randomColor = new Color(Random.value, Random.value, Random.value);
 	}
 
 	public void StartPath(Vector2 from, Vector2 to)
 	{
-		PathfindingNode unfinishedNode = null;
 		if (_path.Count > 0)
 		{
-			unfinishedNode = _path.First.Value;
+			_pendingNewPath = true;
+			_pendingTo = to;
 		}
-		_path = _pathFinder.GetPath(from, to);
-		if (unfinishedNode != null)
+		else
 		{
-			_path.AddFirst(unfinishedNode);
+			_pendingNewPath = false;
+			_path = _pathFinder.GetPath(from, to);
 		}
 	}
 
@@ -38,9 +38,14 @@ public class PathFinderAgent : MonoBehaviour
 		var targetPosition = new Vector3(targetNode.Value.WorldCoordinates.X, transform.position.y, targetNode.Value.WorldCoordinates.Y);
 		transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * MovementSpeed);
 
-		if (Vector3.Distance(transform.position, targetPosition) < 0.02f)
+		if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
 		{
 			_path.Remove(targetNode);
+			if (_pendingNewPath)
+			{
+				_pendingNewPath = false;
+				_path = _pathFinder.GetPath(new Vector2(transform.position.x, transform.position.z), _pendingTo);
+			}
 		}
 	}
 
