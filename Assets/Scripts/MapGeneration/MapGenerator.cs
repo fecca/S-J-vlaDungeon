@@ -215,12 +215,12 @@ public class MapGenerator : MonoBehaviour
 					continue;
 				}
 
-				for (var tileIndexA = 0; tileIndexA < roomListA[i].EdgeTiles.Count; tileIndexA++)
+				for (var tileIndexA = 0; tileIndexA < roomListA[i].Tiles.Count; tileIndexA++)
 				{
-					for (var tileIndexB = 0; tileIndexB < roomListB[j].EdgeTiles.Count; tileIndexB++)
+					for (var tileIndexB = 0; tileIndexB < roomListB[j].Tiles.Count; tileIndexB++)
 					{
-						var tileA = roomListA[i].EdgeTiles[tileIndexA];
-						var tileB = roomListB[j].EdgeTiles[tileIndexB];
+						var tileA = roomListA[i].Tiles[tileIndexA];
+						var tileB = roomListB[j].Tiles[tileIndexB];
 						var distanceX = (tileA.WorldCoordinates.X - tileB.WorldCoordinates.X) * (tileA.WorldCoordinates.X - tileB.WorldCoordinates.X);
 						var distanceY = (tileA.WorldCoordinates.Y - tileB.WorldCoordinates.Y) * (tileA.WorldCoordinates.Y - tileB.WorldCoordinates.Y);
 						var distanceBetweenRooms = distanceX + distanceY;
