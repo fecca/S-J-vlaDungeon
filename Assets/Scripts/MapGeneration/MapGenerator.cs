@@ -96,11 +96,11 @@ public class MapGenerator : MonoBehaviour
 			{
 				if (x == 0 || x == Width - 1 || y == 0 || y == Height - 1)
 				{
-					_map[x, y] = new Tile(x, y, TileType.Wall, TileSize);
+					_map[x, y] = new Tile(x, y, TileType.None, TileSize);
 				}
 				else
 				{
-					var tileType = rng.Next(0, 100) < RandomFillPercent ? TileType.Floor : TileType.Wall;
+					var tileType = rng.Next(0, 100) < RandomFillPercent ? TileType.Floor : TileType.None;
 					_map[x, y] = new Tile(x, y, tileType, TileSize);
 				}
 			}
@@ -120,7 +120,7 @@ public class MapGenerator : MonoBehaviour
 					}
 					else if (GetNumberOfNeighbouringTiles(x, y) < 4)
 					{
-						_map[x, y].Type = TileType.Wall;
+						_map[x, y].Type = TileType.None;
 					}
 				}
 			}
@@ -128,7 +128,7 @@ public class MapGenerator : MonoBehaviour
 	}
 	private void FilterWalls()
 	{
-		var wallRegions = GetRegions(TileType.Wall);
+		var wallRegions = GetRegions(TileType.None);
 		for (var i = 0; i < wallRegions.Count; i++)
 		{
 			var wallRegion = wallRegions[i];
@@ -136,7 +136,7 @@ public class MapGenerator : MonoBehaviour
 			{
 				for (var j = 0; j < wallRegion.Count; j++)
 				{
-					wallRegion[j].Type = TileType.Floor;
+					_map[(int)wallRegion[j].GridCoordinates.X, (int)wallRegion[j].GridCoordinates.Y].Type = TileType.Floor;
 				}
 			}
 		}
@@ -151,7 +151,8 @@ public class MapGenerator : MonoBehaviour
 			{
 				for (var j = 0; j < roomRegion.Count; j++)
 				{
-					roomRegion[j].Type = TileType.Wall;
+					//roomRegion[j].Type = TileType.Wall;
+					_map[(int)roomRegion[j].GridCoordinates.X, (int)roomRegion[j].GridCoordinates.Y].Type = TileType.None;
 				}
 			}
 			else
@@ -292,7 +293,35 @@ public class MapGenerator : MonoBehaviour
 			}
 		}
 	}
+	private void ConfigureTiles()
+	{
+		var controlNodes = new ControlNode[Width, Height];
+		for (var x = 0; x < Width; x++)
+		{
+			for (var y = 0; y < Height; y++)
+			{
+				var tile = _map[x, y];
+				if (tile.GridCoordinates.X >= 17 && tile.GridCoordinates.X <= 20 && tile.GridCoordinates.Y >= 32 && tile.GridCoordinates.Y <= 34)
+				{
+					var a = 0;
+				}
+				controlNodes[x, y] = new ControlNode(new Vector3(tile.WorldCoordinates.X, 0, tile.WorldCoordinates.Y), tile.Type == TileType.Floor, TileSize);
+			}
+		}
 
+		for (var x = 0; x < Width - 1; x++)
+		{
+			for (var y = 0; y < Height - 1; y++)
+			{
+				var tile = _map[x, y];
+				if (tile.GridCoordinates.X >= 17 && tile.GridCoordinates.X <= 20 && tile.GridCoordinates.Y >= 32 && tile.GridCoordinates.Y <= 34)
+				{
+					var a = 0;
+				}
+				tile.SetConfiguration(controlNodes[x, y + 1], controlNodes[x + 1, y + 1], controlNodes[x + 1, y], controlNodes[x, y]);
+			}
+		}
+	}
 	private bool IsInMapRange(int x, int y)
 	{
 		return x >= 0 && x < Width && y >= 0 && y < Height;
@@ -431,29 +460,6 @@ public class MapGenerator : MonoBehaviour
 
 		return line;
 	}
-	private void ConfigureTiles()
-	{
-		var controlNodes = new ControlNode[Width, Height];
-		for (var x = 0; x < Width; x++)
-		{
-			for (var y = 0; y < Height; y++)
-			{
-				var tile = _map[x, y];
-				var position = new Vector3(tile.WorldCoordinates.X, 0, tile.WorldCoordinates.Y);
-				var active = tile.Type == TileType.Floor;
-				controlNodes[x, y] = new ControlNode(position, active, TileSize);
-			}
-		}
-
-		for (var x = 0; x < Width - 1; x++)
-		{
-			for (var y = 0; y < Height - 1; y++)
-			{
-				var tile = _map[x, y];
-				tile.SetConfiguration(controlNodes[x, y + 1], controlNodes[x + 1, y + 1], controlNodes[x + 1, y], controlNodes[x, y]);
-			}
-		}
-	}
 
 	private void OnDrawGizmos()
 	{
@@ -469,6 +475,10 @@ public class MapGenerator : MonoBehaviour
 
 		foreach (var tile in _map)
 		{
+			//if (tile.WorldCoordinates.X >= 10 && tile.WorldCoordinates.X <= 12 && tile.WorldCoordinates.Y >= 12 && tile.WorldCoordinates.Y <= 14)
+			//{
+			//	Debug.Log(tile);
+			//}
 			if (tile.IsWallTile || tile.IsWalkable)
 			{
 				if (tile.IsWallTile)

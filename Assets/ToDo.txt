@@ -5,4 +5,4 @@
 
 Bugs
 ----
-- Room/Wall threshold not clearing all tiles
+- Unreachable areas

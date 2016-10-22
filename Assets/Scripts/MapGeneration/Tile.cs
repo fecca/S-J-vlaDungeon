@@ -44,10 +44,16 @@ public class Tile
 	}
 	public override string ToString()
 	{
-		return "Type: " + Type +
-			", Coordinates: " + WorldCoordinates +
+		var returnValue = "Type: " + Type +
+			", Grid: " + GridCoordinates +
+			", World: " + WorldCoordinates +
 			", CoreVertices: " + CoreVertices.Count +
-			", IsConfigured: " + IsWalkable +
-			", Configuration: " + ConfigurationSquare;
+			", IsConfigured: " + (ConfigurationSquare != null);
+		if (ConfigurationSquare != null)
+		{
+			returnValue += ", Configuration: " + ConfigurationSquare.Configuration;
+		}
+
+		return returnValue;
 	}
 }
