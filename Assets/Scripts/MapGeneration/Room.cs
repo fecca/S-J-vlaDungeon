@@ -5,7 +5,6 @@ using System.Linq;
 public class Room : IComparable<Room>
 {
 	public List<Tile> Tiles;
-	public List<Tile> EdgeTiles;
 	public List<Tile> WalkableTiles;
 	public List<Room> ConnectedRooms;
 	public int RoomSize;
@@ -17,9 +16,8 @@ public class Room : IComparable<Room>
 	public Room(List<Tile> roomTiles)
 	{
 		Tiles = roomTiles;
-		EdgeTiles = Tiles.Where(p => p.IsWallTile).ToList();
-		WalkableTiles = Tiles.Where(p => p.IsWalkable).ToList();
-		RoomSize = Tiles.Count;
+		WalkableTiles = roomTiles.Where(p => p.IsWalkable).ToList();
+		RoomSize = roomTiles.Count;
 		ConnectedRooms = new List<Room>(64);
 	}
 

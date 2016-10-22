@@ -479,9 +479,9 @@ public class MapGenerator : MonoBehaviour
 			//{
 			//	Debug.Log(tile);
 			//}
-			if (tile.IsWallTile || tile.IsWalkable)
+			if (tile.IsEdgeTile || tile.IsWalkable)
 			{
-				if (tile.IsWallTile)
+				if (tile.IsEdgeTile)
 				{
 					Gizmos.color = Color.red;
 					Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X + (TileSize / 2), 0, tile.WorldCoordinates.Y + (TileSize / 2)), Vector3.one * 0.95f);

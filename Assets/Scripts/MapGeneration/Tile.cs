@@ -9,7 +9,7 @@ public class Tile
 	public ConfigurationSquare ConfigurationSquare;
 	public List<Vector3> CoreVertices = new List<Vector3>(4);
 
-	public bool IsWallTile
+	public bool IsEdgeTile
 	{
 		get
 		{
@@ -44,16 +44,11 @@ public class Tile
 	}
 	public override string ToString()
 	{
-		var returnValue = "Type: " + Type +
+		return "Type: " + Type +
 			", Grid: " + GridCoordinates +
 			", World: " + WorldCoordinates +
 			", CoreVertices: " + CoreVertices.Count +
-			", IsConfigured: " + (ConfigurationSquare != null);
-		if (ConfigurationSquare != null)
-		{
-			returnValue += ", Configuration: " + ConfigurationSquare.Configuration;
-		}
-
-		return returnValue;
+			", IsConfigured: " + (ConfigurationSquare != null) +
+			", Configuration: " + (ConfigurationSquare != null ? ConfigurationSquare.Configuration.ToString() : "N/A");
 	}
 }

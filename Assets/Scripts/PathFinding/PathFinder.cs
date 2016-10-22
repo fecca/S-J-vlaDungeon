@@ -209,7 +209,7 @@ public class PathFinder : MonoBehaviour
 		{
 			foreach (var tile in _nodes)
 			{
-				Gizmos.color = tile.Walkable ? Color.blue : Color.yellow;
+				Gizmos.color = tile.Walkable ? Color.green : Color.red;
 				Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X, 0.5f, tile.WorldCoordinates.Y), Vector3.one * 0.1f);
 			}
 		}
