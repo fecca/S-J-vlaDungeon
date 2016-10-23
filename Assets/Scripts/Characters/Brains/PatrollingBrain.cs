@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu]
-public class PatrollingEnemy : EnemyBrain
+[CreateAssetMenu(menuName = "Brains/Enemies/Patroller")]
+public class PatrollingEnemy : Brain
 {
 	[SerializeField]
 	private float MovementSpeed = 20.0f;

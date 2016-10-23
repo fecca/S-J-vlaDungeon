@@ -5,22 +5,30 @@ public class InputHandler : MonoBehaviour
 	[SerializeField]
 	private LayerMask GroundLayer = 0;
 
-	private PlayerController _player;
+	private static InputHandler _instance;
 
-	private void Start()
+	public static InputHandler Instance
 	{
-		_player = FindObjectOfType<PlayerController>();
-	}
-	private void Update()
-	{
-		if (Input.GetMouseButtonUp(0))
+		get
 		{
-			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			RaycastHit hit;
-			if (Physics.Raycast(ray, out hit, 500f, GroundLayer))
-			{
-				_player.ClickedGround(hit.point);
-			}
+			return _instance;
 		}
+	}
+
+	private void Awake()
+	{
+		_instance = this;
+	}
+
+	public Vector3 GetHitPoint(Vector3 mousePosition)
+	{
+		var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		RaycastHit hit;
+		if (Physics.Raycast(ray, out hit, 500f, GroundLayer))
+		{
+			return hit.point;
+		}
+
+		return -Vector3.one;
 	}
 }

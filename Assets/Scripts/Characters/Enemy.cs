@@ -4,14 +4,14 @@
 public class Enemy : MonoBehaviour
 {
 	[SerializeField]
-	private EnemyBrain Brain;
+	private Brain Brain;
 
-	private PathFinderAgent _pathFinderAgent;
+	private PathFinderAgent _agent;
 
 	private void Start()
 	{
-		_pathFinderAgent = GetComponent<PathFinderAgent>();
-		Brain.Initialize(this, _pathFinderAgent);
+		_agent = GetComponent<PathFinderAgent>();
+		Brain.Initialize(this, _agent);
 	}
 	private void Update()
 	{
@@ -20,6 +20,6 @@ public class Enemy : MonoBehaviour
 			return;
 		}
 
-		Brain.Think(this, _pathFinderAgent);
+		Brain.Think(this, _agent);
 	}
 }

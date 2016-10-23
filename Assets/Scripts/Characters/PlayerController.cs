@@ -4,21 +4,22 @@
 public class PlayerController : MonoBehaviour
 {
 	[SerializeField]
-	private float MovementSpeed = 30.0f;
+	private PlayerBrain Brain;
 
 	private PathFinderAgent _agent;
 
 	private void Start()
 	{
 		_agent = GetComponent<PathFinderAgent>();
-		_agent.Setup(FindObjectOfType<PathFinder>());
+		Brain.Initialize(this, _agent);
 	}
-
-	public void ClickedGround(Vector3 targetPosition)
+	private void Update()
 	{
-		_agent.StartPathTo(targetPosition, MovementSpeed, () =>
+		if (Brain == null)
 		{
-			Debug.Log("Arrived at target");
-		});
+			return;
+		}
+
+		Brain.Think(this, _agent);
 	}
 }
