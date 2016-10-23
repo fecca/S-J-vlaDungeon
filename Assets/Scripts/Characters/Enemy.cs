@@ -4,26 +4,27 @@
 public class Enemy : MonoBehaviour
 {
 	private float _timer;
-	private const float Time = 5f;
+	private const float NewPathTime = 2f;
 	private PathFinderAgent _agent;
+	private MapGenerator _mapGenerator;
 
 	private void Start()
 	{
+		_mapGenerator = FindObjectOfType<MapGenerator>();
 		_agent = GetComponent<PathFinderAgent>();
 		_agent.Setup(FindObjectOfType<PathFinder>());
 	}
 
 	private void Update()
 	{
-		if (_timer > Time)
+		if (_timer < NewPathTime)
 		{
-			_timer = 0;
+			_timer += Time.deltaTime;
 			return;
 		}
-	}
+		_timer = 0;
 
-	public void SetPosition(Vector3 position)
-	{
-		transform.position = position;
+		Debug.Log("start new path");
+		_agent.StartPathTo(_mapGenerator.GetRandomWalkableTile());
 	}
 }

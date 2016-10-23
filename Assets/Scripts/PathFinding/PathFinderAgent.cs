@@ -6,29 +6,32 @@ public class PathFinderAgent : MonoBehaviour
 	[SerializeField]
 	private float MovementSpeed = 5.0f;
 
-	private LinkedList<PathfindingNode> _path;
+	private LinkedList<PathfindingNode> _path = new LinkedList<PathfindingNode>();
 	private PathFinder _pathFinder;
 	private bool _pendingNewPath;
-	private Vector2 _pendingTo;
+	private Vector3 _pendingTo;
 
 	public void Setup(PathFinder pathFinder)
 	{
-		_path = new LinkedList<PathfindingNode>();
 		_pathFinder = pathFinder;
 	}
 
-	public void StartPath(Vector2 from, Vector2 to)
+	public void StartPathTo(Vector3 targetPosition)
 	{
 		if (_path.Count > 0)
 		{
 			_pendingNewPath = true;
-			_pendingTo = to;
+			_pendingTo = targetPosition;
 		}
 		else
 		{
 			_pendingNewPath = false;
-			_path = _pathFinder.GetPath(from, to);
+			_path = _pathFinder.GetPath(transform.position, targetPosition);
 		}
+	}
+	public void StartPathTo(Tile targetTile)
+	{
+		StartPathTo(new Vector3(targetTile.WorldCoordinates.X, transform.position.y, targetTile.WorldCoordinates.Y));
 	}
 
 	private void MoveAlongPath()
@@ -44,7 +47,7 @@ public class PathFinderAgent : MonoBehaviour
 			if (_pendingNewPath)
 			{
 				_pendingNewPath = false;
-				_path = _pathFinder.GetPath(new Vector2(transform.position.x, transform.position.z), _pendingTo);
+				_path = _pathFinder.GetPath(transform.position, _pendingTo);
 			}
 		}
 	}
@@ -62,8 +65,8 @@ public class PathFinderAgent : MonoBehaviour
 		{
 			for (var iteration = _path.First; iteration != null; iteration = iteration.Next)
 			{
-				Gizmos.color = Color.white;
-				Gizmos.DrawCube(new Vector3(iteration.Value.WorldCoordinates.X, 1, iteration.Value.WorldCoordinates.Y), Vector3.one * 0.25f);
+				Gizmos.color = Color.red;
+				Gizmos.DrawCube(new Vector3(iteration.Value.WorldCoordinates.X, 1, iteration.Value.WorldCoordinates.Y), Vector3.one * 0.5f);
 			}
 		}
 	}

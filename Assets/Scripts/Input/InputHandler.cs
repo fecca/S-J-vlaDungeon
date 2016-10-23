@@ -20,8 +20,7 @@ public class InputHandler : MonoBehaviour
 			RaycastHit hit;
 			if (Physics.Raycast(ray, out hit, 500f, GroundLayer))
 			{
-				var targetPosition = new Vector2(hit.point.x, hit.point.z);
-				_player.ClickedGround(targetPosition);
+				_player.ClickedGround(hit.point);
 			}
 		}
 	}

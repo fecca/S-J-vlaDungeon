@@ -2,6 +2,11 @@
 
 public class Game : MonoBehaviour
 {
+	[SerializeField]
+	private GameObject EnemyPrefab;
+	[SerializeField]
+	private int NumberOfEnemies;
+
 	private MapGenerator _mapGenerator;
 	private MeshGenerator _meshGenerator;
 	private PathFinder _pathFinder;
@@ -15,6 +20,18 @@ public class Game : MonoBehaviour
 		_player = FindObjectOfType<PlayerController>();
 
 		_mapGenerator.GenerateMap(_meshGenerator, _pathFinder);
-		_player.SetPosition(_mapGenerator.GetPlayerPosition());
+		_player.transform.position = _mapGenerator.GetPlayerPosition();
+
+		SpawnEnemies();
+	}
+
+	private void SpawnEnemies()
+	{
+		for (var i = 0; i < NumberOfEnemies; i++)
+		{
+			var randomTile = _mapGenerator.GetRandomWalkableTile();
+			var randomTilePosition = new Vector3(randomTile.WorldCoordinates.X, 5, randomTile.WorldCoordinates.Y);
+			Instantiate(EnemyPrefab, randomTilePosition, Quaternion.identity);
+		}
 	}
 }

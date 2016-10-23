@@ -11,13 +11,8 @@ public class PlayerController : MonoBehaviour
 		_agent.Setup(FindObjectOfType<PathFinder>());
 	}
 
-	public void SetPosition(Vector3 position)
+	public void ClickedGround(Vector3 targetPosition)
 	{
-		transform.position = position;
-	}
-
-	public void ClickedGround(Vector2 targetPosition)
-	{
-		_agent.StartPath(new Vector2(transform.position.x, transform.position.z), targetPosition);
+		_agent.StartPathTo(targetPosition);
 	}
 }

@@ -17,7 +17,7 @@ public class PathFinder : MonoBehaviour
 		CreateNodes(map);
 		GetNeighbours();
 	}
-	public LinkedList<PathfindingNode> GetPath(Vector2 from, Vector2 to)
+	public LinkedList<PathfindingNode> GetPath(Vector3 from, Vector3 to)
 	{
 		var startNode = GetNode(from);
 		var endNode = GetNode(to);
@@ -75,13 +75,13 @@ public class PathFinder : MonoBehaviour
 		return RetracePath(closed.Last());
 	}
 
-	private PathfindingNode GetNode(Vector2 worldPosition)
+	private PathfindingNode GetNode(Vector3 worldPosition)
 	{
 		worldPosition /= _tileSize;
 		var fromXFraction = worldPosition.x - (int)worldPosition.x;
 		var fromXNodeIndex = Mathf.RoundToInt((int)worldPosition.x * 2 + fromXFraction);
-		var fromYFraction = worldPosition.y - (int)worldPosition.y;
-		var fromYNodeIndex = Mathf.RoundToInt((int)worldPosition.y * 2 + fromYFraction);
+		var fromYFraction = worldPosition.z - (int)worldPosition.z;
+		var fromYNodeIndex = Mathf.RoundToInt((int)worldPosition.z * 2 + fromYFraction);
 
 		return new PathfindingNode(_nodes[fromXNodeIndex, fromYNodeIndex]);
 	}

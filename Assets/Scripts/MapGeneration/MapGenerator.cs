@@ -31,6 +31,7 @@ public class MapGenerator : MonoBehaviour
 
 	private Tile[,] _map;
 	private List<Room> _survivingRooms = new List<Room>(128);
+	private List<Tile> _walkableTiles = new List<Tile>();
 
 	public Tile[,] GenerateMap(MeshGenerator meshGenerator, PathFinder pathFinder)
 	{
@@ -42,6 +43,7 @@ public class MapGenerator : MonoBehaviour
 		FilterRooms();
 		ConnectClosestRooms();
 		ConfigureTiles();
+		RegisterWalkableTiles();
 
 		meshGenerator.GenerateMeshes(_map);
 		pathFinder.RegisterMap(_map, TileSize);
@@ -60,22 +62,9 @@ public class MapGenerator : MonoBehaviour
 
 		return position;
 	}
-	public List<Tile> GetWalkableTiles()
+	public Tile GetRandomWalkableTile()
 	{
-		var walkableTiles = new List<Tile>();
-		for (var x = 0; x < _map.GetLength(0); x++)
-		{
-			for (var y = 0; y < _map.GetLength(1); y++)
-			{
-				var tile = _map[x, y];
-				if (tile.IsWalkable)
-				{
-					walkableTiles.Add(tile);
-				}
-			}
-		}
-
-		return walkableTiles;
+		return _walkableTiles.GetRandomElement();
 	}
 	public int GetTileSize()
 	{
@@ -301,10 +290,6 @@ public class MapGenerator : MonoBehaviour
 			for (var y = 0; y < Height; y++)
 			{
 				var tile = _map[x, y];
-				if (tile.GridCoordinates.X >= 17 && tile.GridCoordinates.X <= 20 && tile.GridCoordinates.Y >= 32 && tile.GridCoordinates.Y <= 34)
-				{
-					var a = 0;
-				}
 				controlNodes[x, y] = new ControlNode(new Vector3(tile.WorldCoordinates.X, 0, tile.WorldCoordinates.Y), tile.Type == TileType.Floor, TileSize);
 			}
 		}
@@ -314,11 +299,20 @@ public class MapGenerator : MonoBehaviour
 			for (var y = 0; y < Height - 1; y++)
 			{
 				var tile = _map[x, y];
-				if (tile.GridCoordinates.X >= 17 && tile.GridCoordinates.X <= 20 && tile.GridCoordinates.Y >= 32 && tile.GridCoordinates.Y <= 34)
-				{
-					var a = 0;
-				}
 				tile.SetConfiguration(controlNodes[x, y + 1], controlNodes[x + 1, y + 1], controlNodes[x + 1, y], controlNodes[x, y]);
+			}
+		}
+	}
+	private void RegisterWalkableTiles()
+	{
+		for (var x = 0; x < Width; x++)
+		{
+			for (var y = 0; y < Height; y++)
+			{
+				if (_map[x, y].IsWalkable)
+				{
+					_walkableTiles.Add(_map[x, y]);
+				}
 			}
 		}
 	}
@@ -475,10 +469,6 @@ public class MapGenerator : MonoBehaviour
 
 		foreach (var tile in _map)
 		{
-			//if (tile.WorldCoordinates.X >= 10 && tile.WorldCoordinates.X <= 12 && tile.WorldCoordinates.Y >= 12 && tile.WorldCoordinates.Y <= 14)
-			//{
-			//	Debug.Log(tile);
-			//}
 			if (tile.IsEdgeTile || tile.IsWalkable)
 			{
 				if (tile.IsEdgeTile)
