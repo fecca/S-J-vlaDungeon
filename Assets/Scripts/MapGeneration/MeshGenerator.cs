@@ -3,6 +3,11 @@ using UnityEngine;
 
 public class MeshGenerator : MonoBehaviour
 {
+	private readonly List<Vector3> _floorVertices = new List<Vector3>(16184);
+	private readonly List<int> _floorTriangles = new List<int>(32768);
+	private readonly List<Vector3> _wallVertices = new List<Vector3>(16184);
+	private readonly List<int> _wallTriangles = new List<int>(32768);
+
 	[SerializeField]
 	private GameObject Walls = null;
 	[SerializeField]
@@ -10,21 +15,7 @@ public class MeshGenerator : MonoBehaviour
 	[SerializeField]
 	private int WallHeight = 2;
 	[SerializeField]
-	private int WallSegments = 1;
-	[SerializeField]
 	private bool RandomizeEdgeVertexPositions = false;
-
-	private readonly List<Vector3> _floorVertices = new List<Vector3>(16184);
-	private readonly List<int> _floorTriangles = new List<int>(32768);
-
-	private readonly List<Vector3> _wallVertices = new List<Vector3>(16184);
-	private readonly List<int> _wallTriangles = new List<int>(32768);
-
-	public void GenerateMeshes(Tile[,] map)
-	{
-		GenerateFloorMesh(map);
-		GenerateWallMesh(map);
-	}
 
 	private void GenerateFloorMesh(Tile[,] map)
 	{
@@ -40,7 +31,6 @@ public class MeshGenerator : MonoBehaviour
 
 		CreateFloorMesh();
 	}
-
 	private void GenerateWallMesh(Tile[,] map)
 	{
 		_wallVertices.Clear();
@@ -55,7 +45,6 @@ public class MeshGenerator : MonoBehaviour
 
 		CreateWallMesh();
 	}
-
 	private void TriangulateFloor(Tile tile)
 	{
 		var square = tile.ConfigurationSquare;
@@ -133,7 +122,6 @@ public class MeshGenerator : MonoBehaviour
 				break;
 		}
 	}
-
 	private void BuildmeshFromPoints(params Node[] points)
 	{
 		AssignVertices(points);
@@ -161,7 +149,6 @@ public class MeshGenerator : MonoBehaviour
 			CreateTriangle(points[0], points[4], points[5]);
 		}
 	}
-
 	private void AssignVertices(Node[] points)
 	{
 		for (var i = 0; i < points.Length; i++)
@@ -181,14 +168,12 @@ public class MeshGenerator : MonoBehaviour
 			}
 		}
 	}
-
 	private void CreateTriangle(Node a, Node b, Node c)
 	{
 		_floorTriangles.Add(a.VertexIndex);
 		_floorTriangles.Add(b.VertexIndex);
 		_floorTriangles.Add(c.VertexIndex);
 	}
-
 	private void TriangulateWall(Tile tile)
 	{
 		if (tile.IsEdgeTile)
@@ -210,7 +195,6 @@ public class MeshGenerator : MonoBehaviour
 			_wallTriangles.Add(_wallVertices.Count - 1);
 		}
 	}
-
 	private void CreateFloorMesh()
 	{
 		var mesh = new Mesh();
@@ -224,7 +208,6 @@ public class MeshGenerator : MonoBehaviour
 		var meshCollider = Floor.AddComponent<MeshCollider>();
 		meshCollider.sharedMesh = mesh;
 	}
-
 	private void CreateWallMesh()
 	{
 		var mesh = new Mesh();
@@ -237,5 +220,11 @@ public class MeshGenerator : MonoBehaviour
 
 		var meshCollider = Walls.AddComponent<MeshCollider>();
 		meshCollider.sharedMesh = mesh;
+	}
+
+	public void GenerateMeshes(Tile[,] map)
+	{
+		GenerateFloorMesh(map);
+		GenerateWallMesh(map);
 	}
 }

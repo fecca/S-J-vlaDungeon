@@ -15,7 +15,6 @@ public class Enemy : MonoBehaviour
 		_agent.Setup(FindObjectOfType<PathFinder>());
 		_timer = NewPathTime;
 	}
-
 	private void Update()
 	{
 		if (_timer < NewPathTime)
@@ -25,7 +24,6 @@ public class Enemy : MonoBehaviour
 		}
 		_timer = 0;
 
-		Debug.Log("start new path");
 		_agent.StartPathTo(_mapGenerator.GetRandomWalkableTile(), () =>
 		{
 			_timer = NewPathTime;

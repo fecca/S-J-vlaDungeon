@@ -1,10 +1,10 @@
 ﻿public struct Triangle
 {
+	private int[] _vertices;
+
 	public int VertexIndexA;
 	public int VertexIndexB;
 	public int VertexIndexC;
-
-	private int[] _vertices;
 
 	public Triangle(int a, int b, int c)
 	{
@@ -25,7 +25,6 @@
 			return _vertices[i];
 		}
 	}
-
 	public bool Contains(int vertexIndex)
 	{
 		return vertexIndex == VertexIndexA || vertexIndex == VertexIndexB || vertexIndex == VertexIndexC;

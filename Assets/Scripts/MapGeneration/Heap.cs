@@ -1,11 +1,4 @@
-﻿using System;
-
-public interface IHeapItem<T> : IComparable<T>
-{
-	int HeapIndex { get; set; }
-}
-
-public class Heap<T> where T : IHeapItem<T>
+﻿public class Heap<T> where T : IHeapItem<T>
 {
 	private readonly T[] _items;
 
@@ -14,35 +7,6 @@ public class Heap<T> where T : IHeapItem<T>
 	public Heap(int maxHeapSize)
 	{
 		_items = new T[maxHeapSize];
-	}
-
-	public void Add(T item)
-	{
-		item.HeapIndex = Count;
-		_items[Count] = item;
-		SortUp(item);
-		Count++;
-	}
-
-	public T RemoveFirst()
-	{
-		var firstItem = _items[0];
-		Count--;
-		_items[0] = _items[Count];
-		_items[0].HeapIndex = 0;
-		SortDown(_items[0]);
-
-		return firstItem;
-	}
-
-	public bool Contains(T item)
-	{
-		return Equals(_items[item.HeapIndex], item);
-	}
-
-	public void UpdateItem(T item)
-	{
-		SortUp(item);
 	}
 
 	private void SortUp(T item)
@@ -63,7 +27,6 @@ public class Heap<T> where T : IHeapItem<T>
 			parentIndex = (item.HeapIndex - 1) / 2;
 		}
 	}
-
 	private void SortDown(T item)
 	{
 		while (true)
@@ -97,7 +60,6 @@ public class Heap<T> where T : IHeapItem<T>
 			}
 		}
 	}
-
 	private void Swap(T itemA, T itemB)
 	{
 		_items[itemA.HeapIndex] = itemB;
@@ -105,5 +67,31 @@ public class Heap<T> where T : IHeapItem<T>
 		var itemAIndex = itemA.HeapIndex;
 		itemA.HeapIndex = itemB.HeapIndex;
 		itemB.HeapIndex = itemAIndex;
+	}
+
+	public void Add(T item)
+	{
+		item.HeapIndex = Count;
+		_items[Count] = item;
+		SortUp(item);
+		Count++;
+	}
+	public T RemoveFirst()
+	{
+		var firstItem = _items[0];
+		Count--;
+		_items[0] = _items[Count];
+		_items[0].HeapIndex = 0;
+		SortDown(_items[0]);
+
+		return firstItem;
+	}
+	public bool Contains(T item)
+	{
+		return Equals(_items[item.HeapIndex], item);
+	}
+	public void UpdateItem(T item)
+	{
+		SortUp(item);
 	}
 }

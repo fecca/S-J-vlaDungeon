@@ -11,7 +11,6 @@ public class CameraController : MonoBehaviour
 	{
 		_player = FindObjectOfType<PlayerController>();
 	}
-
 	private void Update()
 	{
 		if (Input.GetAxis("Mouse ScrollWheel") > 0)

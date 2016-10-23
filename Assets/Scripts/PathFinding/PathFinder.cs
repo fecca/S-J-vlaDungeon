@@ -11,68 +11,21 @@ public class PathFinder : MonoBehaviour
 	private LinkedList<PathfindingNode> _path = new LinkedList<PathfindingNode>();
 	private int _tileSize;
 
-	public void RegisterMap(Tile[,] map, int tileSize)
+	private void OnDrawGizmos()
 	{
-		_tileSize = tileSize;
-		CreateNodes(map);
-		GetNeighbours();
-	}
-	public LinkedList<PathfindingNode> GetPath(Vector3 from, Vector3 to)
-	{
-		var startNode = GetNode(from);
-		var endNode = GetNode(to);
-
-		return GetPath(startNode, endNode);
-	}
-	public LinkedList<PathfindingNode> GetPath(PathfindingNode startNode, PathfindingNode endNode)
-	{
-		if (!startNode.Walkable || !endNode.Walkable)
+		if (!DrawGizmos)
 		{
-			_path.Clear();
-			return _path;
+			return;
 		}
 
-		var open = new Heap<PathfindingNode>(_nodes.GetLength(0) * _nodes.GetLength(1));
-		var closed = new HashSet<PathfindingNode>();
-
-		open.Add(startNode);
-		while (open.Count > 0)
+		if (_nodes != null)
 		{
-			var current = open.RemoveFirst();
-			closed.Add(current);
-
-			if (current.Equals(endNode))
+			foreach (var tile in _nodes)
 			{
-				break;
-			}
-
-			var neighbours = current.Neighbours;
-			for (var i = 0; i < neighbours.Count; i++)
-			{
-				var neighbour = neighbours[i];
-				if (!neighbour.Walkable || closed.Contains(neighbour))
-				{
-					continue;
-				}
-
-				var newMovementCostToNeighbour = current.GCost + GetDistance(current, neighbour);
-				if (newMovementCostToNeighbour < neighbour.GCost || !open.Contains(neighbour))
-				{
-					var distance = GetDistance(neighbour, endNode);
-					neighbour.GCost = newMovementCostToNeighbour;
-					neighbour.HCost = distance;
-					neighbour.FCost = newMovementCostToNeighbour + distance;
-					neighbour.Parent = current;
-
-					if (!open.Contains(neighbour))
-					{
-						open.Add(neighbour);
-					}
-				}
+				Gizmos.color = tile.Walkable ? Color.green : Color.red;
+				Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X, 0.5f, tile.WorldCoordinates.Y), Vector3.one * 0.1f);
 			}
 		}
-
-		return RetracePath(closed.Last());
 	}
 
 	private PathfindingNode GetNode(Vector3 worldPosition)
@@ -198,20 +151,67 @@ public class PathFinder : MonoBehaviour
 		return path;
 	}
 
-	private void OnDrawGizmos()
+	public void RegisterMap(Tile[,] map, int tileSize)
 	{
-		if (!DrawGizmos)
+		_tileSize = tileSize;
+		CreateNodes(map);
+		GetNeighbours();
+	}
+	public LinkedList<PathfindingNode> GetPath(Vector3 from, Vector3 to)
+	{
+		var startNode = GetNode(from);
+		var endNode = GetNode(to);
+
+		return GetPath(startNode, endNode);
+	}
+	public LinkedList<PathfindingNode> GetPath(PathfindingNode startNode, PathfindingNode endNode)
+	{
+		if (!startNode.Walkable || !endNode.Walkable)
 		{
-			return;
+			_path.Clear();
+			return _path;
 		}
 
-		if (_nodes != null)
+		var open = new Heap<PathfindingNode>(_nodes.GetLength(0) * _nodes.GetLength(1));
+		var closed = new HashSet<PathfindingNode>();
+
+		open.Add(startNode);
+		while (open.Count > 0)
 		{
-			foreach (var tile in _nodes)
+			var current = open.RemoveFirst();
+			closed.Add(current);
+
+			if (current.Equals(endNode))
 			{
-				Gizmos.color = tile.Walkable ? Color.green : Color.red;
-				Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X, 0.5f, tile.WorldCoordinates.Y), Vector3.one * 0.1f);
+				break;
+			}
+
+			var neighbours = current.Neighbours;
+			for (var i = 0; i < neighbours.Count; i++)
+			{
+				var neighbour = neighbours[i];
+				if (!neighbour.Walkable || closed.Contains(neighbour))
+				{
+					continue;
+				}
+
+				var newMovementCostToNeighbour = current.GCost + GetDistance(current, neighbour);
+				if (newMovementCostToNeighbour < neighbour.GCost || !open.Contains(neighbour))
+				{
+					var distance = GetDistance(neighbour, endNode);
+					neighbour.GCost = newMovementCostToNeighbour;
+					neighbour.HCost = distance;
+					neighbour.FCost = newMovementCostToNeighbour + distance;
+					neighbour.Parent = current;
+
+					if (!open.Contains(neighbour))
+					{
+						open.Add(neighbour);
+					}
+				}
 			}
 		}
+
+		return RetracePath(closed.Last());
 	}
 }

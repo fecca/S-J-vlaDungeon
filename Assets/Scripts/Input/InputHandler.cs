@@ -11,7 +11,6 @@ public class InputHandler : MonoBehaviour
 	{
 		_player = FindObjectOfType<PlayerController>();
 	}
-
 	private void Update()
 	{
 		if (Input.GetMouseButtonUp(0))

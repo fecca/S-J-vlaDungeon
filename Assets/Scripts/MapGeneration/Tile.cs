@@ -27,6 +27,17 @@ public class Tile
 		WorldCoordinates = new Coordinates(x * tileSize, y * tileSize);
 		Type = type;
 	}
+
+	public override string ToString()
+	{
+		return "Type: " + Type +
+			", Grid: " + GridCoordinates +
+			", World: " + WorldCoordinates +
+			", CoreVertices: " + CoreVertices.Count +
+			", IsConfigured: " + (ConfigurationSquare != null) +
+			", Configuration: " + (ConfigurationSquare != null ? ConfigurationSquare.Configuration.ToString() : "N/A");
+	}
+
 	public void SetConfiguration(ControlNode topLeft, ControlNode topRight, ControlNode bottomRight, ControlNode bottomLeft)
 	{
 		ConfigurationSquare = new ConfigurationSquare(topLeft, topRight, bottomRight, bottomLeft);
@@ -41,14 +52,5 @@ public class Tile
 		{
 			CoreVertices.Add(vertices[i]);
 		}
-	}
-	public override string ToString()
-	{
-		return "Type: " + Type +
-			", Grid: " + GridCoordinates +
-			", World: " + WorldCoordinates +
-			", CoreVertices: " + CoreVertices.Count +
-			", IsConfigured: " + (ConfigurationSquare != null) +
-			", Configuration: " + (ConfigurationSquare != null ? ConfigurationSquare.Configuration.ToString() : "N/A");
 	}
 }

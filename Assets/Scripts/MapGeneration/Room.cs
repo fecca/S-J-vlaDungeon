@@ -11,8 +11,6 @@ public class Room : IComparable<Room>
 	public bool IsMainRoom;
 	public bool IsAccessibleFromMainRoom;
 
-	public Room() { }
-
 	public Room(List<Tile> roomTiles)
 	{
 		Tiles = roomTiles;
@@ -25,7 +23,6 @@ public class Room : IComparable<Room>
 	{
 		return ConnectedRooms.Contains(otherRoom);
 	}
-
 	public void SetAccessibleFromMainRoom()
 	{
 		if (!IsAccessibleFromMainRoom)
@@ -37,7 +34,6 @@ public class Room : IComparable<Room>
 			}
 		}
 	}
-
 	public int CompareTo(Room otherRoom)
 	{
 		return otherRoom.RoomSize.CompareTo(RoomSize);

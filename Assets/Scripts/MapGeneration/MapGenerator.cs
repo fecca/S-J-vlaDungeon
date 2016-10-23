@@ -33,42 +33,34 @@ public class MapGenerator : MonoBehaviour
 	private List<Room> _survivingRooms = new List<Room>(128);
 	private List<Tile> _walkableTiles = new List<Tile>();
 
-	public Tile[,] GenerateMap(MeshGenerator meshGenerator, PathFinder pathFinder)
+	private void OnDrawGizmos()
 	{
-		_map = new Tile[Width, Height];
-
-		RandomFillMap();
-		GenerateClusters();
-		FilterWalls();
-		FilterRooms();
-		ConnectClosestRooms();
-		ConfigureTiles();
-		RegisterWalkableTiles();
-
-		meshGenerator.GenerateMeshes(_map);
-		pathFinder.RegisterMap(_map, TileSize);
-
-		return _map;
-	}
-	public Vector3 GetPlayerPosition()
-	{
-		var room = _survivingRooms.First();
-		var tile = room.Tiles.GetRandomElement();
-		while (!tile.IsWalkable)
+		if (!DrawGizmos)
 		{
-			tile = room.Tiles.GetRandomElement();
+			return;
 		}
-		var position = new Vector3(tile.WorldCoordinates.X, 5, tile.WorldCoordinates.Y);
 
-		return position;
-	}
-	public Tile GetRandomWalkableTile()
-	{
-		return _walkableTiles.GetRandomElement();
-	}
-	public int GetTileSize()
-	{
-		return TileSize;
+		if (_map == null)
+		{
+			return;
+		}
+
+		foreach (var tile in _map)
+		{
+			if (tile.IsEdgeTile || tile.IsWalkable)
+			{
+				if (tile.IsEdgeTile)
+				{
+					Gizmos.color = Color.red;
+					Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X + (TileSize / 2), 0, tile.WorldCoordinates.Y + (TileSize / 2)), Vector3.one * 0.95f);
+				}
+				else if (tile.IsWalkable)
+				{
+					Gizmos.color = Color.green;
+					Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X + (TileSize / 2), 0, tile.WorldCoordinates.Y + (TileSize / 2)), Vector3.one * 0.95f);
+				}
+			}
+		}
 	}
 
 	private void RandomFillMap()
@@ -455,33 +447,41 @@ public class MapGenerator : MonoBehaviour
 		return line;
 	}
 
-	private void OnDrawGizmos()
+	public Tile[,] GenerateMap(MeshGenerator meshGenerator, PathFinder pathFinder)
 	{
-		if (!DrawGizmos)
-		{
-			return;
-		}
+		_map = new Tile[Width, Height];
 
-		if (_map == null)
-		{
-			return;
-		}
+		RandomFillMap();
+		GenerateClusters();
+		FilterWalls();
+		FilterRooms();
+		ConnectClosestRooms();
+		ConfigureTiles();
+		RegisterWalkableTiles();
 
-		foreach (var tile in _map)
+		meshGenerator.GenerateMeshes(_map);
+		pathFinder.RegisterMap(_map, TileSize);
+
+		return _map;
+	}
+	public Vector3 GetPlayerPosition()
+	{
+		var room = _survivingRooms.First();
+		var tile = room.Tiles.GetRandomElement();
+		while (!tile.IsWalkable)
 		{
-			if (tile.IsEdgeTile || tile.IsWalkable)
-			{
-				if (tile.IsEdgeTile)
-				{
-					Gizmos.color = Color.red;
-					Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X + (TileSize / 2), 0, tile.WorldCoordinates.Y + (TileSize / 2)), Vector3.one * 0.95f);
-				}
-				else if (tile.IsWalkable)
-				{
-					Gizmos.color = Color.green;
-					Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X + (TileSize / 2), 0, tile.WorldCoordinates.Y + (TileSize / 2)), Vector3.one * 0.95f);
-				}
-			}
+			tile = room.Tiles.GetRandomElement();
 		}
+		var position = new Vector3(tile.WorldCoordinates.X, 5, tile.WorldCoordinates.Y);
+
+		return position;
+	}
+	public Tile GetRandomWalkableTile()
+	{
+		return _walkableTiles.GetRandomElement();
+	}
+	public int GetTileSize()
+	{
+		return TileSize;
 	}
 }
