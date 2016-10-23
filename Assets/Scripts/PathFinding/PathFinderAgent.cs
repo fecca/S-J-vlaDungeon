@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PathFinderAgent : MonoBehaviour
@@ -10,14 +11,16 @@ public class PathFinderAgent : MonoBehaviour
 	private PathFinder _pathFinder;
 	private bool _pendingNewPath;
 	private Vector3 _pendingTo;
+	private Action _completedPath;
 
 	public void Setup(PathFinder pathFinder)
 	{
 		_pathFinder = pathFinder;
 	}
 
-	public void StartPathTo(Vector3 targetPosition)
+	public void StartPathTo(Vector3 targetPosition, Action completed = null)
 	{
+		_completedPath = completed;
 		if (_path.Count > 0)
 		{
 			_pendingNewPath = true;
@@ -29,9 +32,9 @@ public class PathFinderAgent : MonoBehaviour
 			_path = _pathFinder.GetPath(transform.position, targetPosition);
 		}
 	}
-	public void StartPathTo(Tile targetTile)
+	public void StartPathTo(Tile targetTile, Action completed = null)
 	{
-		StartPathTo(new Vector3(targetTile.WorldCoordinates.X, transform.position.y, targetTile.WorldCoordinates.Y));
+		StartPathTo(new Vector3(targetTile.WorldCoordinates.X, transform.position.y, targetTile.WorldCoordinates.Y), completed);
 	}
 
 	private void MoveAlongPath()
@@ -43,11 +46,21 @@ public class PathFinderAgent : MonoBehaviour
 
 		if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
 		{
-			_path.Remove(targetNode);
 			if (_pendingNewPath)
 			{
 				_pendingNewPath = false;
 				_path = _pathFinder.GetPath(transform.position, _pendingTo);
+			}
+			else
+			{
+				_path.Remove(targetNode);
+				if (_path.Count == 0)
+				{
+					if (_completedPath != null)
+					{
+						_completedPath();
+					}
+				}
 			}
 		}
 	}

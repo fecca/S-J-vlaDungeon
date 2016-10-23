@@ -13,6 +13,9 @@ public class PlayerController : MonoBehaviour
 
 	public void ClickedGround(Vector3 targetPosition)
 	{
-		_agent.StartPathTo(targetPosition);
+		_agent.StartPathTo(targetPosition, () =>
+		{
+			Debug.Log("Arrived at target");
+		});
 	}
 }

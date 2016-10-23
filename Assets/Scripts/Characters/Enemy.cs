@@ -4,7 +4,7 @@
 public class Enemy : MonoBehaviour
 {
 	private float _timer;
-	private const float NewPathTime = 2f;
+	private const float NewPathTime = 5f;
 	private PathFinderAgent _agent;
 	private MapGenerator _mapGenerator;
 
@@ -13,6 +13,7 @@ public class Enemy : MonoBehaviour
 		_mapGenerator = FindObjectOfType<MapGenerator>();
 		_agent = GetComponent<PathFinderAgent>();
 		_agent.Setup(FindObjectOfType<PathFinder>());
+		_timer = NewPathTime;
 	}
 
 	private void Update()
@@ -25,6 +26,9 @@ public class Enemy : MonoBehaviour
 		_timer = 0;
 
 		Debug.Log("start new path");
-		_agent.StartPathTo(_mapGenerator.GetRandomWalkableTile());
+		_agent.StartPathTo(_mapGenerator.GetRandomWalkableTile(), () =>
+		{
+			_timer = NewPathTime;
+		});
 	}
 }
