@@ -1,25 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 
-[RequireComponent(typeof(PathFinderAgent))]
-public class Enemy : MonoBehaviour
+public class Enemy : Character
 {
-	[SerializeField]
-	private Brain Brain;
-
-	private PathFinderAgent _agent;
-
-	private void Start()
-	{
-		_agent = GetComponent<PathFinderAgent>();
-		Brain.Initialize(this, _agent);
-	}
 	private void Update()
 	{
-		if (Brain == null)
+		foreach (var behaviour in _behaviours)
 		{
-			return;
+			behaviour.BehaviourUpdate();
 		}
-
-		Brain.Think(this, _agent);
 	}
 }
