@@ -32,8 +32,8 @@ public class PathFinderAgent : MonoBehaviour
 		{
 			for (var iteration = _path.First; iteration != null; iteration = iteration.Next)
 			{
-				Gizmos.color = Color.red;
-				Gizmos.DrawCube(new Vector3(iteration.Value.WorldCoordinates.X, 1, iteration.Value.WorldCoordinates.Y), Vector3.one * 0.5f);
+				Gizmos.color = Color.white;
+				Gizmos.DrawCube(new Vector3(iteration.Value.WorldCoordinates.X, 1, iteration.Value.WorldCoordinates.Y), Vector3.one * 0.25f);
 			}
 		}
 	}

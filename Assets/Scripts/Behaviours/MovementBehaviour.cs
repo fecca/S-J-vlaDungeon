@@ -1,8 +1,10 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class MovementBehaviour : Behaviour, IMovement
 {
+	[SerializeField]
+	private MovementData Data;
+
 	protected override void RegisterBehaviour()
 	{
 		_character.RegisterBehaviour(this);
@@ -15,22 +17,13 @@ public class MovementBehaviour : Behaviour, IMovement
 	}
 	public void Move()
 	{
-		_character.transform.Translate(Vector3.zero, Space.World);
-	}
-}
-
-public abstract class Behaviour : MonoBehaviour
-{
-	protected Character _character;
-	protected void Awake()
-	{
-		_character = GetComponent<Character>();
-		if (_character == null)
+		if (_character.Agent.IsMoving)
 		{
-			throw new NotSupportedException("Can not add script to this object.");
+			return;
 		}
 
-		RegisterBehaviour();
+		var random = Random.Range(0, 4);
+		var direction = random == 0 ? -Vector3.right : random == 1 ? Vector3.forward : random == 2 ? Vector3.right : -Vector3.forward;
+		_character.Agent.StartPathTo(transform.position + direction, Data.MovementSpeed);
 	}
-	protected abstract void RegisterBehaviour();
 }

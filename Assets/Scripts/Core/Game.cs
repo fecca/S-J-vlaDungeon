@@ -30,7 +30,7 @@ public class Game : MonoBehaviour
 		for (var i = 0; i < NumberOfEnemies; i++)
 		{
 			var randomTile = _mapGenerator.GetRandomWalkableTile();
-			var randomTilePosition = new Vector3(randomTile.WorldCoordinates.X, 5, randomTile.WorldCoordinates.Y);
+			var randomTilePosition = new Vector3(randomTile.WorldCoordinates.X, 0.5f, randomTile.WorldCoordinates.Y);
 			Instantiate(EnemyPrefab, randomTilePosition, Quaternion.identity);
 		}
 	}
