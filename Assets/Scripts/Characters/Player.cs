@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(PathFinderAgent))]
-public class PlayerController : MonoBehaviour
+public class Player : MonoBehaviour
 {
 }

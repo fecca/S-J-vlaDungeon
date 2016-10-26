@@ -5,11 +5,11 @@ public class CameraController : MonoBehaviour
 	[SerializeField]
 	private float MovementSpeed = 10;
 
-	private PlayerController _player;
+	private Player _player;
 
 	private void Start()
 	{
-		_player = FindObjectOfType<PlayerController>();
+		_player = FindObjectOfType<Player>();
 	}
 	private void Update()
 	{

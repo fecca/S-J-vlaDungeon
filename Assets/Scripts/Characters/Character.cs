@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
+[RequireComponent(typeof(PathFinderAgent))]
 public abstract class Character : MonoBehaviour
 {
-	protected List<IBehaviour> _behaviours;
-	protected PathFinderAgent _agent;
-
+	private PathFinderAgent _agent;
 	public PathFinderAgent Agent
 	{
 		get
@@ -17,28 +15,5 @@ public abstract class Character : MonoBehaviour
 			}
 			return _agent;
 		}
-	}
-
-	private void Awake()
-	{
-		_behaviours = new List<IBehaviour>(8);
-	}
-	private void Update()
-	{
-		foreach (var behaviour in _behaviours)
-		{
-			behaviour.BehaviourUpdate();
-		}
-	}
-
-	public void RegisterBehaviour(IBehaviour behaviour)
-	{
-		_behaviours.Add(behaviour);
-		Debug.Log("Behaviour(" + behaviour.GetType() + ") was added");
-	}
-	public void RemoveBehaviour(IBehaviour behaviour)
-	{
-		_behaviours.Remove(behaviour);
-		Debug.Log("Behaviour(" + behaviour.GetType() + ") was removed");
 	}
 }
