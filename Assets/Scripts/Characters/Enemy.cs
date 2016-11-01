@@ -2,16 +2,23 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Perception))]
-public abstract class Enemy : Character
+[RequireComponent(typeof(Attacker))]
+public class Enemy : Character
 {
 	private Perception _perception;
-	private PerceptionLevel _perceptionLevel;
+	private Mover _mover;
+	private Attacker _attacker;
+	private Player _player;
 	private float _timer;
 	private const float UpdateInterval = 1.0f;
 
 	private void Awake()
 	{
 		_perception = GetComponent<Perception>();
+		_mover = GetComponent<Mover>();
+		_mover.Initialize(this);
+		_attacker = GetComponent<Attacker>();
+		_player = FindObjectOfType<Player>();
 	}
 	private void Update()
 	{
@@ -22,47 +29,27 @@ public abstract class Enemy : Character
 		}
 		_timer = 0f;
 
-		_perceptionLevel = _perception.GetPlayerDistance();
+		Act(_perception.GetDistanceLevel(_player));
 	}
 
-	private void Act()
+	private void Act(DistanceLevel distanceLevel)
 	{
-		switch (_perceptionLevel)
+		_mover.Stop();
+		switch (distanceLevel)
 		{
-			case PerceptionLevel.Outside:
+			case DistanceLevel.Outside:
 				break;
 
-			case PerceptionLevel.InnerCirle:
+			case DistanceLevel.InnerCirle:
+				_attacker.Attack();
 				break;
 
-			case PerceptionLevel.OuterCircle:
+			case DistanceLevel.OuterCircle:
+				_mover.Move(_player.transform.position);
 				break;
 
 			default:
-				throw new NotImplementedException("Perception level not implementetd: " + _perceptionLevel);
+				throw new NotImplementedException("Distance level not implementetd: " + distanceLevel);
 		}
 	}
-}
-
-public enum PerceptionLevel
-{
-	Outside,
-	InnerCirle,
-	OuterCircle
-}
-
-public class Perception : MonoBehaviour
-{
-	private PerceptionData Data;
-
-	public PerceptionLevel GetPlayerDistance()
-	{
-		return PerceptionLevel.Outside;
-	}
-}
-
-public class PerceptionData : ScriptableObject
-{
-	public const float InnerRadius = 10.0f;
-	public const float OuterRadius = 10.0f;
 }

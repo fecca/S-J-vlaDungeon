@@ -1,4 +1,7 @@
-﻿public interface IMover : IBehaviour
+﻿using UnityEngine;
+
+public interface IMover : IBehaviour
 {
-	void Move();
+	void Move(Vector3 position);
+	void Stop();
 }

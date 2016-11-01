@@ -11,14 +11,6 @@ public class PathFinderAgent : MonoBehaviour
 	private bool _pendingNewPath;
 	private float _movementSpeed;
 
-	public bool IsMoving
-	{
-		get
-		{
-			return _path.Count > 0;
-		}
-	}
-
 	private void FixedUpdate()
 	{
 		if (_path.Count > 0)
@@ -61,6 +53,11 @@ public class PathFinderAgent : MonoBehaviour
 	{
 		StartPathTo(new Vector3(targetTile.WorldCoordinates.X, transform.position.y, targetTile.WorldCoordinates.Y), movementSpeed, completed);
 	}
+	public void Stop()
+	{
+		_path.Clear();
+	}
+
 	private void MoveAlongPath()
 	{
 		var targetNode = _path.First;

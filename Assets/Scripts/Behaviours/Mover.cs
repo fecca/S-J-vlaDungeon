@@ -1,33 +1,33 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Mover : MonoBehaviour, IMover
 {
 	[SerializeField]
 	private MoverData Data;
+
 	private Character _character;
-	private Player _player;
+
+	public void BehaviourUpdate()
+	{
+		throw new NotImplementedException();
+	}
 
 	public void Initialize(Character character)
 	{
 		_character = character;
-		_player = FindObjectOfType<Player>();
 	}
 
-	public void BehaviourUpdate()
+	public void Move(Vector3 position)
 	{
-		//if (_character.Agent.IsMoving)
-		//{
-		//	return;
-		//}
-
-		Move();
-	}
-
-	public void Move()
-	{
-		_character.Agent.StartPathTo(_player.transform.position, Data.MovementSpeed, () =>
+		_character.Agent.StartPathTo(position, Data.MovementSpeed, () =>
 		{
 			Debug.Log("Arrived...");
 		});
+	}
+
+	public void Stop()
+	{
+		_character.Agent.Stop();
 	}
 }

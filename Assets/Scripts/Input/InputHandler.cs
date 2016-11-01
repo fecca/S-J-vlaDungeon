@@ -3,7 +3,7 @@
 public class InputHandler : MonoBehaviour
 {
 	[SerializeField]
-	private LayerMask GroundLayer = 0;
+	private LayerMask GroundLayer;
 
 	private static InputHandler _instance;
 
@@ -20,7 +20,7 @@ public class InputHandler : MonoBehaviour
 		_instance = this;
 	}
 
-	public Vector3 GetHitPoint(Vector3 mousePosition)
+	public Vector3 GetHitPoint()
 	{
 		var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
