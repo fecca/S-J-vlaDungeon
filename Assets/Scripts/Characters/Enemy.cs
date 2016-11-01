@@ -8,7 +8,7 @@ public class Enemy : Character
 	private Perception _perception;
 	private Mover _mover;
 	private Attacker _attacker;
-	private Player _player;
+	private Transform _playerTransform;
 	private float _timer;
 	private const float UpdateInterval = 1.0f;
 
@@ -16,9 +16,8 @@ public class Enemy : Character
 	{
 		_perception = GetComponent<Perception>();
 		_mover = GetComponent<Mover>();
-		_mover.Initialize(this);
 		_attacker = GetComponent<Attacker>();
-		_player = FindObjectOfType<Player>();
+		_playerTransform = FindObjectOfType<Player>().transform;
 	}
 	private void Update()
 	{
@@ -29,7 +28,7 @@ public class Enemy : Character
 		}
 		_timer = 0f;
 
-		Act(_perception.GetDistanceLevel(_player));
+		Act(_perception.GetDistanceLevel(_playerTransform.position));
 	}
 
 	private void Act(DistanceLevel distanceLevel)
@@ -41,11 +40,11 @@ public class Enemy : Character
 				break;
 
 			case DistanceLevel.InnerCirle:
-				_attacker.Attack();
+				_attacker.Attack(_playerTransform.position);
 				break;
 
 			case DistanceLevel.OuterCircle:
-				_mover.Move(_player.transform.position);
+				_mover.Move(_playerTransform.position);
 				break;
 
 			default:

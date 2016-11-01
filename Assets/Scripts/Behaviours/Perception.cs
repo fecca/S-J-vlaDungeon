@@ -4,16 +4,15 @@ public class Perception : MonoBehaviour
 {
 	[SerializeField]
 	private PerceptionData Data;
-	[SerializeField]
-	private LayerMask Layer;
 
-	public DistanceLevel GetDistanceLevel(Player player)
+	public DistanceLevel GetDistanceLevel(Vector3 playerPosition)
 	{
-		var playerPosition = player.transform.position;
 		var position = transform.position;
 		var ray = new Ray(position, (playerPosition - position).normalized);
+
+		Debug.DrawRay(ray.origin, ray.direction * float.MaxValue, Color.green, 0.5f);
+
 		RaycastHit hit;
-		Debug.DrawRay(ray.origin, ray.direction * float.MaxValue, Color.green, 1.0f);
 		if (Physics.Raycast(ray, out hit, float.MaxValue))
 		{
 			if (hit.collider.GetComponent<Player>() != null)

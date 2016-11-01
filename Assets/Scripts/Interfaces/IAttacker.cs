@@ -1,4 +1,6 @@
-﻿public interface IAttacker : IBehaviour
+﻿using UnityEngine;
+
+public interface IAttacker
 {
-	void Attack();
+	void Attack(Vector3 position);
 }

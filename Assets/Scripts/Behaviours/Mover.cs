@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Mover : MonoBehaviour, IMover
 {
@@ -8,14 +7,9 @@ public class Mover : MonoBehaviour, IMover
 
 	private Character _character;
 
-	public void BehaviourUpdate()
+	public void Awake()
 	{
-		throw new NotImplementedException();
-	}
-
-	public void Initialize(Character character)
-	{
-		_character = character;
+		_character = GetComponent<Character>();
 	}
 
 	public void Move(Vector3 position)

@@ -10,7 +10,6 @@ public class Player : Character
 	private void Awake()
 	{
 		_mover = GetComponent<Mover>();
-		_mover.Initialize(this);
 	}
 	private void Update()
 	{

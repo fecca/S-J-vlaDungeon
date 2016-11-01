@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 
 [CreateAssetMenu]
-public class AttackerData : ScriptableObject
+public class PerceptionData : ScriptableObject
 {
-	public float AttacksPerSecond = 1.0f;
+	public float InnerRadius = 10.0f;
+	public float OuterRadius = 20.0f;
 }

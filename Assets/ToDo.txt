@@ -1,7 +1,11 @@
-- Constant for number of path nodes per tile
-- Smoothen movement
-- Increase performance when generating map/mesh
-- Identify edge tiles in rooms
+(
+	- Constant for number of path nodes per tile
+	- Smoothen movement
+	- Increase performance when generating map/mesh
+	- Identify edge tiles in rooms
+)
+- Enemy attack
+- Enemy follow around corners
 
 Bugs
 ----

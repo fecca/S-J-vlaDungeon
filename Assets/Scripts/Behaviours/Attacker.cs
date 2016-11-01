@@ -4,18 +4,12 @@ public class Attacker : MonoBehaviour, IAttacker
 {
 	[SerializeField]
 	private AttackerData Data;
-	private Character _character;
 
-	public void Initialize(Character character)
+	public void Attack(Vector3 position)
 	{
-		_character = character;
-	}
-
-	public void BehaviourUpdate()
-	{
-	}
-
-	public void Attack()
-	{
+		var projectile = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		projectile.transform.localScale = Vector3.one * 0.2f;
+		projectile.transform.position = transform.position + Vector3.up;
+		projectile.GetOrAddComponent<Rigidbody>().AddForce((position - transform.position).normalized * Data.ProjectileSpeed);
 	}
 }
