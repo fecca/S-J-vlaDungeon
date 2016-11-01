@@ -16,7 +16,6 @@ public class Mover : MonoBehaviour, IMover
 	{
 		_character.Agent.StartPathTo(position, Data.MovementSpeed, () =>
 		{
-			Debug.Log("Arrived...");
 		});
 	}
 

@@ -9,8 +9,8 @@ public class Enemy : Character
 	private Mover _mover;
 	private Attacker _attacker;
 	private Transform _playerTransform;
+	private DistanceLevel _distanceLevel;
 	private float _timer;
-	private const float UpdateInterval = 1.0f;
 
 	private void Awake()
 	{
@@ -19,16 +19,17 @@ public class Enemy : Character
 		_attacker = GetComponent<Attacker>();
 		_playerTransform = FindObjectOfType<Player>().transform;
 	}
-	private void Update()
+	private void FixedUpdate()
 	{
-		if (_timer < UpdateInterval)
+		if (_timer < _perception.GetUpdateInterval())
 		{
 			_timer += Time.deltaTime;
 			return;
 		}
 		_timer = 0f;
 
-		Act(_perception.GetDistanceLevel(_playerTransform.position));
+		_distanceLevel = _perception.GetDistanceLevel(_playerTransform.position);
+		Act(_distanceLevel);
 	}
 
 	private void Act(DistanceLevel distanceLevel)

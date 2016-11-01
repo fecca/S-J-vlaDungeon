@@ -8,7 +8,7 @@ public class Attacker : MonoBehaviour, IAttacker
 	public void Attack(Vector3 position)
 	{
 		var projectile = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		projectile.transform.localScale = Vector3.one * 0.2f;
+		projectile.transform.localScale = Vector3.one * 0.35f;
 		projectile.transform.position = transform.position + Vector3.up;
 		projectile.GetOrAddComponent<Rigidbody>().AddForce((position - transform.position).normalized * Data.ProjectileSpeed);
 	}

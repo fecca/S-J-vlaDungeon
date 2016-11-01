@@ -30,6 +30,10 @@ public class Perception : MonoBehaviour
 		}
 		return DistanceLevel.Outside;
 	}
+	public float GetUpdateInterval()
+	{
+		return Data.UpdateInterval;
+	}
 
 	private void OnDrawGizmos()
 	{
