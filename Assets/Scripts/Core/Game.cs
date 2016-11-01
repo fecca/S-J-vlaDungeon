@@ -10,14 +10,14 @@ public class Game : MonoBehaviour
 	private MapGenerator _mapGenerator;
 	private MeshGenerator _meshGenerator;
 	private PathFinder _pathFinder;
-	private PlayerController _player;
+	private Player _player;
 
 	private void Start()
 	{
 		_mapGenerator = FindObjectOfType<MapGenerator>();
 		_meshGenerator = FindObjectOfType<MeshGenerator>();
 		_pathFinder = FindObjectOfType<PathFinder>();
-		_player = FindObjectOfType<PlayerController>();
+		_player = FindObjectOfType<Player>();
 
 		_mapGenerator.GenerateMap(_meshGenerator, _pathFinder);
 		_player.transform.position = _mapGenerator.GetPlayerPosition();
