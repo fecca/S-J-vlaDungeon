@@ -5,10 +5,10 @@ public class Perception : MonoBehaviour
 	[SerializeField]
 	private PerceptionData Data;
 
-	public DistanceLevel GetDistanceLevel(Vector3 playerPosition)
+	public PlayerPosition GetDistanceLevel(Vector3 targetPosition)
 	{
 		var position = transform.position;
-		var ray = new Ray(position, (playerPosition - position).normalized);
+		var ray = new Ray(position, (targetPosition - position).normalized);
 
 		Debug.DrawRay(ray.origin, ray.direction * float.MaxValue, Color.green, 0.5f);
 
@@ -17,18 +17,19 @@ public class Perception : MonoBehaviour
 		{
 			if (hit.collider.GetComponent<Player>() != null)
 			{
-				var distance = Vector3.Distance(playerPosition, position);
+				var distance = Vector3.Distance(targetPosition, position);
 				if (distance < Data.InnerRadius)
 				{
-					return DistanceLevel.InnerCirle;
+					return PlayerPosition.InnerCirle;
 				}
-				else if (distance < Data.OuterRadius)
+
+				if (distance < Data.OuterRadius)
 				{
-					return DistanceLevel.OuterCircle;
+					return PlayerPosition.OuterCircle;
 				}
 			}
 		}
-		return DistanceLevel.Outside;
+		return PlayerPosition.Outside;
 	}
 	public float GetUpdateInterval()
 	{

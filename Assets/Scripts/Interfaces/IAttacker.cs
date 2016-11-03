@@ -1,6 +1,3 @@
-﻿using UnityEngine;
-
-public interface IAttacker
+﻿public interface IAttacker : IBehaviour
 {
-	void Attack(Vector3 position);
 }

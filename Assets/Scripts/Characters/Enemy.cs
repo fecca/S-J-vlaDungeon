@@ -3,53 +3,84 @@ using UnityEngine;
 
 [RequireComponent(typeof(Perception))]
 [RequireComponent(typeof(Attacker))]
+[RequireComponent(typeof(Idle))]
 public class Enemy : Character
 {
 	private Perception _perception;
 	private Mover _mover;
+	private Idle _idle;
 	private Attacker _attacker;
-	private Transform _playerTransform;
-	private DistanceLevel _distanceLevel;
+	private Transform _targetTransform;
 	private float _timer;
+	private IBehaviour _currentBehaviour;
 
 	private void Awake()
 	{
 		_perception = GetComponent<Perception>();
 		_mover = GetComponent<Mover>();
+		_idle = GetComponent<Idle>();
 		_attacker = GetComponent<Attacker>();
-		_playerTransform = FindObjectOfType<Player>().transform;
+		_targetTransform = FindObjectOfType<Player>().transform;
+		_currentBehaviour = _idle;
 	}
-	private void FixedUpdate()
+	private void Update()
 	{
-		if (_timer < _perception.GetUpdateInterval())
+		if (_timer > _perception.GetUpdateInterval())
 		{
-			_timer += Time.deltaTime;
-			return;
+			_timer = 0f;
+			UpdateState();
 		}
-		_timer = 0f;
 
-		_distanceLevel = _perception.GetDistanceLevel(_playerTransform.position);
-		Act(_distanceLevel);
+		_currentBehaviour.UpdateBehaviour(_targetTransform);
+
+		_timer += Time.deltaTime;
 	}
 
-	private void Act(DistanceLevel distanceLevel)
+	private void UpdateState()
 	{
-		_mover.Stop();
-		switch (distanceLevel)
+		EnemyState state;
+		var targetPosition = _perception.GetDistanceLevel(_targetTransform.position);
+		switch (targetPosition)
 		{
-			case DistanceLevel.Outside:
+			case PlayerPosition.Outside:
+				state = EnemyState.Idle;
 				break;
-
-			case DistanceLevel.InnerCirle:
-				_attacker.Attack(_playerTransform.position);
+			case PlayerPosition.InnerCirle:
+				state = EnemyState.Attacking;
 				break;
-
-			case DistanceLevel.OuterCircle:
-				_mover.Move(_playerTransform.position);
+			case PlayerPosition.OuterCircle:
+				state = EnemyState.Moving;
 				break;
-
 			default:
-				throw new NotImplementedException("Distance level not implementetd: " + distanceLevel);
+				throw new NotImplementedException("PlayerPosition type not implemented: " + targetPosition);
+		}
+
+		SwitchState(state);
+	}
+
+	private void SwitchState(EnemyState state)
+	{
+		IBehaviour nextBehaviour;
+		switch (state)
+		{
+			case EnemyState.Idle:
+				nextBehaviour = _idle;
+				break;
+			case EnemyState.Moving:
+				nextBehaviour = _mover;
+				break;
+			case EnemyState.Attacking:
+				nextBehaviour = _attacker;
+				break;
+			default:
+				throw new NotImplementedException("EnemyState type not implemented: " + state);
+		}
+
+		if (nextBehaviour != _currentBehaviour)
+		{
+			_currentBehaviour.Stop();
+			_currentBehaviour = nextBehaviour;
+			_currentBehaviour.Start();
 		}
 	}
 }

@@ -4,8 +4,8 @@
 	- Increase performance when generating map/mesh
 	- Identify edge tiles in rooms
 )
-- Enemy attack
 - Enemy follow around corners
+- Enemy attacks individually and not based on perception update interval
 
 Bugs
 ----

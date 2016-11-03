@@ -6,10 +6,30 @@ public class Mover : MonoBehaviour, IMover
 	private MoverData Data;
 
 	private Character _character;
+	private float _timer;
 
 	public void Awake()
 	{
 		_character = GetComponent<Character>();
+	}
+
+	public void Stop()
+	{
+		_character.Agent.Stop();
+	}
+	public void Start()
+	{
+		_timer = Data.PositionUpdateInterval;
+	}
+	public void UpdateBehaviour(Transform targetTransform)
+	{
+		if (_timer > Data.PositionUpdateInterval)
+		{
+			_timer = 0;
+			Move(targetTransform.position);
+		}
+
+		_timer += Time.deltaTime;
 	}
 
 	public void Move(Vector3 position)
@@ -17,10 +37,5 @@ public class Mover : MonoBehaviour, IMover
 		_character.Agent.StartPathTo(position, Data.MovementSpeed, () =>
 		{
 		});
-	}
-
-	public void Stop()
-	{
-		_character.Agent.Stop();
 	}
 }

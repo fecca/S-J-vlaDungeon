@@ -472,7 +472,7 @@ public class MapGenerator : MonoBehaviour
 		{
 			tile = room.Tiles.GetRandomElement();
 		}
-		var position = new Vector3(tile.WorldCoordinates.X, 5, tile.WorldCoordinates.Y);
+		var position = new Vector3(tile.WorldCoordinates.X, 0, tile.WorldCoordinates.Y);
 
 		return position;
 	}
