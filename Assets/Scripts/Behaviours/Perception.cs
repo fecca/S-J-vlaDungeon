@@ -5,7 +5,7 @@ public class Perception : MonoBehaviour
 	[SerializeField]
 	private PerceptionData Data;
 
-	public PlayerPosition GetDistanceLevel(Vector3 targetPosition)
+	public PlayerPosition GetPlayerPosition(Vector3 targetPosition)
 	{
 		var position = transform.position;
 		var ray = new Ray(position, (targetPosition - position).normalized);
@@ -27,6 +27,13 @@ public class Perception : MonoBehaviour
 				{
 					return PlayerPosition.OuterCircle;
 				}
+
+				return PlayerPosition.Outside;
+			}
+
+			if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Wall"))
+			{
+				return PlayerPosition.BehindWall;
 			}
 		}
 		return PlayerPosition.Outside;

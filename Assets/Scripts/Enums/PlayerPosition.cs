@@ -2,5 +2,6 @@
 {
 	Outside,
 	InnerCirle,
-	OuterCircle
+	OuterCircle,
+	BehindWall
 }

@@ -13,6 +13,7 @@ public class Enemy : Character
 	private Transform _targetTransform;
 	private float _timer;
 	private IBehaviour _currentBehaviour;
+	private EnemyState _currentState;
 
 	private void Awake()
 	{
@@ -38,42 +39,63 @@ public class Enemy : Character
 
 	private void UpdateState()
 	{
-		EnemyState state;
-		var targetPosition = _perception.GetDistanceLevel(_targetTransform.position);
+		EnemyState nextState;
+		var targetPosition = _perception.GetPlayerPosition(_targetTransform.position);
+		Debug.Log("#asdf# PlayerPosition" + targetPosition);
 		switch (targetPosition)
 		{
 			case PlayerPosition.Outside:
-				state = EnemyState.Idle;
+				nextState = EnemyState.Idle;
 				break;
+
 			case PlayerPosition.InnerCirle:
-				state = EnemyState.Attacking;
+				nextState = EnemyState.Attacking;
 				break;
+
 			case PlayerPosition.OuterCircle:
-				state = EnemyState.Moving;
+				nextState = EnemyState.Moving;
 				break;
+
+			case PlayerPosition.BehindWall:
+				if (_currentState == EnemyState.Moving || _currentState == EnemyState.Moving)
+				{
+					nextState = EnemyState.Moving;
+				}
+				else
+				{
+					nextState = EnemyState.Idle;
+				}
+				break;
+
 			default:
 				throw new NotImplementedException("PlayerPosition type not implemented: " + targetPosition);
 		}
 
-		SwitchState(state);
+		Debug.Log("#asdf# CurrentState" + _currentState);
+		Debug.Log("#asdf# NextState" + nextState);
+		_currentState = nextState;
+		SwitchState();
 	}
 
-	private void SwitchState(EnemyState state)
+	private void SwitchState()
 	{
 		IBehaviour nextBehaviour;
-		switch (state)
+		switch (_currentState)
 		{
 			case EnemyState.Idle:
 				nextBehaviour = _idle;
 				break;
+
 			case EnemyState.Moving:
 				nextBehaviour = _mover;
 				break;
+
 			case EnemyState.Attacking:
 				nextBehaviour = _attacker;
 				break;
+
 			default:
-				throw new NotImplementedException("EnemyState type not implemented: " + state);
+				throw new NotImplementedException("EnemyState type not implemented: " + _currentState);
 		}
 
 		if (nextBehaviour != _currentBehaviour)

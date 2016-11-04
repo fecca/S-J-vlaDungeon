@@ -59,14 +59,17 @@ public class MeshGenerator : MonoBehaviour
 				tile.AddWallVertices(square.CenterBottom.Position, square.CenterLeft.Position);
 				BuildmeshFromPoints(square.BottomLeft, square.CenterLeft, square.CenterBottom);
 				break;
+
 			case 2:
 				tile.AddWallVertices(square.CenterRight.Position, square.CenterBottom.Position);
 				BuildmeshFromPoints(square.BottomRight, square.CenterBottom, square.CenterRight);
 				break;
+
 			case 4:
 				tile.AddWallVertices(square.CenterTop.Position, square.CenterRight.Position);
 				BuildmeshFromPoints(square.TopRight, square.CenterRight, square.CenterTop);
 				break;
+
 			case 8:
 				tile.AddWallVertices(square.CenterLeft.Position, square.CenterTop.Position);
 				BuildmeshFromPoints(square.TopLeft, square.CenterTop, square.CenterLeft);
@@ -77,22 +80,27 @@ public class MeshGenerator : MonoBehaviour
 				tile.AddWallVertices(square.CenterRight.Position, square.CenterLeft.Position);
 				BuildmeshFromPoints(square.BottomLeft, square.CenterLeft, square.CenterRight, square.BottomRight);
 				break;
+
 			case 6:
 				tile.AddWallVertices(square.CenterTop.Position, square.CenterBottom.Position);
 				BuildmeshFromPoints(square.BottomRight, square.CenterBottom, square.CenterTop, square.TopRight);
 				break;
+
 			case 12:
 				tile.AddWallVertices(square.CenterLeft.Position, square.CenterRight.Position);
 				BuildmeshFromPoints(square.TopRight, square.CenterRight, square.CenterLeft, square.TopLeft);
 				break;
+
 			case 9:
 				tile.AddWallVertices(square.CenterBottom.Position, square.CenterTop.Position);
 				BuildmeshFromPoints(square.TopLeft, square.CenterTop, square.CenterBottom, square.BottomLeft);
 				break;
+
 			case 5:
 				tile.AddWallVertices(square.CenterRight.Position, square.CenterBottom.Position);
 				BuildmeshFromPoints(square.BottomLeft, square.CenterBottom, square.CenterRight, square.TopRight, square.CenterTop, square.CenterLeft);
 				break;
+
 			case 10:
 				tile.AddWallVertices(square.CenterTop.Position, square.CenterRight.Position);
 				BuildmeshFromPoints(square.BottomRight, square.CenterRight, square.CenterTop, square.TopLeft, square.CenterLeft, square.CenterBottom);
@@ -103,14 +111,17 @@ public class MeshGenerator : MonoBehaviour
 				tile.AddWallVertices(square.CenterRight.Position, square.CenterTop.Position);
 				BuildmeshFromPoints(square.BottomLeft, square.TopLeft, square.CenterTop, square.CenterRight, square.BottomRight);
 				break;
+
 			case 7:
 				tile.AddWallVertices(square.CenterTop.Position, square.CenterLeft.Position);
 				BuildmeshFromPoints(square.BottomRight, square.BottomLeft, square.CenterLeft, square.CenterTop, square.TopRight);
 				break;
+
 			case 14:
 				tile.AddWallVertices(square.CenterLeft.Position, square.CenterBottom.Position);
 				BuildmeshFromPoints(square.TopRight, square.BottomRight, square.CenterBottom, square.CenterLeft, square.TopLeft);
 				break;
+
 			case 13:
 				tile.AddWallVertices(square.CenterBottom.Position, square.CenterRight.Position);
 				BuildmeshFromPoints(square.TopLeft, square.TopRight, square.CenterRight, square.CenterBottom, square.BottomLeft);

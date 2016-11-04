@@ -61,22 +61,24 @@ public class PathFinder : MonoBehaviour
 						case 13:
 							topLeftWalkable = true;
 							break;
+
 						case 11:
 							bottomLeftWalkable = true;
 							break;
+
 						case 7:
 							bottomRightWalkable = true;
 							break;
+
 						case 14:
 							topRightWalkable = true;
 							break;
+
 						case 15:
 							topLeftWalkable = true;
 							topRightWalkable = true;
 							bottomRightWalkable = true;
 							bottomLeftWalkable = true;
-							break;
-						default:
 							break;
 					}
 				}
