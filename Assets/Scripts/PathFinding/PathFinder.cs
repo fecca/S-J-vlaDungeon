@@ -23,7 +23,7 @@ public class PathFinder : MonoBehaviour
 			foreach (var tile in _nodes)
 			{
 				Gizmos.color = tile.Walkable ? Color.green : Color.red;
-				Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X, 0.5f, tile.WorldCoordinates.Y), Vector3.one * 0.1f);
+				Gizmos.DrawCube(tile.WorldCoordinates, Vector3.one * 0.5f);
 			}
 		}
 	}
@@ -103,8 +103,8 @@ public class PathFinder : MonoBehaviour
 	}
 	private float GetDistance(PathfindingNode from, PathfindingNode to)
 	{
-		var distanceX = Mathf.Abs(from.WorldCoordinates.X - to.WorldCoordinates.X);
-		var distanceY = Mathf.Abs(from.WorldCoordinates.Y - to.WorldCoordinates.Y);
+		var distanceX = Mathf.Abs(from.WorldCoordinates.x - to.WorldCoordinates.x);
+		var distanceY = Mathf.Abs(from.WorldCoordinates.z - to.WorldCoordinates.z);
 
 		if (distanceX > distanceY)
 		{

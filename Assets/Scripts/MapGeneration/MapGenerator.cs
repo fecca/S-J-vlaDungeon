@@ -28,6 +28,8 @@ public class MapGenerator : MonoBehaviour
 	private int CorridorThickness = 2;
 	[SerializeField]
 	private int SmoothingLoops = 5;
+	[SerializeField]
+	private bool RandomizeVertexPositions = false;
 
 	private Tile[,] _map;
 	private List<Room> _survivingRooms = new List<Room>(128);
@@ -52,12 +54,12 @@ public class MapGenerator : MonoBehaviour
 				if (tile.IsEdgeTile)
 				{
 					Gizmos.color = Color.red;
-					Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X + (TileSize / 2), 0, tile.WorldCoordinates.Y + (TileSize / 2)), Vector3.one * 0.95f);
+					Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.x + (TileSize / 2), 0, tile.WorldCoordinates.z + (TileSize / 2)), Vector3.one * 0.95f);
 				}
 				else if (tile.IsWalkable)
 				{
 					Gizmos.color = Color.green;
-					Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.X + (TileSize / 2), 0, tile.WorldCoordinates.Y + (TileSize / 2)), Vector3.one * 0.95f);
+					Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.x + (TileSize / 2), 0, tile.WorldCoordinates.z + (TileSize / 2)), Vector3.one * 0.95f);
 				}
 			}
 		}
@@ -132,7 +134,6 @@ public class MapGenerator : MonoBehaviour
 			{
 				for (var j = 0; j < roomRegion.Count; j++)
 				{
-					//roomRegion[j].Type = TileType.Wall;
 					_map[(int)roomRegion[j].GridCoordinates.X, (int)roomRegion[j].GridCoordinates.Y].Type = TileType.None;
 				}
 			}
@@ -203,8 +204,8 @@ public class MapGenerator : MonoBehaviour
 					{
 						var tileA = roomListA[i].Tiles[tileIndexA];
 						var tileB = roomListB[j].Tiles[tileIndexB];
-						var distanceX = (tileA.WorldCoordinates.X - tileB.WorldCoordinates.X) * (tileA.WorldCoordinates.X - tileB.WorldCoordinates.X);
-						var distanceY = (tileA.WorldCoordinates.Y - tileB.WorldCoordinates.Y) * (tileA.WorldCoordinates.Y - tileB.WorldCoordinates.Y);
+						var distanceX = (tileA.WorldCoordinates.x - tileB.WorldCoordinates.x) * (tileA.WorldCoordinates.x - tileB.WorldCoordinates.x);
+						var distanceY = (tileA.WorldCoordinates.z - tileB.WorldCoordinates.z) * (tileA.WorldCoordinates.z - tileB.WorldCoordinates.z);
 						var distanceBetweenRooms = distanceX + distanceY;
 
 						if (distanceBetweenRooms < bestDistance || !possibleConnectionFound)
@@ -282,7 +283,12 @@ public class MapGenerator : MonoBehaviour
 			for (var y = 0; y < Height; y++)
 			{
 				var tile = _map[x, y];
-				controlNodes[x, y] = new ControlNode(new Vector3(tile.WorldCoordinates.X, 0, tile.WorldCoordinates.Y), tile.Type == TileType.Floor, TileSize);
+				var position = new Vector3(tile.WorldCoordinates.x, 0, tile.WorldCoordinates.z);
+				if (RandomizeVertexPositions)
+				{
+					position += Vector3.one * UnityEngine.Random.Range(-(TileSize * 0.1f), TileSize * 0.1f);
+				}
+				controlNodes[x, y] = new ControlNode(position, tile.Type == TileType.Floor, TileSize);
 			}
 		}
 
@@ -472,7 +478,7 @@ public class MapGenerator : MonoBehaviour
 		{
 			tile = room.Tiles.GetRandomElement();
 		}
-		var position = new Vector3(tile.WorldCoordinates.X, 0, tile.WorldCoordinates.Y);
+		var position = new Vector3(tile.WorldCoordinates.x, 0, tile.WorldCoordinates.z);
 
 		return position;
 	}

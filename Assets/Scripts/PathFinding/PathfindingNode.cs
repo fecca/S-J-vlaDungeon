@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class PathfindingNode : IHeapItem<PathfindingNode>
 {
 	public PathfindingNode Parent;
 	public Coordinates GridCoordinates;
-	public Coordinates WorldCoordinates;
+	public Vector3 WorldCoordinates;
 	public List<PathfindingNode> Neighbours;
 	public bool Walkable;
 
@@ -16,7 +17,7 @@ public class PathfindingNode : IHeapItem<PathfindingNode>
 	public PathfindingNode(float x, float y, bool walkable, int tileSize)
 	{
 		GridCoordinates = new Coordinates(x, y);
-		WorldCoordinates = new Coordinates((x / 2f + 0.25f) * tileSize, (y / 2f + 0.25f) * tileSize);
+		WorldCoordinates = FindWorldCoordinates(x, y, tileSize);
 		Neighbours = new List<PathfindingNode>();
 		Walkable = walkable;
 	}
@@ -40,7 +41,7 @@ public class PathfindingNode : IHeapItem<PathfindingNode>
 	}
 	public override string ToString()
 	{
-		return "Grid: [" + GridCoordinates.X + ";" + GridCoordinates.Y + "], World: [" + WorldCoordinates.X + ";" + WorldCoordinates.Y + "], Walkable: " + Walkable;
+		return "Grid: [" + GridCoordinates.X + ";" + GridCoordinates.Y + "], World: [" + WorldCoordinates.x + ";" + WorldCoordinates.z + "], Walkable: " + Walkable;
 	}
 	public int CompareTo(PathfindingNode other)
 	{
@@ -51,5 +52,20 @@ public class PathfindingNode : IHeapItem<PathfindingNode>
 		}
 
 		return -compare;
+	}
+
+	private Vector3 FindWorldCoordinates(float x, float y, int tileSize)
+	{
+		var worldPosition = new Vector3((x / 2f + 0.25f) * tileSize, 0, (y / 2f + 0.25f) * tileSize);
+		Ray ray = new Ray(worldPosition + Vector3.up * 2f, -Vector3.up);
+		RaycastHit hit;
+		if (Physics.Raycast(ray, out hit, 10f))
+		{
+			var adjustedPoint = hit.point + Vector3.up * 0.1f;
+			var newPosition = worldPosition;
+			newPosition.y = adjustedPoint.y;
+			return newPosition;
+		}
+		return worldPosition;
 	}
 }

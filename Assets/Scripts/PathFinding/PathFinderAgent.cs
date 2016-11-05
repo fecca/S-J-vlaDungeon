@@ -25,7 +25,7 @@ public class PathFinderAgent : MonoBehaviour
 			for (var iteration = _path.First; iteration != null; iteration = iteration.Next)
 			{
 				Gizmos.color = Color.white;
-				Gizmos.DrawCube(new Vector3(iteration.Value.WorldCoordinates.X, 1, iteration.Value.WorldCoordinates.Y), Vector3.one * 0.25f);
+				Gizmos.DrawCube(new Vector3(iteration.Value.WorldCoordinates.x, 1, iteration.Value.WorldCoordinates.z), Vector3.one * 0.25f);
 			}
 		}
 	}
@@ -51,7 +51,7 @@ public class PathFinderAgent : MonoBehaviour
 	}
 	public void StartPathTo(Tile targetTile, float movementSpeed, Action completed = null)
 	{
-		StartPathTo(new Vector3(targetTile.WorldCoordinates.X, transform.position.y, targetTile.WorldCoordinates.Y), movementSpeed, completed);
+		StartPathTo(new Vector3(targetTile.WorldCoordinates.x, transform.position.y, targetTile.WorldCoordinates.z), movementSpeed, completed);
 	}
 	public void Stop()
 	{
@@ -62,7 +62,7 @@ public class PathFinderAgent : MonoBehaviour
 	{
 		var targetNode = _path.First;
 
-		var targetPosition = new Vector3(targetNode.Value.WorldCoordinates.X, transform.position.y, targetNode.Value.WorldCoordinates.Y);
+		var targetPosition = new Vector3(targetNode.Value.WorldCoordinates.x, transform.position.y, targetNode.Value.WorldCoordinates.z);
 		transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * _movementSpeed);
 
 		if (Vector3.Distance(transform.position, targetPosition) < 0.01f)

@@ -5,7 +5,7 @@ public class Tile
 {
 	public TileType Type;
 	public Coordinates GridCoordinates;
-	public Coordinates WorldCoordinates;
+	public Vector3 WorldCoordinates;
 	public ConfigurationSquare ConfigurationSquare;
 	public List<Vector3> CoreVertices = new List<Vector3>(4);
 
@@ -24,7 +24,7 @@ public class Tile
 	public Tile(int x, int y, TileType type, int tileSize)
 	{
 		GridCoordinates = new Coordinates(x, y);
-		WorldCoordinates = new Coordinates(x * tileSize, y * tileSize);
+		WorldCoordinates = new Vector3(x * tileSize, 0, y * tileSize);
 		Type = type;
 	}
 

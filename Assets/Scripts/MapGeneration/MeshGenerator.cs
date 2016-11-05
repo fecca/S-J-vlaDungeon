@@ -14,8 +14,6 @@ public class MeshGenerator : MonoBehaviour
 	private GameObject Floor = null;
 	[SerializeField]
 	private int WallHeight = 2;
-	[SerializeField]
-	private bool RandomizeEdgeVertexPositions = false;
 
 	//private Mesh mesh;
 	//private float _timer;
@@ -29,7 +27,7 @@ public class MeshGenerator : MonoBehaviour
 	//			_timer = 0;
 	//			for (int i = 0; i < _floorVertices.Count; i++)
 	//			{
-	//				tmp[i] = _floorVertices[i] + Vector3.one * Random.Range(-0.1f, 0.1f);
+	//				tmp[i] = _floorVertices[i] + Vector3.one * Random.Range(-0.2f, 0.2f);
 	//			}
 	//			mesh.SetVertices(tmp);
 	//			mesh.RecalculateNormals();
@@ -189,12 +187,6 @@ public class MeshGenerator : MonoBehaviour
 			if (point.VertexIndex == -1)
 			{
 				point.VertexIndex = _floorVertices.Count;
-
-				if (RandomizeEdgeVertexPositions)
-				{
-					point.Position += Vector3.right * Random.Range(-0.1f, 0.1f);
-					point.Position += Vector3.forward * Random.Range(-0.1f, 0.1f);
-				}
 
 				_floorVertices.Add(point.Position);
 			}
