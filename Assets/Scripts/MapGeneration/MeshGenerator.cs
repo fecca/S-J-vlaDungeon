@@ -17,6 +17,27 @@ public class MeshGenerator : MonoBehaviour
 	[SerializeField]
 	private bool RandomizeEdgeVertexPositions = false;
 
+	//private Mesh mesh;
+	//private float _timer;
+	//private List<Vector3> tmp;
+	//private void Update()
+	//{
+	//	if (mesh != null)
+	//	{
+	//		if (_timer > 0.2f)
+	//		{
+	//			_timer = 0;
+	//			for (int i = 0; i < _floorVertices.Count; i++)
+	//			{
+	//				tmp[i] = _floorVertices[i] + Vector3.one * Random.Range(-0.1f, 0.1f);
+	//			}
+	//			mesh.SetVertices(tmp);
+	//			mesh.RecalculateNormals();
+	//		}
+	//		_timer += Time.deltaTime;
+	//	}
+	//}
+
 	private void GenerateFloorMesh(Tile[,] map)
 	{
 		_floorVertices.Clear();
@@ -208,7 +229,9 @@ public class MeshGenerator : MonoBehaviour
 	}
 	private void CreateFloorMesh()
 	{
+		//tmp = new List<Vector3>(_floorVertices);
 		var mesh = new Mesh();
+		mesh = new Mesh();
 		mesh.SetVertices(_floorVertices);
 		mesh.SetTriangles(_floorTriangles, 0);
 		mesh.RecalculateNormals();

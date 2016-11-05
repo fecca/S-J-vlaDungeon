@@ -41,7 +41,6 @@ public class Enemy : Character
 	{
 		EnemyState nextState;
 		var targetPosition = _perception.GetPlayerPosition(_targetTransform.position);
-		Debug.Log("#asdf# PlayerPosition" + targetPosition);
 		switch (targetPosition)
 		{
 			case PlayerPosition.Outside:
@@ -57,7 +56,7 @@ public class Enemy : Character
 				break;
 
 			case PlayerPosition.BehindWall:
-				if (_currentState == EnemyState.Moving || _currentState == EnemyState.Moving)
+				if (_currentState == EnemyState.Moving || _currentState == EnemyState.Attacking)
 				{
 					nextState = EnemyState.Moving;
 				}
@@ -71,8 +70,6 @@ public class Enemy : Character
 				throw new NotImplementedException("PlayerPosition type not implemented: " + targetPosition);
 		}
 
-		Debug.Log("#asdf# CurrentState" + _currentState);
-		Debug.Log("#asdf# NextState" + nextState);
 		_currentState = nextState;
 		SwitchState();
 	}
