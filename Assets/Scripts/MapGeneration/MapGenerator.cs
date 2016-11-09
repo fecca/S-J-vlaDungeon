@@ -470,18 +470,6 @@ public class MapGenerator : MonoBehaviour
 
 		return _map;
 	}
-	public Vector3 GetPlayerPosition()
-	{
-		var room = _survivingRooms.First();
-		var tile = room.Tiles.GetRandomElement();
-		while (!tile.IsWalkable)
-		{
-			tile = room.Tiles.GetRandomElement();
-		}
-		var position = new Vector3(tile.WorldCoordinates.x, 0, tile.WorldCoordinates.z);
-
-		return position;
-	}
 	public Tile GetRandomWalkableTile()
 	{
 		return _walkableTiles.GetRandomElement();

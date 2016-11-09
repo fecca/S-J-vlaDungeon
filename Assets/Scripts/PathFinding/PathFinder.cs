@@ -8,6 +8,7 @@ public class PathFinder : MonoBehaviour
 	private bool DrawGizmos = false;
 
 	private PathfindingNode[,] _nodes;
+	private List<PathfindingNode> _walkableNodes = new List<PathfindingNode>();
 	private LinkedList<PathfindingNode> _path = new LinkedList<PathfindingNode>();
 	private int _tileSize;
 
@@ -87,6 +88,23 @@ public class PathFinder : MonoBehaviour
 				_nodes[xIndex + 1, yIndex + 1] = new PathfindingNode(xIndex + 1, yIndex + 1, topRightWalkable, _tileSize);
 				_nodes[xIndex + 1, yIndex] = new PathfindingNode(xIndex + 1, yIndex, bottomRightWalkable, _tileSize);
 				_nodes[xIndex, yIndex] = new PathfindingNode(xIndex, yIndex, bottomLeftWalkable, _tileSize);
+
+				if (topLeftWalkable)
+				{
+					_walkableNodes.Add(_nodes[xIndex, yIndex + 1]);
+				}
+				if (topRightWalkable)
+				{
+					_walkableNodes.Add(_nodes[xIndex + 1, yIndex + 1]);
+				}
+				if (bottomRightWalkable)
+				{
+					_walkableNodes.Add(_nodes[xIndex + 1, yIndex]);
+				}
+				if (bottomLeftWalkable)
+				{
+					_walkableNodes.Add(_nodes[xIndex, yIndex]);
+				}
 			}
 		}
 	}
@@ -215,5 +233,9 @@ public class PathFinder : MonoBehaviour
 		}
 
 		return RetracePath(closed.Last());
+	}
+	public Vector3 GetRandomWalkableNode()
+	{
+		return _walkableNodes.GetRandomElement().WorldCoordinates;
 	}
 }
