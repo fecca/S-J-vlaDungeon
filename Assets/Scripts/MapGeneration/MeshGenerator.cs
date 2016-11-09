@@ -15,27 +15,6 @@ public class MeshGenerator : MonoBehaviour
 	[SerializeField]
 	private int WallHeight = 2;
 
-	//private Mesh mesh;
-	//private float _timer;
-	//private List<Vector3> tmp;
-	//private void Update()
-	//{
-	//	if (mesh != null)
-	//	{
-	//		if (_timer > 0.2f)
-	//		{
-	//			_timer = 0;
-	//			for (int i = 0; i < _floorVertices.Count; i++)
-	//			{
-	//				tmp[i] = _floorVertices[i] + Vector3.one * Random.Range(-0.2f, 0.2f);
-	//			}
-	//			mesh.SetVertices(tmp);
-	//			mesh.RecalculateNormals();
-	//		}
-	//		_timer += Time.deltaTime;
-	//	}
-	//}
-
 	private void GenerateFloorMesh(Tile[,] map)
 	{
 		_floorVertices.Clear();
