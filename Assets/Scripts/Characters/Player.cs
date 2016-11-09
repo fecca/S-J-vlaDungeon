@@ -10,17 +10,27 @@ public class Player : Character
 	private void Awake()
 	{
 		_mover = GetComponent<Mover>();
+		_timer = _mouseDragUpdateInterval;
 	}
+
+	private float _timer;
+	private float _mouseDragUpdateInterval = 0.1f;
 	private void Update()
 	{
-		if (Input.GetMouseButtonDown(0))
+		if (Input.GetMouseButton(0))
 		{
-			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			RaycastHit hit;
-			if (Physics.Raycast(ray, out hit, 500f, GroundLayer))
+			if (_timer > _mouseDragUpdateInterval)
 			{
-				_mover.Move(hit.point);
+				_timer = 0f;
+
+				var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+				RaycastHit hit;
+				if (Physics.Raycast(ray, out hit, 500f, GroundLayer))
+				{
+					_mover.Move(hit.point);
+				}
 			}
+			_timer += Time.deltaTime;
 		}
 	}
 }

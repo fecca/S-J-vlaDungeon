@@ -24,8 +24,8 @@ public class PathFinderAgent : MonoBehaviour
 		{
 			for (var iteration = _path.First; iteration != null; iteration = iteration.Next)
 			{
-				Gizmos.color = Color.white;
-				Gizmos.DrawCube(new Vector3(iteration.Value.WorldCoordinates.x, 1, iteration.Value.WorldCoordinates.z), Vector3.one * 0.25f);
+				Gizmos.color = Color.blue;
+				Gizmos.DrawSphere(new Vector3(iteration.Value.WorldCoordinates.x, 1, iteration.Value.WorldCoordinates.z), 0.25f);
 			}
 		}
 	}
@@ -61,11 +61,10 @@ public class PathFinderAgent : MonoBehaviour
 	private void MoveAlongPath()
 	{
 		var targetNode = _path.First;
-
 		var targetPosition = new Vector3(targetNode.Value.WorldCoordinates.x, transform.position.y, targetNode.Value.WorldCoordinates.z);
-		transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * _movementSpeed);
+		transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * _movementSpeed);
 
-		if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
+		if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
 		{
 			ArrivedAtNode();
 		}
