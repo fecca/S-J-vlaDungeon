@@ -20,7 +20,7 @@ public class Game : MonoBehaviour
 		_player = FindObjectOfType<Player>();
 
 		_mapGenerator.GenerateMap(_meshGenerator, _pathFinder);
-		_player.transform.position = _mapGenerator.GetPlayerPosition() + Vector3.up;
+		_player.transform.position = _pathFinder.GetRandomWalkableNode() + Vector3.up;
 
 		SpawnEnemies();
 	}
