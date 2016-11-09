@@ -17,6 +17,18 @@ public class Player : Character
 	private float _mouseDragUpdateInterval = 0.1f;
 	private void Update()
 	{
+		if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonUp(0))
+		{
+			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			RaycastHit hit;
+			if (Physics.Raycast(ray, out hit, 500f, GroundLayer))
+			{
+				_mover.Move(hit.point);
+			}
+
+			return;
+		}
+
 		if (Input.GetMouseButton(0))
 		{
 			if (_timer > _mouseDragUpdateInterval)
