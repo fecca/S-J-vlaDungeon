@@ -24,15 +24,9 @@ public class Enemy : Character
 		_targetTransform = FindObjectOfType<Player>().transform;
 		_currentBehaviour = _idle;
 	}
-	//public override void Setup(PathFinder pathFinder)
-	//{
-	//	var node = pathFinder.GetRandomWalkableNode();
-	//	transform.position = node.WorldCoordinates + Vector3.up;
-	//	Agent.Setup(pathFinder, node);
-	//}
 	private void Update()
 	{
-		if (_timer > _perception.GetUpdateInterval())
+		if (_timer > _perception.GetRandomUpdateInterval())
 		{
 			_timer = 0f;
 			UpdateState();

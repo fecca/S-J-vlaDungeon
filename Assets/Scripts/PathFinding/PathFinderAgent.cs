@@ -40,7 +40,6 @@ public class PathFinderAgent : MonoBehaviour
 	}
 	public void StartPathTo(Vector3 targetPosition, float movementSpeed, Action completed = null)
 	{
-		Debug.Log(_pendingNewPath + ", " + _path.Count);
 		_movementSpeed = movementSpeed;
 		_completedPath = completed;
 		if (_path.Count > 0)

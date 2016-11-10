@@ -12,12 +12,6 @@ public class Player : Character
 		_mover = GetComponent<Mover>();
 		_timer = _mouseDragUpdateInterval;
 	}
-	//public override void Setup(PathFinder pathFinder)
-	//{
-	//	var node = pathFinder.GetRandomWalkableNode();
-	//	transform.position = node.WorldCoordinates + Vector3.up;
-	//	Agent.Setup(pathFinder, node);
-	//}
 
 	private float _timer;
 	private float _mouseDragUpdateInterval = 0.1f;

@@ -38,9 +38,9 @@ public class Perception : MonoBehaviour
 		}
 		return PlayerPosition.Outside;
 	}
-	public float GetUpdateInterval()
+	public float GetRandomUpdateInterval()
 	{
-		return Data.UpdateInterval;
+		return Data.UpdateInterval * Random.Range(0.8f, 1.2f);
 	}
 
 	private void OnDrawGizmos()
