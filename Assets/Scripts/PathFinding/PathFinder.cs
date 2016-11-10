@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -132,8 +134,8 @@ public class PathFinder : MonoBehaviour
 					continue;
 				}
 
-				var neighbourX = (int)node.GridCoordinates.X + x;
-				var neighbourY = (int)node.GridCoordinates.Y + y;
+				var neighbourX = node.GridCoordinates.X + x;
+				var neighbourY = node.GridCoordinates.Y + y;
 				if (neighbourX < 0 || neighbourX >= _nodes.GetLength(0) || neighbourY < 0 || neighbourY >= _nodes.GetLength(1))
 				{
 					continue;
@@ -148,6 +150,10 @@ public class PathFinder : MonoBehaviour
 	private LinkedList<PathfindingNode> RetracePath(PathfindingNode lastNode)
 	{
 		var path = new LinkedList<PathfindingNode>();
+		if (lastNode == null)
+		{
+			return path;
+		}
 		path.AddFirst(lastNode);
 
 		var parent = lastNode.Parent;
@@ -184,14 +190,8 @@ public class PathFinder : MonoBehaviour
 
 		return GetPath(startNode, endNode);
 	}
-	public LinkedList<PathfindingNode> GetPath(PathfindingNode startNode, PathfindingNode endNode)
+	private IEnumerator FindPath(PathfindingNode startNode, PathfindingNode endNode, Action<PathfindingNode> completed)
 	{
-		if (!startNode.Walkable || !endNode.Walkable)
-		{
-			_path.Clear();
-			return _path;
-		}
-
 		var open = new Heap<PathfindingNode>(_nodes.GetLength(0) * _nodes.GetLength(1));
 		var closed = new HashSet<PathfindingNode>();
 
@@ -232,7 +232,24 @@ public class PathFinder : MonoBehaviour
 			}
 		}
 
-		return RetracePath(closed.Last());
+		completed(closed.Last());
+
+		yield break;
+	}
+	public LinkedList<PathfindingNode> GetPath(PathfindingNode startNode, PathfindingNode endNode)
+	{
+		if (!startNode.Walkable || !endNode.Walkable)
+		{
+			return RetracePath(null);
+		}
+
+		LinkedList<PathfindingNode> returnList = null;
+		StartCoroutine(FindPath(startNode, endNode, (lastNode) =>
+		{
+			returnList = RetracePath(lastNode);
+		}));
+		return returnList;
+
 	}
 	public PathfindingNode GetRandomWalkableNode()
 	{
