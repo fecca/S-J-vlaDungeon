@@ -13,13 +13,13 @@ public class Mover : MonoBehaviour, IMover
 		_character = GetComponent<Character>();
 	}
 
-	public void Stop()
-	{
-		_character.Agent.Stop();
-	}
 	public void Start()
 	{
 		_timer = Data.PositionUpdateInterval;
+	}
+	public void Stop()
+	{
+		_character.Agent.SmoothStop();
 	}
 	public void UpdateBehaviour(Transform targetTransform)
 	{

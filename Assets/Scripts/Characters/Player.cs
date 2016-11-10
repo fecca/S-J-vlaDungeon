@@ -23,6 +23,11 @@ public class Player : Character
 	private float _mouseDragUpdateInterval = 0.1f;
 	private void Update()
 	{
+		if (Input.GetKeyDown(KeyCode.Return))
+		{
+			Agent.SmoothStop();
+		}
+
 		if (Input.GetMouseButtonDown(0))
 		{
 			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);

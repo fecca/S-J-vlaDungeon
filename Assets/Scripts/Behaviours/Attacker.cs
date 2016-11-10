@@ -7,12 +7,12 @@ public class Attacker : MonoBehaviour, IAttacker
 
 	private float _timer;
 
-	public void Stop()
-	{
-	}
 	public void Start()
 	{
 		_timer = Data.TimeBetweenAttacks;
+	}
+	public void Stop()
+	{
 	}
 	public void UpdateBehaviour(Transform targetTransform)
 	{

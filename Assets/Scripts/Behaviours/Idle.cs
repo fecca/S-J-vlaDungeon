@@ -2,10 +2,10 @@
 
 public class Idle : MonoBehaviour, IIdle
 {
-	public void Stop()
+	public void Start()
 	{
 	}
-	public void Start()
+	public void Stop()
 	{
 	}
 	public void UpdateBehaviour(Transform targetTransform)

@@ -58,9 +58,14 @@ public class PathFinderAgent : MonoBehaviour
 	{
 		StartPathTo(new Vector3(targetTile.WorldCoordinates.x, transform.position.y, targetTile.WorldCoordinates.z), movementSpeed, completed);
 	}
-	public void Stop()
+	public void SmoothStop()
 	{
+		var firstNode = _path.First;
 		_path.Clear();
+		if (firstNode != null)
+		{
+			_path.AddFirst(firstNode);
+		}
 	}
 
 	private void MoveAlongPath()
