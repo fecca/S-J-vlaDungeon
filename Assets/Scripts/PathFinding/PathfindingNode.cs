@@ -8,13 +8,14 @@ public class PathfindingNode : IHeapItem<PathfindingNode>
 	public Vector3 WorldCoordinates;
 	public List<PathfindingNode> Neighbours;
 	public bool Walkable;
+	public bool Occupied;
 
 	public float GCost { get; set; }
 	public float HCost { get; set; }
 	public float FCost { get; set; }
 	public int HeapIndex { get; set; }
 
-	public PathfindingNode(float x, float y, bool walkable, int tileSize)
+	public PathfindingNode(int x, int y, bool walkable, int tileSize)
 	{
 		GridCoordinates = new Coordinates(x, y);
 		WorldCoordinates = FindWorldCoordinates(x, y, tileSize);

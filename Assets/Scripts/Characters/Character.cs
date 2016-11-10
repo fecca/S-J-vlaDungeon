@@ -12,9 +12,15 @@ public abstract class Character : MonoBehaviour
 			if (_agent == null)
 			{
 				_agent = GetComponent<PathFinderAgent>();
-				_agent.Setup(FindObjectOfType<PathFinder>());
 			}
 			return _agent;
 		}
+	}
+
+	public void Setup(PathFinder pathFinder)
+	{
+		var node = pathFinder.GetRandomWalkableNode();
+		transform.position = node.WorldCoordinates + Vector3.up;
+		Agent.Setup(pathFinder, node);
 	}
 }

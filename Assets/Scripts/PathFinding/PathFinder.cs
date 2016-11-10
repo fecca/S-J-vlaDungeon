@@ -23,22 +23,12 @@ public class PathFinder : MonoBehaviour
 		{
 			foreach (var tile in _nodes)
 			{
-				Gizmos.color = tile.Walkable ? Color.green : Color.red;
+				Gizmos.color = tile.Occupied ? Color.magenta : tile.Walkable ? Color.green : Color.red;
 				Gizmos.DrawCube(tile.WorldCoordinates, Vector3.one * 0.5f);
 			}
 		}
 	}
 
-	private PathfindingNode GetNode(Vector3 worldPosition)
-	{
-		worldPosition /= _tileSize;
-		var fromXFraction = worldPosition.x - (int)worldPosition.x;
-		var fromXNodeIndex = Mathf.RoundToInt((int)worldPosition.x * 2 + fromXFraction);
-		var fromYFraction = worldPosition.z - (int)worldPosition.z;
-		var fromYNodeIndex = Mathf.RoundToInt((int)worldPosition.z * 2 + fromYFraction);
-
-		return new PathfindingNode(_nodes[fromXNodeIndex, fromYNodeIndex]);
-	}
 	private void CreateNodes(Tile[,] tiles)
 	{
 		_nodes = new PathfindingNode[tiles.GetLength(0) * 2, tiles.GetLength(1) * 2];
@@ -164,13 +154,23 @@ public class PathFinder : MonoBehaviour
 		while (parent != null)
 		{
 			path.AddFirst(parent);
-
 			parent = parent.Parent;
 		}
+		path.RemoveFirst();
 
 		return path;
 	}
 
+	public PathfindingNode GetNode(Vector3 worldPosition)
+	{
+		worldPosition /= _tileSize;
+		var fromXFraction = worldPosition.x - (int)worldPosition.x;
+		var fromXNodeIndex = Mathf.RoundToInt((int)worldPosition.x * 2 + fromXFraction);
+		var fromYFraction = worldPosition.z - (int)worldPosition.z;
+		var fromYNodeIndex = Mathf.RoundToInt((int)worldPosition.z * 2 + fromYFraction);
+
+		return new PathfindingNode(_nodes[fromXNodeIndex, fromYNodeIndex]);
+	}
 	public void RegisterMap(Tile[,] map, int tileSize)
 	{
 		_tileSize = tileSize;
@@ -234,8 +234,8 @@ public class PathFinder : MonoBehaviour
 
 		return RetracePath(closed.Last());
 	}
-	public Vector3 GetRandomWalkableNode()
+	public PathfindingNode GetRandomWalkableNode()
 	{
-		return _walkableNodes.GetRandomElement().WorldCoordinates;
+		return _walkableNodes.GetRandomElement();
 	}
 }

@@ -12,12 +12,18 @@ public class Player : Character
 		_mover = GetComponent<Mover>();
 		_timer = _mouseDragUpdateInterval;
 	}
+	//public override void Setup(PathFinder pathFinder)
+	//{
+	//	var node = pathFinder.GetRandomWalkableNode();
+	//	transform.position = node.WorldCoordinates + Vector3.up;
+	//	Agent.Setup(pathFinder, node);
+	//}
 
 	private float _timer;
 	private float _mouseDragUpdateInterval = 0.1f;
 	private void Update()
 	{
-		if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonUp(0))
+		if (Input.GetMouseButtonDown(0))
 		{
 			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			RaycastHit hit;
@@ -43,6 +49,8 @@ public class Player : Character
 				}
 			}
 			_timer += Time.deltaTime;
+
+			return;
 		}
 	}
 }

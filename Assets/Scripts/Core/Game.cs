@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Game : MonoBehaviour
 {
@@ -20,9 +21,14 @@ public class Game : MonoBehaviour
 		_player = FindObjectOfType<Player>();
 
 		_mapGenerator.GenerateMap(_meshGenerator, _pathFinder);
-		_player.transform.position = _pathFinder.GetRandomWalkableNode() + Vector3.up;
 
+		SpawnPlayer();
 		SpawnEnemies();
+	}
+
+	private void SpawnPlayer()
+	{
+		_player.Setup(_pathFinder);
 	}
 
 	private void SpawnEnemies()
@@ -31,7 +37,8 @@ public class Game : MonoBehaviour
 		{
 			var randomTile = _mapGenerator.GetRandomWalkableTile();
 			var randomTilePosition = new Vector3(randomTile.WorldCoordinates.x, 0.5f, randomTile.WorldCoordinates.z);
-			Instantiate(EnemyPrefab, randomTilePosition, Quaternion.identity);
+			var enemyGameObject = Instantiate(EnemyPrefab, randomTilePosition, Quaternion.identity) as GameObject;
+			enemyGameObject.GetComponent<Character>().Setup(_pathFinder);
 		}
 	}
 }
