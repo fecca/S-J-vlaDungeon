@@ -11,7 +11,6 @@ public class PathFinder : MonoBehaviour
 
 	private PathfindingNode[,] _nodes;
 	private List<PathfindingNode> _walkableNodes = new List<PathfindingNode>();
-	private LinkedList<PathfindingNode> _path = new LinkedList<PathfindingNode>();
 	private int _tileSize;
 
 	private void OnDrawGizmos()

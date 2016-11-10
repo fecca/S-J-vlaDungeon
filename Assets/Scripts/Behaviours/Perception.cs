@@ -10,8 +10,6 @@ public class Perception : MonoBehaviour
 		var position = transform.position;
 		var ray = new Ray(position, (targetPosition - position).normalized);
 
-		Debug.DrawRay(ray.origin, ray.direction * float.MaxValue, Color.green, 0.5f);
-
 		RaycastHit hit;
 		if (Physics.Raycast(ray, out hit, float.MaxValue))
 		{
@@ -45,9 +43,9 @@ public class Perception : MonoBehaviour
 
 	private void OnDrawGizmos()
 	{
-		Gizmos.color = new Color(0.9f, 0.9f, 0.9f, 0.9f);
-		Gizmos.DrawWireSphere(transform.position, Data.InnerRadius);
-		Gizmos.color = new Color(0.7f, 0.7f, 0.7f, 0.7f);
-		Gizmos.DrawWireSphere(transform.position, Data.OuterRadius);
+		//Gizmos.color = new Color(0.9f, 0.9f, 0.9f, 0.9f);
+		//Gizmos.DrawWireSphere(transform.position, Data.InnerRadius);
+		//Gizmos.color = new Color(0.7f, 0.7f, 0.7f, 0.7f);
+		//Gizmos.DrawWireSphere(transform.position, Data.OuterRadius);
 	}
 }
