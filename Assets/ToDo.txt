@@ -1,11 +1,7 @@
-(
-	- Constant for number of path nodes per tile
-	- Smoothen movement
-	- Increase performance when generating map/mesh
-	- Identify edge tiles in rooms
-)
-- Enemy follow around corners
+Input handler - Key bindings - Listen to keys
+Coroutine for generating map and mesh
+Add callback to path created
 
 Bugs
 ----
-- Unreachable areas
+- Unreachable areas in generated map
