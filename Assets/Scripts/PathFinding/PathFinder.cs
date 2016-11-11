@@ -13,6 +13,10 @@ public class PathFinder : MonoBehaviour
 	private List<PathfindingNode> _walkableNodes = new List<PathfindingNode>();
 	private int _tileSize;
 
+	private void Awake()
+	{
+		MessageHub.Instance.Subscribe<MeshGeneratedEvent>(OnMeshGenerated);
+	}
 	private void OnDrawGizmos()
 	{
 		if (!DrawGizmos)
@@ -30,6 +34,23 @@ public class PathFinder : MonoBehaviour
 		}
 	}
 
+	private void OnMeshGenerated(MeshGeneratedEvent mapGeneratedEvent)
+	{
+		StartCoroutine(RegisterMap(mapGeneratedEvent.Map, () =>
+		{
+			MessageHub.Instance.Publish(new MapRegisteredEvent(null));
+		}));
+	}
+	private IEnumerator RegisterMap(Tile[,] map, Action completed)
+	{
+		_tileSize = 3;
+		CreateNodes(map);
+		GetNeighbours();
+
+		completed();
+
+		yield break;
+	}
 	private void CreateNodes(Tile[,] tiles)
 	{
 		_nodes = new PathfindingNode[tiles.GetLength(0) * 2, tiles.GetLength(1) * 2];
@@ -165,30 +186,6 @@ public class PathFinder : MonoBehaviour
 
 		return path;
 	}
-
-	public PathfindingNode GetNode(Vector3 worldPosition)
-	{
-		worldPosition /= _tileSize;
-		var fromXFraction = worldPosition.x - (int)worldPosition.x;
-		var fromXNodeIndex = Mathf.RoundToInt((int)worldPosition.x * 2 + fromXFraction);
-		var fromYFraction = worldPosition.z - (int)worldPosition.z;
-		var fromYNodeIndex = Mathf.RoundToInt((int)worldPosition.z * 2 + fromYFraction);
-
-		return new PathfindingNode(_nodes[fromXNodeIndex, fromYNodeIndex]);
-	}
-	public void RegisterMap(Tile[,] map, int tileSize)
-	{
-		_tileSize = tileSize;
-		CreateNodes(map);
-		GetNeighbours();
-	}
-	public LinkedList<PathfindingNode> GetPath(Vector3 from, Vector3 to)
-	{
-		var startNode = GetNode(from);
-		var endNode = GetNode(to);
-
-		return GetPath(startNode, endNode);
-	}
 	private IEnumerator FindPath(PathfindingNode startNode, PathfindingNode endNode, Action<PathfindingNode> completed)
 	{
 		var open = new Heap<PathfindingNode>(_nodes.GetLength(0) * _nodes.GetLength(1));
@@ -234,6 +231,24 @@ public class PathFinder : MonoBehaviour
 		completed(closed.Last());
 
 		yield break;
+	}
+
+	public PathfindingNode GetNode(Vector3 worldPosition)
+	{
+		worldPosition /= _tileSize;
+		var fromXFraction = worldPosition.x - (int)worldPosition.x;
+		var fromXNodeIndex = Mathf.RoundToInt((int)worldPosition.x * 2 + fromXFraction);
+		var fromYFraction = worldPosition.z - (int)worldPosition.z;
+		var fromYNodeIndex = Mathf.RoundToInt((int)worldPosition.z * 2 + fromYFraction);
+
+		return new PathfindingNode(_nodes[fromXNodeIndex, fromYNodeIndex]);
+	}
+	public LinkedList<PathfindingNode> GetPath(Vector3 from, Vector3 to)
+	{
+		var startNode = GetNode(from);
+		var endNode = GetNode(to);
+
+		return GetPath(startNode, endNode);
 	}
 	public LinkedList<PathfindingNode> GetPath(PathfindingNode startNode, PathfindingNode endNode)
 	{

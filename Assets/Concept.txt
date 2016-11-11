@@ -12,3 +12,14 @@ AI
   - Move towards target every interval
 - Attacking
   - Attacks target every interval
+
+  INIT
+  ----
+  GameStarted
+  ...
+  MapGenerated
+  MapRegistered
+  MeshGenerated
+  CharactersSpawned
+  ...
+  GameInitialized

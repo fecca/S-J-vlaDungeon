@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -35,6 +36,10 @@ public class MapGenerator : MonoBehaviour
 	private List<Room> _survivingRooms = new List<Room>(128);
 	private List<Tile> _walkableTiles = new List<Tile>();
 
+	private void Awake()
+	{
+		MessageHub.Instance.Subscribe<GameStartedEvent>(OnGameStarted);
+	}
 	private void OnDrawGizmos()
 	{
 		if (!DrawGizmos)
@@ -65,6 +70,32 @@ public class MapGenerator : MonoBehaviour
 		}
 	}
 
+	private void OnGameStarted(GameStartedEvent gameStartedEvent)
+	{
+		StartCoroutine(GenerateMap(() =>
+		{
+			MessageHub.Instance.Publish(new MapGeneratedEvent(null)
+			{
+				Map = _map
+			});
+		}));
+	}
+	private IEnumerator GenerateMap(Action completed)
+	{
+		_map = new Tile[Width, Height];
+
+		RandomFillMap();
+		GenerateClusters();
+		FilterWalls();
+		FilterRooms();
+		ConnectClosestRooms();
+		ConfigureTiles();
+		RegisterWalkableTiles();
+
+		completed();
+
+		yield break;
+	}
 	private void RandomFillMap()
 	{
 		if (UseRandomSeed)
@@ -453,23 +484,6 @@ public class MapGenerator : MonoBehaviour
 		return line;
 	}
 
-	public Tile[,] GenerateMap(MeshGenerator meshGenerator, PathFinder pathFinder)
-	{
-		_map = new Tile[Width, Height];
-
-		RandomFillMap();
-		GenerateClusters();
-		FilterWalls();
-		FilterRooms();
-		ConnectClosestRooms();
-		ConfigureTiles();
-		RegisterWalkableTiles();
-
-		meshGenerator.GenerateMeshes(_map);
-		pathFinder.RegisterMap(_map, TileSize);
-
-		return _map;
-	}
 	public Tile GetRandomWalkableTile()
 	{
 		return _walkableTiles.GetRandomElement();

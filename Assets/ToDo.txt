@@ -1,6 +1,7 @@
 Input handler - Key bindings - Listen to keys
 Coroutine for generating map and mesh
 Add callback to path created
+Evaluate occupied nodes when calculating path
 
 Bugs
 ----

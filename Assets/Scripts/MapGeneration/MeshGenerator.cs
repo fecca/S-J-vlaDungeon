@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MeshGenerator : MonoBehaviour
@@ -9,12 +11,32 @@ public class MeshGenerator : MonoBehaviour
 	private readonly List<int> _wallTriangles = new List<int>(32768);
 
 	[SerializeField]
-	private GameObject Walls = null;
-	[SerializeField]
-	private GameObject Floor = null;
-	[SerializeField]
 	private int WallHeight = 2;
 
+	private void Awake()
+	{
+		MessageHub.Instance.Subscribe<MapGeneratedEvent>(OnMapGenerated);
+	}
+
+	private void OnMapGenerated(MapGeneratedEvent mapGeneratedEvent)
+	{
+		StartCoroutine(GenerateMesh(mapGeneratedEvent.Map, () =>
+		{
+			MessageHub.Instance.Publish(new MeshGeneratedEvent(null)
+			{
+				Map = mapGeneratedEvent.Map
+			});
+		}));
+	}
+	private IEnumerator GenerateMesh(Tile[,] map, Action completed)
+	{
+		GenerateFloorMesh(map);
+		GenerateWallMesh(map);
+
+		completed();
+
+		yield break;
+	}
 	private void GenerateFloorMesh(Tile[,] map)
 	{
 		_floorVertices.Clear();
@@ -200,36 +222,40 @@ public class MeshGenerator : MonoBehaviour
 	}
 	private void CreateFloorMesh()
 	{
-		//tmp = new List<Vector3>(_floorVertices);
+		var floorGameObject = new GameObject("Floor");
+		floorGameObject.layer = LayerMask.NameToLayer("Ground");
+
+		var meshRenderer = floorGameObject.GetOrAddComponent<MeshRenderer>();
+		meshRenderer.sharedMaterial = Resources.Load<Material>("MeshMaterial");
+
 		var mesh = new Mesh();
-		mesh = new Mesh();
 		mesh.SetVertices(_floorVertices);
 		mesh.SetTriangles(_floorTriangles, 0);
 		mesh.RecalculateNormals();
 
-		var meshFilter = Floor.GetComponent<MeshFilter>();
+		var meshFilter = floorGameObject.GetOrAddComponent<MeshFilter>();
 		meshFilter.mesh = mesh;
 
-		var meshCollider = Floor.AddComponent<MeshCollider>();
+		var meshCollider = floorGameObject.GetOrAddComponent<MeshCollider>();
 		meshCollider.sharedMesh = mesh;
 	}
 	private void CreateWallMesh()
 	{
+		var wallGameObject = new GameObject("Walls");
+		wallGameObject.layer = LayerMask.NameToLayer("Wall");
+
+		var meshRenderer = wallGameObject.GetOrAddComponent<MeshRenderer>();
+		meshRenderer.sharedMaterial = Resources.Load<Material>("MeshMaterial");
+
 		var mesh = new Mesh();
 		mesh.SetVertices(_wallVertices);
 		mesh.SetTriangles(_wallTriangles, 0);
 		mesh.RecalculateNormals();
 
-		var meshFilter = Walls.GetComponent<MeshFilter>();
+		var meshFilter = wallGameObject.GetOrAddComponent<MeshFilter>();
 		meshFilter.mesh = mesh;
 
-		var meshCollider = Walls.AddComponent<MeshCollider>();
+		var meshCollider = wallGameObject.GetOrAddComponent<MeshCollider>();
 		meshCollider.sharedMesh = mesh;
-	}
-
-	public void GenerateMeshes(Tile[,] map)
-	{
-		GenerateFloorMesh(map);
-		GenerateWallMesh(map);
 	}
 }
