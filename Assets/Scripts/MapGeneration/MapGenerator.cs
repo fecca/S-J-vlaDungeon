@@ -47,27 +47,14 @@ public class MapGenerator : MonoBehaviour
 			return;
 		}
 
-		if (_map == null)
-		{
-			return;
-		}
+		//if (_map == null)
+		//{
+		//	return;
+		//}
 
-		foreach (var tile in _map)
-		{
-			if (tile.IsEdgeTile || tile.IsWalkable)
-			{
-				if (tile.IsEdgeTile)
-				{
-					Gizmos.color = Color.red;
-					Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.x + (TileSize / 2), 0, tile.WorldCoordinates.z + (TileSize / 2)), Vector3.one * 0.95f);
-				}
-				else if (tile.IsWalkable)
-				{
-					Gizmos.color = Color.green;
-					Gizmos.DrawCube(new Vector3(tile.WorldCoordinates.x + (TileSize / 2), 0, tile.WorldCoordinates.z + (TileSize / 2)), Vector3.one * 0.95f);
-				}
-			}
-		}
+		//foreach (var tile in _map)
+		//{
+		//}
 	}
 
 	private void OnGameStarted(GameStartedEvent gameStartedEvent)

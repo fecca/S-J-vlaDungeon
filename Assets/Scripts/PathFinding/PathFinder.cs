@@ -186,7 +186,7 @@ public class PathFinder : MonoBehaviour
 
 		return path;
 	}
-	private IEnumerator FindPath(PathfindingNode startNode, PathfindingNode endNode, Action<PathfindingNode> completed)
+	private IEnumerator GetPath(PathfindingNode startNode, PathfindingNode endNode, Action<PathfindingNode> completed)
 	{
 		var open = new Heap<PathfindingNode>(_nodes.GetLength(0) * _nodes.GetLength(1));
 		var closed = new HashSet<PathfindingNode>();
@@ -258,7 +258,7 @@ public class PathFinder : MonoBehaviour
 		}
 
 		LinkedList<PathfindingNode> returnList = null;
-		StartCoroutine(FindPath(startNode, endNode, (lastNode) =>
+		StartCoroutine(GetPath(startNode, endNode, (lastNode) =>
 		{
 			returnList = RetracePath(lastNode);
 		}));

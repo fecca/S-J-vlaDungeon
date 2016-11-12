@@ -19,7 +19,7 @@ public class Attacker : MonoBehaviour, IAttacker
 		if (_timer > Data.TimeBetweenAttacks)
 		{
 			_timer = 0;
-			//CreateProjectile(targetTransform.position);
+			CreateProjectile(targetTransform.position);
 		}
 
 		_timer += Time.deltaTime;
