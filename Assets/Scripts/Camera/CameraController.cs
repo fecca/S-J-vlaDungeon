@@ -7,7 +7,11 @@ public class CameraController : MonoBehaviour
 
 	private Player _player;
 
-	private void Start()
+	private void Awake()
+	{
+		MessageHub.Instance.Subscribe<CharactersSpawnedEvent>(OnCharacterSpawnedEvent);
+	}
+	private void OnCharacterSpawnedEvent(CharactersSpawnedEvent charactersSpawnedEvent)
 	{
 		_player = FindObjectOfType<Player>();
 	}

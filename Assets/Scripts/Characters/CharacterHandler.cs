@@ -28,7 +28,7 @@ public class CharacterHandler : MonoBehaviour
 	}
 	private void SpawnEnemies()
 	{
-		for (var i = 0; i < 5; i++)
+		for (var i = 0; i < NumberOfEnemies; i++)
 		{
 			var enemy = Instantiate(EnemyPrefab) as GameObject;
 			enemy.GetComponent<Character>().Setup(FindObjectOfType<PathFinder>());

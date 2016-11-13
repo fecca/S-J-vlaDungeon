@@ -243,27 +243,20 @@ public class PathFinder : MonoBehaviour
 
 		return new PathfindingNode(_nodes[fromXNodeIndex, fromYNodeIndex]);
 	}
-	public LinkedList<PathfindingNode> GetPath(Vector3 from, Vector3 to)
+	public void GetPath(Vector3 from, Vector3 to, Action<LinkedList<PathfindingNode>> completed)
 	{
 		var startNode = GetNode(from);
 		var endNode = GetNode(to);
 
-		return GetPath(startNode, endNode);
-	}
-	public LinkedList<PathfindingNode> GetPath(PathfindingNode startNode, PathfindingNode endNode)
-	{
 		if (!startNode.Walkable || !endNode.Walkable)
 		{
-			return RetracePath(null);
+			completed(new LinkedList<PathfindingNode>());
 		}
 
-		LinkedList<PathfindingNode> returnList = null;
 		StartCoroutine(GetPath(startNode, endNode, (lastNode) =>
 		{
-			returnList = RetracePath(lastNode);
+			completed(RetracePath(lastNode));
 		}));
-		return returnList;
-
 	}
 	public PathfindingNode GetRandomWalkableNode()
 	{

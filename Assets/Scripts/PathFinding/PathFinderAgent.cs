@@ -50,7 +50,10 @@ public class PathFinderAgent : MonoBehaviour
 		else
 		{
 			_pendingNewPath = false;
-			_path = _pathFinder.GetPath(transform.position, targetPosition);
+			_pathFinder.GetPath(transform.position, targetPosition, (path) =>
+			{
+				_path = path;
+			});
 		}
 	}
 	public void StartPathTo(Tile targetTile, float movementSpeed, Action completed = null)
@@ -87,7 +90,10 @@ public class PathFinderAgent : MonoBehaviour
 		if (_pendingNewPath)
 		{
 			_pendingNewPath = false;
-			_path = _pathFinder.GetPath(transform.position, _pendingTo);
+			_pathFinder.GetPath(transform.position, _pendingTo, (path) =>
+			{
+				_path = path;
+			});
 		}
 		else
 		{
