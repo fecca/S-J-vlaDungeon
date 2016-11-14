@@ -17,6 +17,25 @@ public class PathFinderAgent : MonoBehaviour
 	{
 		if (_path.Count > 0)
 		{
+			if (_nextNode == null)
+			{
+				_nextNode = _path.First.Value;
+				if (_nextNode.Occupied)
+				{
+					var lastNodeWorldCoordinates = _path.Last.Value.WorldCoordinates;
+					_path.Clear();
+					_nextNode = null;
+					_pathFinder.GetPath(transform.position, lastNodeWorldCoordinates, (path) =>
+					{
+						_path = path;
+					});
+					return;
+				}
+				else
+				{
+					_nextNode.SetOccupied(true);
+				}
+			}
 			MoveAlongPath();
 		}
 	}
@@ -36,7 +55,7 @@ public class PathFinderAgent : MonoBehaviour
 	{
 		_pathFinder = pathFinder;
 		_currentNode = startingNode;
-		_currentNode.Occupied = true;
+		_currentNode.SetOccupied(true);
 	}
 	public void StartPathTo(Vector3 targetPosition, float movementSpeed, Action completed = null)
 	{
@@ -72,8 +91,6 @@ public class PathFinderAgent : MonoBehaviour
 
 	private void MoveAlongPath()
 	{
-		_nextNode = _path.First.Value;
-		_nextNode.Occupied = true;
 		var targetPosition = new Vector3(_nextNode.WorldCoordinates.x, transform.position.y, _nextNode.WorldCoordinates.z);
 		transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * _movementSpeed);
 
@@ -84,8 +101,9 @@ public class PathFinderAgent : MonoBehaviour
 	}
 	private void ArrivedAtNode()
 	{
-		_currentNode.Occupied = false;
+		_currentNode.SetOccupied(false);
 		_currentNode = _nextNode;
+		_nextNode = null;
 
 		if (_pendingNewPath)
 		{

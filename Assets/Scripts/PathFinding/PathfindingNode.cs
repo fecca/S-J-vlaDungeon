@@ -8,8 +8,8 @@ public class PathfindingNode : IHeapItem<PathfindingNode>
 	public Vector3 WorldCoordinates;
 	public List<PathfindingNode> Neighbours;
 	public bool Walkable;
-	public bool Occupied;
 
+	public bool Occupied { get; private set; }
 	public float GCost { get; set; }
 	public float HCost { get; set; }
 	public float FCost { get; set; }
@@ -42,7 +42,11 @@ public class PathfindingNode : IHeapItem<PathfindingNode>
 	}
 	public override string ToString()
 	{
-		return "Grid: [" + GridCoordinates.X + ";" + GridCoordinates.Y + "], World: [" + WorldCoordinates.x + ";" + WorldCoordinates.z + "], Walkable: " + Walkable;
+		return string.Format("Grid: {0}, " +
+			"World: {1}, " +
+			"Walkable: {2}, " +
+			"Occupied: {3}, ",
+			GridCoordinates, WorldCoordinates, Walkable, Occupied);
 	}
 	public int CompareTo(PathfindingNode other)
 	{
@@ -53,6 +57,14 @@ public class PathfindingNode : IHeapItem<PathfindingNode>
 		}
 
 		return -compare;
+	}
+	public void SetOccupied(bool occupied)
+	{
+		//for (var i = 0; i < Neighbours.Count; i++)
+		//{
+		//	Neighbours[i].Occupied = occupied;
+		//}
+		Occupied = occupied;
 	}
 
 	private Vector3 FindWorldCoordinates(float x, float y, int tileSize)

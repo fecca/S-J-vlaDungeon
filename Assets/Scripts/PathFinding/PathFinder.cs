@@ -206,7 +206,7 @@ public class PathFinder : MonoBehaviour
 			for (var i = 0; i < neighbours.Count; i++)
 			{
 				var neighbour = neighbours[i];
-				if (!neighbour.Walkable || closed.Contains(neighbour))
+				if ((neighbour.Occupied && !neighbour.Equals(endNode)) || !neighbour.Walkable || closed.Contains(neighbour))
 				{
 					continue;
 				}
