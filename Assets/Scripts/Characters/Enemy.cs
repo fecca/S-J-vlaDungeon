@@ -1,9 +1,8 @@
 ﻿using System;
 using UnityEngine;
 
-[RequireComponent(typeof(Perception))]
-[RequireComponent(typeof(Attacker))]
 [RequireComponent(typeof(Idle))]
+[RequireComponent(typeof(Perception))]
 public class Enemy : Character
 {
 	private Perception _perception;

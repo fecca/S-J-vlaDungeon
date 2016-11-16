@@ -2,28 +2,39 @@
 
 public class Player : Character
 {
-	[SerializeField]
-	private LayerMask GroundLayer;
-
+	private Attacker _attacker;
 	private Mover _mover;
+	private float _mouseDragTimer;
+	private float _mouseDragUpdateInterval = 0.1f;
 
 	private void Awake()
 	{
+		_attacker = GetComponent<Attacker>();
 		_mover = GetComponent<Mover>();
-		_timer = _mouseDragUpdateInterval;
 	}
 
-	private float _timer;
-	private float _mouseDragUpdateInterval = 0.1f;
 	private void Update()
 	{
 		if (Input.GetMouseButtonDown(0))
 		{
-			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			RaycastHit hit;
-			if (Physics.Raycast(ray, out hit, 500f, GroundLayer))
+			var hit = InputHandler.Instance.GetRaycastHit();
+			if (hit.transform)
 			{
-				_mover.Move(hit.point);
+				if (hit.transform.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
+				{
+					_mover.Move(hit.point);
+				}
+			}
+
+			return;
+		}
+
+		if (Input.GetMouseButtonDown(1))
+		{
+			var hit = InputHandler.Instance.GetRaycastHit();
+			if (hit.transform)
+			{
+				_attacker.Attack(hit.point);
 			}
 
 			return;
@@ -31,18 +42,20 @@ public class Player : Character
 
 		if (Input.GetMouseButton(0))
 		{
-			if (_timer > _mouseDragUpdateInterval)
+			if (_mouseDragTimer > _mouseDragUpdateInterval)
 			{
-				_timer = 0f;
+				_mouseDragTimer = 0f;
 
-				var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-				RaycastHit hit;
-				if (Physics.Raycast(ray, out hit, 500f, GroundLayer))
+				var hit = InputHandler.Instance.GetRaycastHit();
+				if (hit.transform)
 				{
-					_mover.Move(hit.point);
+					if (hit.transform.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
+					{
+						_mover.Move(hit.point);
+					}
 				}
 			}
-			_timer += Time.deltaTime;
+			_mouseDragTimer += Time.deltaTime;
 
 			return;
 		}

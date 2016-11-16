@@ -1,12 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class InputHandler : MonoBehaviour
 {
-	[SerializeField]
-	private LayerMask GroundLayer;
+	private IDictionary<KeyCode, List<TinyMessageBase>> _keyboardBindings = new Dictionary<KeyCode, List<TinyMessageBase>>();
 
 	private static InputHandler _instance;
-
 	public static InputHandler Instance
 	{
 		get
@@ -18,17 +18,32 @@ public class InputHandler : MonoBehaviour
 	private void Awake()
 	{
 		_instance = this;
+		SetupKeyboardBindings();
+	}
+	private void Update()
+	{
+		for (var i = 0; i < _keyboardBindings.Count; i++)
+		{
+			var binding = _keyboardBindings.ElementAt(i);
+			if (Input.GetKeyDown(binding.Key))
+			{
+				for (int j = 0; j < binding.Value.Count; j++)
+				{
+					MessageHub.Instance.Publish(binding.Value[j]);
+				}
+			}
+		}
 	}
 
-	public Vector3 GetHitPoint()
+	private void SetupKeyboardBindings()
+	{
+	}
+
+	public RaycastHit GetRaycastHit()
 	{
 		var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
-		if (Physics.Raycast(ray, out hit, 500f, GroundLayer))
-		{
-			return hit.point;
-		}
-
-		return -Vector3.one;
+		Physics.Raycast(ray, out hit, 500f);
+		return hit;
 	}
 }

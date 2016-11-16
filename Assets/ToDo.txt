@@ -1,8 +1,14 @@
 Input handler - Key bindings - Listen to keys
-Coroutine for generating map and mesh
-Add callback to path created
-Let paths be found inside coroutine with a delay
+Attacking
+Level transition
+Inventory
+Taking damage
+Killing enemies
+Crafting
+Loot
 
 Bugs
 ----
-- Unreachable areas in generated map
+Unreachable areas in generated map
+Failed pathing when close to agent
+Spike when automoving on big maps

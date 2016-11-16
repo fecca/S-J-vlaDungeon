@@ -14,18 +14,18 @@ public class Attacker : MonoBehaviour, IAttacker
 	public void Stop()
 	{
 	}
-	public void UpdateBehaviour(Transform targetTransform)
+	public void UpdateBehaviour(Transform target)
 	{
 		if (_timer > Data.TimeBetweenAttacks)
 		{
 			_timer = 0;
-			CreateProjectile(targetTransform.position);
+			Attack(target.position);
 		}
 
 		_timer += Time.deltaTime;
 	}
 
-	public void CreateProjectile(Vector3 targetPosition)
+	public void Attack(Vector3 targetPosition)
 	{
 		var projectile = GameObject.CreatePrimitive(PrimitiveType.Cube);
 		projectile.transform.localScale = Vector3.one * 0.35f;

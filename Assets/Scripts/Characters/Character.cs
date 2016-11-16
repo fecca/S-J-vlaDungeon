@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(PathFinderAgent))]
+[RequireComponent(typeof(Attacker))]
 [RequireComponent(typeof(Mover))]
+[RequireComponent(typeof(PathFinderAgent))]
 public abstract class Character : MonoBehaviour
 {
 	private PathFinderAgent _agent;
