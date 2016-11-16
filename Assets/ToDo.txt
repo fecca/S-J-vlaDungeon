@@ -12,3 +12,4 @@ Bugs
 Unreachable areas in generated map
 Failed pathing when close to agent
 Spike when automoving on big maps
+Mark node as unoccupied when enemy dies

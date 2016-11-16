@@ -28,7 +28,7 @@ public class Attacker : MonoBehaviour, IAttacker
 	public void Attack(Vector3 targetPosition)
 	{
 		var projectile = Instantiate(Resources.Load<GameObject>("Projectile"));
-		projectile.transform.position = transform.position + transform.up;
-		projectile.GetOrAddComponent<Rigidbody>().AddForce((targetPosition - transform.position).normalized * Data.ProjectileSpeed);
+		targetPosition.y = transform.position.y;
+		projectile.GetComponent<Projectile>().Setup(transform.position, targetPosition, Data.ProjectileSpeed);
 	}
 }
