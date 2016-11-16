@@ -12,7 +12,6 @@ public class Player : Character
 		_attacker = GetComponent<Attacker>();
 		_mover = GetComponent<Mover>();
 	}
-
 	private void Update()
 	{
 		if (Input.GetMouseButtonDown(0))
@@ -59,5 +58,9 @@ public class Player : Character
 
 			return;
 		}
+	}
+
+	public override void TakeDamage()
+	{
 	}
 }

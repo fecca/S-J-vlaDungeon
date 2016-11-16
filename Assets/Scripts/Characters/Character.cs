@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 [RequireComponent(typeof(Attacker))]
 [RequireComponent(typeof(Mover))]
 [RequireComponent(typeof(PathFinderAgent))]
-public abstract class Character : MonoBehaviour
+public abstract class Character : MonoBehaviour, IDamagable
 {
 	private PathFinderAgent _agent;
 	public PathFinderAgent Agent
@@ -24,4 +25,6 @@ public abstract class Character : MonoBehaviour
 		transform.position = node.WorldCoordinates + Vector3.up;
 		Agent.Setup(pathFinder, node);
 	}
+
+	public virtual void TakeDamage() { }
 }

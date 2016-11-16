@@ -3,15 +3,16 @@
 public class CharacterHandler : MonoBehaviour
 {
 	[SerializeField]
-	private GameObject PlayerPrefab;
+	private GameObject PlayerPrefab = null;
 	[SerializeField]
-	private GameObject EnemyPrefab;
+	private GameObject EnemyPrefab = null;
 	[SerializeField]
-	private int NumberOfEnemies;
+	private int NumberOfEnemies = 1;
 
 	private void Awake()
 	{
 		MessageHub.Instance.Subscribe<MapRegisteredEvent>(OnMapRegisteredEvent);
+		MessageHub.Instance.Subscribe<EnemyDiedEvent>(OnEnemyDiedEvent);
 	}
 
 	private void OnMapRegisteredEvent(MapRegisteredEvent mapGeneratedEvent)
@@ -20,6 +21,11 @@ public class CharacterHandler : MonoBehaviour
 		SpawnEnemies();
 
 		MessageHub.Instance.Publish(new CharactersSpawnedEvent(null));
+	}
+	private void OnEnemyDiedEvent(EnemyDiedEvent enemyDiedEvent)
+	{
+		SpawnEnemy();
+		SpawnEnemy();
 	}
 	private void SpawnPlayer()
 	{
@@ -30,8 +36,13 @@ public class CharacterHandler : MonoBehaviour
 	{
 		for (var i = 0; i < NumberOfEnemies; i++)
 		{
-			var enemy = Instantiate(EnemyPrefab) as GameObject;
-			enemy.GetComponent<Character>().Setup(FindObjectOfType<PathFinder>());
+			SpawnEnemy();
 		}
+	}
+
+	public void SpawnEnemy()
+	{
+		var enemy = Instantiate(EnemyPrefab) as GameObject;
+		enemy.GetComponent<Character>().Setup(FindObjectOfType<PathFinder>());
 	}
 }

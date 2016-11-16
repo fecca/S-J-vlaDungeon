@@ -72,7 +72,6 @@ public class Enemy : Character
 		_currentState = nextState;
 		SwitchState();
 	}
-
 	private void SwitchState()
 	{
 		IBehaviour nextBehaviour;
@@ -100,5 +99,11 @@ public class Enemy : Character
 			_currentBehaviour = nextBehaviour;
 			_currentBehaviour.Start();
 		}
+	}
+
+	public override void TakeDamage()
+	{
+		Destroy(gameObject);
+		MessageHub.Instance.Publish(new EnemyDiedEvent(null));
 	}
 }

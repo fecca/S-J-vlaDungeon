@@ -27,10 +27,8 @@ public class Attacker : MonoBehaviour, IAttacker
 
 	public void Attack(Vector3 targetPosition)
 	{
-		var projectile = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		projectile.transform.localScale = Vector3.one * 0.35f;
-		projectile.transform.position = transform.position + Vector3.up;
-		projectile.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+		var projectile = Instantiate(Resources.Load<GameObject>("Projectile"));
+		projectile.transform.position = transform.position + transform.up;
 		projectile.GetOrAddComponent<Rigidbody>().AddForce((targetPosition - transform.position).normalized * Data.ProjectileSpeed);
 	}
 }
