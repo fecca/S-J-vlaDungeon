@@ -3,12 +3,12 @@
 public class Mover : MonoBehaviour, IMover
 {
 	[SerializeField]
-	private MoverData Data;
+	private MoverData Data = null;
 
 	private Character _character;
 	private float _timer;
 
-	public void Awake()
+	private void Awake()
 	{
 		_character = GetComponent<Character>();
 	}

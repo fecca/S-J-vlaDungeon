@@ -23,7 +23,7 @@ public class Enemy : Character
 		_targetTransform = FindObjectOfType<Player>().transform;
 		_currentBehaviour = _idle;
 	}
-	private void Update()
+	private void FixedUpdate()
 	{
 		if (_timer > _perception.GetRandomUpdateInterval())
 		{

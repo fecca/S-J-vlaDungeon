@@ -3,7 +3,7 @@
 public class Perception : MonoBehaviour
 {
 	[SerializeField]
-	private PerceptionData Data;
+	private PerceptionData Data = null;
 
 	public PlayerPosition GetPlayerPosition(Vector3 targetPosition)
 	{
@@ -39,13 +39,5 @@ public class Perception : MonoBehaviour
 	public float GetRandomUpdateInterval()
 	{
 		return Data.UpdateInterval * Random.Range(0.8f, 1.2f);
-	}
-
-	private void OnDrawGizmos()
-	{
-		//Gizmos.color = new Color(0.9f, 0.9f, 0.9f, 0.9f);
-		//Gizmos.DrawWireSphere(transform.position, Data.InnerRadius);
-		//Gizmos.color = new Color(0.7f, 0.7f, 0.7f, 0.7f);
-		//Gizmos.DrawWireSphere(transform.position, Data.OuterRadius);
 	}
 }

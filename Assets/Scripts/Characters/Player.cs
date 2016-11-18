@@ -2,6 +2,7 @@
 
 public class Player : Character
 {
+	private Transform _cachedTransform;
 	private Attacker _attacker;
 	private Mover _mover;
 	private float _mouseDragTimer;
@@ -9,6 +10,7 @@ public class Player : Character
 
 	private void Awake()
 	{
+		_cachedTransform = transform;
 		_attacker = GetComponent<Attacker>();
 		_mover = GetComponent<Mover>();
 	}
@@ -37,7 +39,7 @@ public class Player : Character
 	}
 	private void OnDrawGizmos()
 	{
-		Debug.DrawRay(transform.position, transform.forward, Color.red);
+		Debug.DrawRay(_cachedTransform.position, _cachedTransform.forward, Color.red);
 	}
 
 	private void Move()
@@ -56,8 +58,8 @@ public class Player : Character
 		var hit = InputHandler.Instance.GetRaycastHit();
 		if (hit.transform != null)
 		{
-			var adjustedHitPoint = new Vector3(hit.point.x, transform.position.y, hit.point.z);
-			var direction = (adjustedHitPoint - transform.position).normalized;
+			var adjustedHitPoint = new Vector3(hit.point.x, _cachedTransform.position.y, hit.point.z);
+			var direction = (adjustedHitPoint - _cachedTransform.position).normalized;
 			Agent.RotateAgent(direction);
 			Agent.SmoothStop();
 			_attacker.Attack(direction);

@@ -3,9 +3,15 @@
 public class Attacker : MonoBehaviour, IAttacker
 {
 	[SerializeField]
-	private AttackerData Data;
+	private AttackerData Data = null;
 
+	private Transform _cachedTransform;
 	private float _timer;
+
+	private void Awake()
+	{
+		_cachedTransform = transform;
+	}
 
 	public void Start()
 	{
@@ -19,7 +25,9 @@ public class Attacker : MonoBehaviour, IAttacker
 		if (_timer > Data.TimeBetweenAttacks)
 		{
 			_timer = 0;
-			Attack(target.position);
+			var targetPosition = target.position;
+			targetPosition.y = _cachedTransform.position.y;
+			Attack((targetPosition - _cachedTransform.position).normalized);
 		}
 
 		_timer += Time.deltaTime;
@@ -27,7 +35,7 @@ public class Attacker : MonoBehaviour, IAttacker
 
 	public void Attack(Vector3 direction)
 	{
-		var projectile = Instantiate(Resources.Load<GameObject>("PlayerProjectile"));
-		projectile.GetComponent<Projectile>().Setup(transform.position, direction, Data.ProjectileSpeed);
+		var projectile = Instantiate(Data.ProjectilePrefab);
+		projectile.GetComponent<Projectile>().Setup(_cachedTransform.position, direction, Data.ProjectileSpeed);
 	}
 }

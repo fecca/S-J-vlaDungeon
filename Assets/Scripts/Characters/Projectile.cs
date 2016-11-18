@@ -4,12 +4,18 @@
 [RequireComponent(typeof(Rigidbody))]
 public class Projectile : MonoBehaviour
 {
+	private Transform _cachedTransform;
 	private Vector3 _direction;
 	private float _speed;
 
-	private void Update()
+	private void Awake()
 	{
-		transform.Translate(_direction * Time.deltaTime * _speed, Space.World);
+		_cachedTransform = transform;
+	}
+
+	private void FixedUpdate()
+	{
+		_cachedTransform.Translate(_direction * Time.deltaTime * _speed, Space.World);
 	}
 	private void OnTriggerEnter(Collider collider)
 	{
@@ -26,6 +32,6 @@ public class Projectile : MonoBehaviour
 		_direction = direction;
 		_speed = speed;
 
-		transform.position = spawnPosition + direction;
+		_cachedTransform.position = spawnPosition + direction;
 	}
 }

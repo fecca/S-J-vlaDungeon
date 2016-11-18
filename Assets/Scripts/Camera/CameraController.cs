@@ -5,11 +5,13 @@ public class CameraController : MonoBehaviour
 	[SerializeField]
 	private float MovementSpeed = 10;
 
+	private Transform _cachedTransform;
 	private Player _player;
 
 	private void Awake()
 	{
 		MessageHub.Instance.Subscribe<CharactersSpawnedEvent>(OnCharacterSpawnedEvent);
+		_cachedTransform = transform;
 	}
 	private void OnCharacterSpawnedEvent(CharactersSpawnedEvent charactersSpawnedEvent)
 	{
@@ -27,6 +29,6 @@ public class CameraController : MonoBehaviour
 		}
 		Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, 5, 20);
 
-		transform.position = Vector3.Lerp(transform.position, _player.transform.position + Vector3.up * 25f + Vector3.forward * -25, Time.deltaTime * MovementSpeed);
+		_cachedTransform.position = Vector3.Lerp(_cachedTransform.position, _player.transform.position + Vector3.up * 25f + Vector3.forward * -25, Time.deltaTime * MovementSpeed);
 	}
 }

@@ -1,9 +1,7 @@
 Input handler - Key bindings - Listen to keys
-Attacking
 Level transition
 Inventory
 Taking damage
-Killing enemies
 Crafting
 Loot
 Cache transforms and other components
@@ -13,4 +11,4 @@ Bugs
 Unreachable areas in generated map
 Failed pathing when close to agent
 Spike when automoving on big maps
-Projectile hits grounds
+Handle moving outside of map
