@@ -25,10 +25,9 @@ public class Attacker : MonoBehaviour, IAttacker
 		_timer += Time.deltaTime;
 	}
 
-	public void Attack(Vector3 targetPosition)
+	public void Attack(Vector3 direction)
 	{
-		var projectile = Instantiate(Resources.Load<GameObject>("Projectile"));
-		targetPosition.y = transform.position.y;
-		projectile.GetComponent<Projectile>().Setup(transform.position, targetPosition, Data.ProjectileSpeed);
+		var projectile = Instantiate(Resources.Load<GameObject>("PlayerProjectile"));
+		projectile.GetComponent<Projectile>().Setup(transform.position, direction, Data.ProjectileSpeed);
 	}
 }

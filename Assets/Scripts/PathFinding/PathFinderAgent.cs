@@ -36,7 +36,7 @@ public class PathFinderAgent : MonoBehaviour
 					_nextNode.SetOccupied(true);
 				}
 			}
-			RotateAgent();
+			RotateAgent(_nextNode.WorldCoordinates);
 			MoveAlongPath();
 		}
 	}
@@ -100,14 +100,12 @@ public class PathFinderAgent : MonoBehaviour
 			_nextNode.SetOccupied(false);
 		}
 	}
-
-	private void RotateAgent()
+	public void RotateAgent(Vector3 direction)
 	{
-		var targetPosition = new Vector3(_nextNode.WorldCoordinates.x, transform.position.y, _nextNode.WorldCoordinates.z);
-		var targetDirection = targetPosition - transform.position;
-		var newDirection = Vector3.RotateTowards(transform.forward, targetDirection, 1, 0.0F);
+		var newDirection = Vector3.RotateTowards(transform.forward, direction, 1, 0.0F);
 		transform.rotation = Quaternion.LookRotation(newDirection);
 	}
+
 	private void MoveAlongPath()
 	{
 		var targetPosition = new Vector3(_nextNode.WorldCoordinates.x, transform.position.y, _nextNode.WorldCoordinates.z);

@@ -4,16 +4,12 @@
 [RequireComponent(typeof(Rigidbody))]
 public class Projectile : MonoBehaviour
 {
-	private Vector3 _targetPosition;
+	private Vector3 _direction;
 	private float _speed;
 
 	private void Update()
 	{
-		transform.position = Vector3.MoveTowards(transform.position, _targetPosition, Time.deltaTime * _speed);
-		if (transform.position == _targetPosition)
-		{
-			Destroy(gameObject);
-		}
+		transform.Translate(_direction * Time.deltaTime * _speed, Space.World);
 	}
 	private void OnTriggerEnter(Collider collider)
 	{
@@ -25,12 +21,11 @@ public class Projectile : MonoBehaviour
 		}
 	}
 
-	public void Setup(Vector3 spawnPosition, Vector3 targetPosition, float speed)
+	public void Setup(Vector3 spawnPosition, Vector3 direction, float speed)
 	{
-		_targetPosition = targetPosition;
+		_direction = direction;
 		_speed = speed;
 
-		var direction = (targetPosition - spawnPosition).normalized;
 		transform.position = spawnPosition + direction;
 	}
 }

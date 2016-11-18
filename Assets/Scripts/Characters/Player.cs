@@ -16,27 +16,12 @@ public class Player : Character
 	{
 		if (Input.GetMouseButtonDown(0))
 		{
-			var hit = InputHandler.Instance.GetRaycastHit();
-			if (hit.transform)
-			{
-				if (hit.transform.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
-				{
-					_mover.Move(hit.point);
-				}
-			}
-
-			return;
+			Move();
 		}
 
 		if (Input.GetMouseButtonDown(1))
 		{
-			var hit = InputHandler.Instance.GetRaycastHit();
-			if (hit.transform)
-			{
-				_attacker.Attack(hit.point);
-			}
-
-			return;
+			Attack();
 		}
 
 		if (Input.GetMouseButton(0))
@@ -45,19 +30,42 @@ public class Player : Character
 			{
 				_mouseDragTimer = 0f;
 
-				var hit = InputHandler.Instance.GetRaycastHit();
-				if (hit.transform)
-				{
-					if (hit.transform.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
-					{
-						_mover.Move(hit.point);
-					}
-				}
+				Move();
 			}
 			_mouseDragTimer += Time.deltaTime;
-
-			return;
 		}
+	}
+	private void OnDrawGizmos()
+	{
+		Debug.DrawRay(transform.position, transform.forward, Color.red);
+	}
+
+	private void Move()
+	{
+		var hit = InputHandler.Instance.GetRaycastHit();
+		if (hit.transform)
+		{
+			if (hit.transform.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
+			{
+				_mover.Move(hit.point);
+			}
+		}
+	}
+	private void ContinuousMove()
+	{
+	}
+	private void Attack()
+	{
+		var hit = InputHandler.Instance.GetRaycastHit();
+		if (hit.transform != null)
+		{
+			var adjustedHitPoint = new Vector3(hit.point.x, transform.position.y, hit.point.z);
+			var direction = (adjustedHitPoint - transform.position).normalized;
+			Agent.RotateAgent(direction);
+			Agent.SmoothStop();
+			_attacker.Attack(direction);
+		}
+
 	}
 
 	public override void TakeDamage()
