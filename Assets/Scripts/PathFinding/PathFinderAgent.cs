@@ -35,8 +35,10 @@ public class PathFinderAgent : MonoBehaviour
 				{
 					_nextNode.SetOccupied(true);
 				}
+				var targetPosition = _nextNode.WorldCoordinates;
+				targetPosition.y = transform.position.y;
+				RotateAgent((targetPosition - transform.position).normalized);
 			}
-			RotateAgent(_nextNode.WorldCoordinates);
 			MoveAlongPath();
 		}
 	}
@@ -102,8 +104,7 @@ public class PathFinderAgent : MonoBehaviour
 	}
 	public void RotateAgent(Vector3 direction)
 	{
-		var newDirection = Vector3.RotateTowards(transform.forward, direction, 1, 0.0F);
-		transform.rotation = Quaternion.LookRotation(newDirection);
+		transform.rotation = Quaternion.LookRotation(direction);
 	}
 
 	private void MoveAlongPath()

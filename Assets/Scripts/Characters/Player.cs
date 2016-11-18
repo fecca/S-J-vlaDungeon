@@ -51,9 +51,6 @@ public class Player : Character
 			}
 		}
 	}
-	private void ContinuousMove()
-	{
-	}
 	private void Attack()
 	{
 		var hit = InputHandler.Instance.GetRaycastHit();
@@ -65,7 +62,6 @@ public class Player : Character
 			Agent.SmoothStop();
 			_attacker.Attack(direction);
 		}
-
 	}
 
 	public override void TakeDamage()
