@@ -103,6 +103,7 @@ public class Enemy : Character
 
 	public override void TakeDamage()
 	{
+		Agent.ClearNodes();
 		Destroy(gameObject);
 		MessageHub.Instance.Publish(new EnemyDiedEvent(null));
 	}

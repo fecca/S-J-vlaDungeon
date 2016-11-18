@@ -233,20 +233,26 @@ public class PathFinder : MonoBehaviour
 		yield break;
 	}
 
-	public PathfindingNode GetNode(Vector3 worldPosition)
+	public PathfindingNode GetNode(Vector3 worldPosition, bool copy)
 	{
 		worldPosition /= _tileSize;
 		var fromXFraction = worldPosition.x - (int)worldPosition.x;
 		var fromXNodeIndex = Mathf.RoundToInt((int)worldPosition.x * 2 + fromXFraction);
 		var fromYFraction = worldPosition.z - (int)worldPosition.z;
 		var fromYNodeIndex = Mathf.RoundToInt((int)worldPosition.z * 2 + fromYFraction);
+		var node = _nodes[fromXNodeIndex, fromYNodeIndex];
 
-		return new PathfindingNode(_nodes[fromXNodeIndex, fromYNodeIndex]);
+		if (copy)
+		{
+			return new PathfindingNode(node);
+		}
+
+		return node;
 	}
 	public void GetPath(Vector3 from, Vector3 to, Action<LinkedList<PathfindingNode>> completed)
 	{
-		var startNode = GetNode(from);
-		var endNode = GetNode(to);
+		var startNode = GetNode(from, true);
+		var endNode = GetNode(to, true);
 
 		if (!startNode.Walkable || !endNode.Walkable)
 		{

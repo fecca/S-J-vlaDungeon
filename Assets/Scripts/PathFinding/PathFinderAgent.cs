@@ -89,6 +89,17 @@ public class PathFinderAgent : MonoBehaviour
 			_path.AddFirst(firstNode);
 		}
 	}
+	public void ClearNodes()
+	{
+		if (_currentNode != null)
+		{
+			_currentNode.SetOccupied(false);
+		}
+		if (_nextNode != null)
+		{
+			_nextNode.SetOccupied(false);
+		}
+	}
 
 	private void RotateAgent()
 	{
