@@ -60,10 +60,6 @@ public class PathfindingNode : IHeapItem<PathfindingNode>
 	}
 	public void SetOccupied(bool occupied)
 	{
-		//for (var i = 0; i < Neighbours.Count; i++)
-		//{
-		//	Neighbours[i].Occupied = occupied;
-		//}
 		Occupied = occupied;
 	}
 

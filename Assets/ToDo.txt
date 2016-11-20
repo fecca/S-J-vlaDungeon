@@ -2,6 +2,7 @@ Input handler - Key bindings - Listen to keys
 Level transition
 Inventory
 Taking damage
+UI
 Crafting
 Loot
 Cache transforms and other components

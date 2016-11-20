@@ -1,104 +1,23 @@
 ﻿using System;
 using UnityEngine;
 
-[RequireComponent(typeof(Idle))]
 [RequireComponent(typeof(Perception))]
-public class Enemy : Character
+public class Enemy : Character, IAttacking, IMoving
 {
-	private Perception _perception;
-	private Mover _mover;
-	private Idle _idle;
-	private Attacker _attacker;
-	private Transform _targetTransform;
-	private float _timer;
-	private IBehaviour _currentBehaviour;
-	private EnemyState _currentState;
+	private Brain _brain;
+	private Transform _target;
+	private Transform _cachedTransform;
 
 	private void Awake()
 	{
-		_perception = GetComponent<Perception>();
-		_mover = GetComponent<Mover>();
-		_idle = GetComponent<Idle>();
-		_attacker = GetComponent<Attacker>();
-		_targetTransform = FindObjectOfType<Player>().transform;
-		_currentBehaviour = _idle;
+		_target = FindObjectOfType<Player>().transform;
+		_cachedTransform = transform;
+		_brain = new Brain(this, _target);
+		_brain.EnterThought(ThoughtType.Idle);
 	}
-	private void FixedUpdate()
+	private void Update()
 	{
-		if (_timer > _perception.GetRandomUpdateInterval())
-		{
-			_timer = 0f;
-			UpdateState();
-		}
-
-		_currentBehaviour.UpdateBehaviour(_targetTransform);
-
-		_timer += Time.deltaTime;
-	}
-
-	private void UpdateState()
-	{
-		EnemyState nextState;
-		var targetPosition = _perception.GetPlayerPosition(_targetTransform.position);
-		switch (targetPosition)
-		{
-			case PlayerPosition.Outside:
-				nextState = EnemyState.Idle;
-				break;
-
-			case PlayerPosition.InnerCirle:
-				nextState = EnemyState.Attacking;
-				break;
-
-			case PlayerPosition.OuterCircle:
-				nextState = EnemyState.Moving;
-				break;
-
-			case PlayerPosition.BehindWall:
-				if (_currentState == EnemyState.Moving || _currentState == EnemyState.Attacking)
-				{
-					nextState = EnemyState.Moving;
-				}
-				else
-				{
-					nextState = EnemyState.Idle;
-				}
-				break;
-
-			default:
-				throw new NotImplementedException("PlayerPosition type not implemented: " + targetPosition);
-		}
-
-		_currentState = nextState;
-		SwitchState();
-	}
-	private void SwitchState()
-	{
-		IBehaviour nextBehaviour;
-		switch (_currentState)
-		{
-			case EnemyState.Idle:
-				nextBehaviour = _idle;
-				break;
-
-			case EnemyState.Moving:
-				nextBehaviour = _mover;
-				break;
-
-			case EnemyState.Attacking:
-				nextBehaviour = _attacker;
-				break;
-
-			default:
-				throw new NotImplementedException("EnemyState type not implemented: " + _currentState);
-		}
-
-		if (nextBehaviour != _currentBehaviour)
-		{
-			_currentBehaviour.Stop();
-			_currentBehaviour = nextBehaviour;
-			_currentBehaviour.Start();
-		}
+		_brain.Think();
 	}
 
 	public override void TakeDamage()
@@ -106,5 +25,22 @@ public class Enemy : Character
 		Agent.ClearNodes();
 		Destroy(gameObject);
 		MessageHub.Instance.Publish(new EnemyDiedEvent(null));
+	}
+	public void Attack(AttackerData data)
+	{
+		var targetPosition = _target.position;
+		targetPosition.y = _cachedTransform.position.y;
+		var direction = (targetPosition - _cachedTransform.position).normalized;
+		Agent.RotateAgent(direction);
+		Agent.SmoothStop();
+
+		var projectile = Instantiate(data.ProjectilePrefab);
+		projectile.GetComponent<Projectile>().Setup(_cachedTransform.position, direction, data.ProjectileSpeed);
+	}
+	public void Move(MoverData data)
+	{
+		Agent.StartPathTo(_target.position, data.MovementSpeed, () =>
+		{
+		});
 	}
 }

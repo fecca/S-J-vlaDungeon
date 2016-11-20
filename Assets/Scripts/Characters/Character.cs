@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(Attacker))]
-[RequireComponent(typeof(Mover))]
 [RequireComponent(typeof(PathFinderAgent))]
 public abstract class Character : MonoBehaviour, IDamagable
 {
@@ -21,9 +19,9 @@ public abstract class Character : MonoBehaviour, IDamagable
 	public void Setup(PathFinder pathFinder)
 	{
 		var node = pathFinder.GetRandomWalkableNode();
-		transform.position = node.WorldCoordinates + Vector3.up;
+		transform.position = node.WorldCoordinates + Vector3.up * 5;
 		Agent.Setup(pathFinder, node);
 	}
 
-	public virtual void TakeDamage() { }
+	public abstract void TakeDamage();
 }

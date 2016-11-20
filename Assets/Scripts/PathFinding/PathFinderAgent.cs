@@ -12,7 +12,12 @@ public class PathFinderAgent : MonoBehaviour
 	private float _movementSpeed;
 	private PathfindingNode _currentNode;
 	private PathfindingNode _nextNode;
+	private Transform _cachedTransform;
 
+	private void Awake()
+	{
+		_cachedTransform = transform;
+	}
 	private void FixedUpdate()
 	{
 		if (_path.Count > 0)
@@ -25,7 +30,7 @@ public class PathFinderAgent : MonoBehaviour
 					var lastNodeWorldCoordinates = _path.Last.Value.WorldCoordinates;
 					_path.Clear();
 					_nextNode = null;
-					_pathFinder.GetPath(transform.position, lastNodeWorldCoordinates, (path) =>
+					_pathFinder.GetPath(_cachedTransform.position, lastNodeWorldCoordinates, (path) =>
 					{
 						_path = path;
 					});
@@ -36,8 +41,8 @@ public class PathFinderAgent : MonoBehaviour
 					_nextNode.SetOccupied(true);
 				}
 				var targetPosition = _nextNode.WorldCoordinates;
-				targetPosition.y = transform.position.y;
-				RotateAgent((targetPosition - transform.position).normalized);
+				targetPosition.y = _cachedTransform.position.y;
+				RotateAgent((targetPosition - _cachedTransform.position).normalized);
 			}
 			MoveAlongPath();
 		}
@@ -72,7 +77,7 @@ public class PathFinderAgent : MonoBehaviour
 		else
 		{
 			_pendingNewPath = false;
-			_pathFinder.GetPath(transform.position, targetPosition, (path) =>
+			_pathFinder.GetPath(_cachedTransform.position, targetPosition, (path) =>
 			{
 				_path = path;
 			});
@@ -80,7 +85,7 @@ public class PathFinderAgent : MonoBehaviour
 	}
 	public void StartPathTo(Tile targetTile, float movementSpeed, Action completed = null)
 	{
-		StartPathTo(new Vector3(targetTile.WorldCoordinates.x, transform.position.y, targetTile.WorldCoordinates.z), movementSpeed, completed);
+		StartPathTo(new Vector3(targetTile.WorldCoordinates.x, _cachedTransform.position.y, targetTile.WorldCoordinates.z), movementSpeed, completed);
 	}
 	public void SmoothStop()
 	{
@@ -104,15 +109,15 @@ public class PathFinderAgent : MonoBehaviour
 	}
 	public void RotateAgent(Vector3 direction)
 	{
-		transform.rotation = Quaternion.LookRotation(direction);
+		_cachedTransform.rotation = Quaternion.LookRotation(direction);
 	}
 
 	private void MoveAlongPath()
 	{
-		var targetPosition = new Vector3(_nextNode.WorldCoordinates.x, transform.position.y, _nextNode.WorldCoordinates.z);
-		transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * _movementSpeed);
+		var targetPosition = new Vector3(_nextNode.WorldCoordinates.x, _cachedTransform.position.y, _nextNode.WorldCoordinates.z);
+		_cachedTransform.position = Vector3.MoveTowards(_cachedTransform.position, targetPosition, Time.deltaTime * _movementSpeed);
 
-		if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
+		if (Vector3.Distance(_cachedTransform.position, targetPosition) < 0.1f)
 		{
 			ArrivedAtNode();
 		}
@@ -126,7 +131,7 @@ public class PathFinderAgent : MonoBehaviour
 		if (_pendingNewPath)
 		{
 			_pendingNewPath = false;
-			_pathFinder.GetPath(transform.position, _pendingTo, (path) =>
+			_pathFinder.GetPath(_cachedTransform.position, _pendingTo, (path) =>
 			{
 				_path = path;
 			});
