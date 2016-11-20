@@ -1,17 +1,15 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
-[RequireComponent(typeof(Perception))]
 public class Enemy : Character, IAttacking, IMoving
 {
+	private Transform _cachedTransform;
 	private Brain _brain;
 	private Transform _target;
-	private Transform _cachedTransform;
 
 	private void Awake()
 	{
-		_target = FindObjectOfType<Player>().transform;
 		_cachedTransform = transform;
+		_target = FindObjectOfType<Player>().transform;
 		_brain = new Brain(this, _target);
 		_brain.EnterThought(ThoughtType.Idle);
 	}
