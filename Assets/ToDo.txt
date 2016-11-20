@@ -5,7 +5,6 @@ Taking damage
 UI
 Crafting
 Loot
-Cache transforms and other components
 
 Bugs
 ----

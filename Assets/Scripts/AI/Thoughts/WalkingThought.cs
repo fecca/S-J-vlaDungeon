@@ -14,7 +14,6 @@ public class WalkingThought : Thought
 
 	public override void Enter()
 	{
-		Debug.Log("Enter " + GetType());
 	}
 	public override void Think()
 	{
@@ -28,7 +27,6 @@ public class WalkingThought : Thought
 	}
 	public override void Exit()
 	{
-		Debug.Log("Exit " + GetType());
 		_brain.GetOwner().Agent.SmoothStop();
 	}
 }

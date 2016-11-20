@@ -2,6 +2,12 @@
 
 public class Player : Character
 {
+	[SerializeField]
+	private Canvas _canvas;
+	private RectTransform _bar;
+	private float _totalHitpoints = 100;
+	private float _currentHitpoints = 100;
+
 	private AttackerData _attackerData;
 	private MoverData _moverData;
 	private Transform _cachedTransform;
@@ -14,8 +20,15 @@ public class Player : Character
 		_attackerData = ScriptableObject.CreateInstance<AttackerData>();
 		_attackerData.ProjectilePrefab = Resources.Load<GameObject>("PlayerProjectile");
 		_moverData = ScriptableObject.CreateInstance<MoverData>();
+		_bar = _canvas.transform.FindChild("CurrentHitpoints").GetComponent<RectTransform>();
 	}
 	private void Update()
+	{
+		HandleInput();
+		_canvas.transform.LookAt(Camera.main.transform.position);
+	}
+
+	private void HandleInput()
 	{
 		if (Input.GetMouseButtonDown(0))
 		{
@@ -58,11 +71,6 @@ public class Player : Character
 			}
 		}
 	}
-	private void OnDrawGizmos()
-	{
-		Debug.DrawRay(_cachedTransform.position, _cachedTransform.forward, Color.red);
-	}
-
 	private void Move(Vector3 position)
 	{
 		Agent.StartPathTo(position, _moverData.MovementSpeed, () =>
@@ -72,6 +80,11 @@ public class Player : Character
 
 	public override void TakeDamage()
 	{
+		_currentHitpoints--;
+		if (_currentHitpoints > 0)
+		{
+			_bar.sizeDelta = new Vector2(4 * (_currentHitpoints / _totalHitpoints), _bar.sizeDelta.y);
+		}
 	}
 	public void Attack(Vector3 direction)
 	{

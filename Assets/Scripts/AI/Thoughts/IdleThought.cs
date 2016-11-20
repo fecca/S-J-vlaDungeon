@@ -11,13 +11,11 @@ public class IdleThought : Thought
 
 	public override void Enter()
 	{
-		Debug.Log("Enter " + GetType());
 	}
 	public override void Think()
 	{
 	}
 	public override void Exit()
 	{
-		Debug.Log("Exit " + GetType());
 	}
 }

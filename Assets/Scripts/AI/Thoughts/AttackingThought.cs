@@ -15,7 +15,6 @@ public class AttackingThought : Thought
 
 	public override void Enter()
 	{
-		Debug.Log("Enter " + GetType());
 	}
 	public override void Think()
 	{
@@ -29,6 +28,5 @@ public class AttackingThought : Thought
 	}
 	public override void Exit()
 	{
-		Debug.Log("Exit " + GetType());
 	}
 }
