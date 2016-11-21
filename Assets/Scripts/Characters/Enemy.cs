@@ -1,12 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Enemy : Character, IAttacking, IMoving
 {
 	[SerializeField]
-	private Canvas _canvas;
+	private Canvas _canvas = null;
 	private RectTransform _bar;
-	private float _totalHitpoints = 5;
-	private float _currentHitpoints = 5;
 
 	private Transform _cachedTransform;
 	private Brain _brain;
@@ -26,12 +25,25 @@ public class Enemy : Character, IAttacking, IMoving
 		_canvas.transform.LookAt(Camera.main.transform.position);
 	}
 
+	public override void SetHealth(HealthData healthData)
+	{
+		Stats = new Stats(healthData);
+	}
+	public void SetToAttacker(AttackerData attackerData)
+	{
+		_brain.SetToAttacker(attackerData);
+	}
+	public void SetToMover(MoverData moverData)
+	{
+		_brain.SetToMover(moverData);
+	}
 	public override void TakeDamage()
 	{
-		_currentHitpoints--;
-		if (_currentHitpoints > 0)
+		Stats.CurrentHealth--;
+		if (Stats.CurrentHealth > 0)
 		{
-			_bar.sizeDelta = new Vector2(4 * (_currentHitpoints / _totalHitpoints), _bar.sizeDelta.y);
+			var fraction = Stats.CurrentHealth / Stats.TotalHitpoints;
+			_bar.sizeDelta = new Vector2(fraction * 4, _bar.sizeDelta.y);
 		}
 		else
 		{

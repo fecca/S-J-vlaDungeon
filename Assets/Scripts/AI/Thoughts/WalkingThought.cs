@@ -6,10 +6,10 @@ public class WalkingThought : Thought
 	private MoverData _data;
 	private float _updateTimer;
 
-	public WalkingThought(Brain brain)
+	public WalkingThought(Brain brain, MoverData data)
 	{
 		_brain = brain;
-		_data = ScriptableObject.CreateInstance<MoverData>();
+		_data = data;
 	}
 
 	public override void Enter()

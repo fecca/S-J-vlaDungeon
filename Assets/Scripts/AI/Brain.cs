@@ -6,9 +6,9 @@ public class Brain
 	private Perception _perception;
 	private Transform _target;
 	private Thought _currentThought;
+	private Thought _attackingThought;
 	private Thought _idleThought;
 	private Thought _walkingThought;
-	private Thought _attackingThought;
 	private float _perceptionTimer;
 
 	public ThoughtType CurrentThoughtType { get; private set; }
@@ -19,8 +19,6 @@ public class Brain
 		_perception = new Perception();
 		_target = target;
 		_idleThought = new IdleThought(this);
-		_walkingThought = new WalkingThought(this);
-		_attackingThought = new AttackingThought(this);
 	}
 
 	private void CheckPerception()
@@ -105,6 +103,14 @@ public class Brain
 		}
 		_currentThought = nextThought;
 		_currentThought.Enter();
+	}
+	public void SetToAttacker(AttackerData attackerData)
+	{
+		_attackingThought = new AttackingThought(this, attackerData);
+	}
+	public void SetToMover(MoverData moverData)
+	{
+		_walkingThought = new WalkingThought(this, moverData);
 	}
 	public Enemy GetOwner()
 	{

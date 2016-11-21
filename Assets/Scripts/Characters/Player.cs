@@ -3,10 +3,8 @@
 public class Player : Character
 {
 	[SerializeField]
-	private Canvas _canvas;
+	private Canvas _canvas = null;
 	private RectTransform _bar;
-	private float _totalHitpoints = 100;
-	private float _currentHitpoints = 100;
 
 	private AttackerData _attackerData;
 	private MoverData _moverData;
@@ -17,9 +15,6 @@ public class Player : Character
 	private void Awake()
 	{
 		_cachedTransform = transform;
-		_attackerData = ScriptableObject.CreateInstance<AttackerData>();
-		_attackerData.ProjectilePrefab = Resources.Load<GameObject>("PlayerProjectile");
-		_moverData = ScriptableObject.CreateInstance<MoverData>();
 		_bar = _canvas.transform.FindChild("CurrentHitpoints").GetComponent<RectTransform>();
 	}
 	private void Update()
@@ -78,12 +73,25 @@ public class Player : Character
 		});
 	}
 
+	public override void SetHealth(HealthData healthData)
+	{
+		Stats = new Stats(healthData);
+	}
+	public void SetToAttacker(AttackerData attackerData)
+	{
+		_attackerData = attackerData;
+	}
+	public void SetToMover(MoverData moverData)
+	{
+		_moverData = moverData;
+	}
 	public override void TakeDamage()
 	{
-		_currentHitpoints--;
-		if (_currentHitpoints > 0)
+		Stats.CurrentHealth--;
+		if (Stats.CurrentHealth > 0)
 		{
-			_bar.sizeDelta = new Vector2(4 * (_currentHitpoints / _totalHitpoints), _bar.sizeDelta.y);
+			var fraction = Stats.CurrentHealth / Stats.TotalHitpoints;
+			_bar.sizeDelta = new Vector2(fraction * 4, _bar.sizeDelta.y);
 		}
 	}
 	public void Attack(Vector3 direction)

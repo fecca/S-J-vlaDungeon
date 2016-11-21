@@ -6,11 +6,10 @@ public class AttackingThought : Thought
 	private AttackerData _data;
 	private float _updateTimer;
 
-	public AttackingThought(Brain brain)
+	public AttackingThought(Brain brain, AttackerData data)
 	{
 		_brain = brain;
-		_data = ScriptableObject.CreateInstance<AttackerData>();
-		_data.ProjectilePrefab = Resources.Load<GameObject>("EnemyProjectile");
+		_data = data;
 	}
 
 	public override void Enter()

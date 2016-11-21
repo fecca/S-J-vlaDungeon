@@ -17,32 +17,58 @@ public class CharacterHandler : MonoBehaviour
 
 	private void OnMapRegisteredEvent(MapRegisteredEvent mapGeneratedEvent)
 	{
-		SpawnPlayer();
-		SpawnEnemies();
+		CreatePlayer();
+		CreateEnemies();
 
 		MessageHub.Instance.Publish(new CharactersSpawnedEvent(null));
 	}
 	private void OnEnemyDiedEvent(EnemyDiedEvent enemyDiedEvent)
 	{
-		SpawnEnemy();
-		SpawnEnemy();
+		CreateEnemy();
+		CreateEnemy();
 	}
-	private void SpawnPlayer()
+	private void CreatePlayer()
 	{
-		var player = Instantiate(PlayerPrefab) as GameObject;
-		player.GetComponent<Character>().Setup(FindObjectOfType<PathFinder>());
+		var playerObject = Instantiate(PlayerPrefab) as GameObject;
+		var player = playerObject.GetComponent<Player>();
+
+		player.Initialize(FindObjectOfType<PathFinder>());
+
+		var healthData = ScriptableObject.CreateInstance<HealthData>();
+		healthData.Health = 100;
+		player.SetHealth(healthData);
+
+		var attackerData = ScriptableObject.CreateInstance<AttackerData>();
+		attackerData.ProjectilePrefab = Resources.Load<GameObject>("PlayerProjectile");
+		player.SetToAttacker(attackerData);
+
+		var moverData = ScriptableObject.CreateInstance<MoverData>();
+		player.SetToMover(moverData);
 	}
-	private void SpawnEnemies()
+	private void CreateEnemies()
 	{
 		for (var i = 0; i < NumberOfEnemies; i++)
 		{
-			SpawnEnemy();
+			CreateEnemy();
 		}
 	}
 
-	public void SpawnEnemy()
+	public void CreateEnemy()
 	{
-		var enemy = Instantiate(EnemyPrefab) as GameObject;
-		enemy.GetComponent<Character>().Setup(FindObjectOfType<PathFinder>());
+		var enemyObject = Instantiate(EnemyPrefab) as GameObject;
+		var enemy = enemyObject.GetComponent<Enemy>();
+
+		enemy.Initialize(FindObjectOfType<PathFinder>());
+
+		var healthData = ScriptableObject.CreateInstance<HealthData>();
+		healthData.Health = 4;
+		enemy.SetHealth(healthData);
+
+		var attackerData = ScriptableObject.CreateInstance<AttackerData>();
+		attackerData.ProjectilePrefab = Resources.Load<GameObject>("EnemyProjectile");
+		enemy.SetToAttacker(attackerData);
+
+		var moverData = ScriptableObject.CreateInstance<MoverData>();
+		enemy.SetToMover(moverData);
 	}
 }
