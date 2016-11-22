@@ -16,9 +16,9 @@ public class Brain
 	public Brain(Enemy owner, Transform target)
 	{
 		_owner = owner;
-		_perception = new Perception();
 		_target = target;
 		_idleThought = new IdleThought(this);
+		EnterThought(ThoughtType.Idle);
 	}
 
 	private void CheckPerception()
@@ -36,19 +36,19 @@ public class Brain
 		var perceptionState = _perception.GetPerceptionState(_owner.transform.position, _target.position);
 		switch (perceptionState)
 		{
-			case PlayerPosition.Outside:
+			case PerceptionState.Outside:
 				EnterThought(ThoughtType.Idle);
 				break;
 
-			case PlayerPosition.InnerCirle:
+			case PerceptionState.InnerCirle:
 				EnterThought(ThoughtType.Attacking);
 				break;
 
-			case PlayerPosition.OuterCircle:
+			case PerceptionState.OuterCircle:
 				EnterThought(ThoughtType.Walking);
 				break;
 
-			case PlayerPosition.BehindWall:
+			case PerceptionState.BehindWall:
 				if (CurrentThoughtType == ThoughtType.Walking || CurrentThoughtType == ThoughtType.Attacking)
 				{
 					EnterThought(ThoughtType.Walking);
@@ -104,13 +104,17 @@ public class Brain
 		_currentThought = nextThought;
 		_currentThought.Enter();
 	}
-	public void SetToAttacker(AttackerData attackerData)
+	public void SetToAttacker(AttackData attackData)
 	{
-		_attackingThought = new AttackingThought(this, attackerData);
+		_attackingThought = new AttackingThought(this, attackData);
 	}
-	public void SetToMover(MoverData moverData)
+	public void SetToMover(MoveData moveData)
 	{
-		_walkingThought = new WalkingThought(this, moverData);
+		_walkingThought = new WalkingThought(this, moveData);
+	}
+	public void SetToPerceiver(PerceptionData perceptionData)
+	{
+		_perception = new Perception(perceptionData);
 	}
 	public Enemy GetOwner()
 	{

@@ -3,11 +3,7 @@
 public class CharacterHandler : MonoBehaviour
 {
 	[SerializeField]
-	private GameObject PlayerPrefab = null;
-	[SerializeField]
-	private GameObject EnemyPrefab = null;
-	[SerializeField]
-	private int NumberOfEnemies = 1;
+	private GameObject CharacterPrefab = null;
 
 	private void Awake()
 	{
@@ -29,46 +25,23 @@ public class CharacterHandler : MonoBehaviour
 	}
 	private void CreatePlayer()
 	{
-		var playerObject = Instantiate(PlayerPrefab) as GameObject;
-		var player = playerObject.GetComponent<Player>();
+		var newGameObject = Instantiate(CharacterPrefab);
+		newGameObject.layer = LayerMask.NameToLayer("Player");
 
+		var player = CharacterFactory.CreatePlayer(newGameObject);
 		player.Initialize(FindObjectOfType<PathFinder>());
-
-		var healthData = ScriptableObject.CreateInstance<HealthData>();
-		healthData.Health = 100;
-		player.SetHealth(healthData);
-
-		var attackerData = ScriptableObject.CreateInstance<AttackerData>();
-		attackerData.ProjectilePrefab = Resources.Load<GameObject>("PlayerProjectile");
-		player.SetToAttacker(attackerData);
-
-		var moverData = ScriptableObject.CreateInstance<MoverData>();
-		player.SetToMover(moverData);
 	}
 	private void CreateEnemies()
 	{
-		for (var i = 0; i < NumberOfEnemies; i++)
-		{
-			CreateEnemy();
-		}
+		CreateEnemy();
 	}
-
-	public void CreateEnemy()
+	private void CreateEnemy()
 	{
-		var enemyObject = Instantiate(EnemyPrefab) as GameObject;
-		var enemy = enemyObject.GetComponent<Enemy>();
+		var newGameObject = Instantiate(CharacterPrefab);
+		newGameObject.layer = LayerMask.NameToLayer("Enemy");
+		newGameObject.GetComponentInChildren<Light>().gameObject.SetActive(false);
 
+		var enemy = CharacterFactory.CreateEnemy(newGameObject, HealthType.Medium, AttackerType.Medium, MoverType.Medium, PerceptionType.Medium);
 		enemy.Initialize(FindObjectOfType<PathFinder>());
-
-		var healthData = ScriptableObject.CreateInstance<HealthData>();
-		healthData.Health = 4;
-		enemy.SetHealth(healthData);
-
-		var attackerData = ScriptableObject.CreateInstance<AttackerData>();
-		attackerData.ProjectilePrefab = Resources.Load<GameObject>("EnemyProjectile");
-		enemy.SetToAttacker(attackerData);
-
-		var moverData = ScriptableObject.CreateInstance<MoverData>();
-		enemy.SetToMover(moverData);
 	}
 }

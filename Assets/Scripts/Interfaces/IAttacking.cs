@@ -1,4 +1,4 @@
 ﻿public interface IAttacking
 {
-	void Attack(AttackerData data);
+	void Attack(AttackData data);
 }

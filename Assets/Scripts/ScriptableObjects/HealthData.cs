@@ -1,6 +1,11 @@
-﻿using UnityEngine;
-
-public class HealthData : ScriptableObject
+﻿public class HealthData
 {
-	public float Health = 1;
+	public float TotalHealth { get; private set; }
+	public float CurrentHealth { get; set; }
+
+	public HealthData(float totalHealth)
+	{
+		TotalHealth = totalHealth;
+		CurrentHealth = totalHealth;
+	}
 }

@@ -3,10 +3,10 @@
 public class WalkingThought : Thought
 {
 	private Brain _brain;
-	private MoverData _data;
+	private MoveData _data;
 	private float _updateTimer;
 
-	public WalkingThought(Brain brain, MoverData data)
+	public WalkingThought(Brain brain, MoveData data)
 	{
 		_brain = brain;
 		_data = data;

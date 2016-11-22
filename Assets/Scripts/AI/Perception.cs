@@ -2,14 +2,14 @@
 
 public class Perception
 {
-	private PerceptionData _data;
+	private PerceptionData _perceptionData;
 
-	public Perception()
+	public Perception(PerceptionData perceptionData)
 	{
-		_data = ScriptableObject.CreateInstance<PerceptionData>();
+		_perceptionData = perceptionData;
 	}
 
-	public PlayerPosition GetPerceptionState(Vector3 ownerPosition, Vector3 targetPosition)
+	public PerceptionState GetPerceptionState(Vector3 ownerPosition, Vector3 targetPosition)
 	{
 		var position = ownerPosition;
 		var ray = new Ray(position, (targetPosition - position).normalized);
@@ -22,28 +22,28 @@ public class Perception
 			if (hit.collider.GetComponent<Player>() != null)
 			{
 				var distance = Vector3.Distance(targetPosition, position);
-				if (distance < _data.InnerRadius)
+				if (distance < _perceptionData.InnerRadius)
 				{
-					return PlayerPosition.InnerCirle;
+					return PerceptionState.InnerCirle;
 				}
 
-				if (distance < _data.OuterRadius)
+				if (distance < _perceptionData.OuterRadius)
 				{
-					return PlayerPosition.OuterCircle;
+					return PerceptionState.OuterCircle;
 				}
 
-				return PlayerPosition.Outside;
+				return PerceptionState.Outside;
 			}
 
 			if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Wall"))
 			{
-				return PlayerPosition.BehindWall;
+				return PerceptionState.BehindWall;
 			}
 		}
-		return PlayerPosition.Outside;
+		return PerceptionState.Outside;
 	}
 	public float GetRandomUpdateInterval()
 	{
-		return _data.UpdateInterval * Random.Range(0.8f, 1.2f);
+		return _perceptionData.PerceptionUpdateInterval * Random.Range(0.8f, 1.2f);
 	}
 }

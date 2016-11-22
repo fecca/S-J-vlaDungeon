@@ -1,4 +1,4 @@
 ﻿public interface IMoving
 {
-	void Move(MoverData data);
+	void Move(MoveData data);
 }

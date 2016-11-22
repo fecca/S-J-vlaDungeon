@@ -3,10 +3,10 @@
 public class AttackingThought : Thought
 {
 	private Brain _brain;
-	private AttackerData _data;
+	private AttackData _data;
 	private float _updateTimer;
 
-	public AttackingThought(Brain brain, AttackerData data)
+	public AttackingThought(Brain brain, AttackData data)
 	{
 		_brain = brain;
 		_data = data;

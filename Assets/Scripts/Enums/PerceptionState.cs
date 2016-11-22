@@ -1,4 +1,4 @@
-﻿public enum PlayerPosition
+﻿public enum PerceptionState
 {
 	Outside,
 	InnerCirle,

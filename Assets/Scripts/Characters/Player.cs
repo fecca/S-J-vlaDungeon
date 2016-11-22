@@ -2,12 +2,11 @@
 
 public class Player : Character
 {
-	[SerializeField]
-	private Canvas _canvas = null;
+	private Canvas _canvas;
 	private RectTransform _bar;
 
-	private AttackerData _attackerData;
-	private MoverData _moverData;
+	private AttackData _attackData;
+	private MoveData _moveData;
 	private Transform _cachedTransform;
 	private float _mouseDragTimer;
 	private float _mouseDragUpdateInterval = 0.1f;
@@ -15,6 +14,7 @@ public class Player : Character
 	private void Awake()
 	{
 		_cachedTransform = transform;
+		_canvas = transform.FindChild("Canvas").GetComponent<Canvas>();
 		_bar = _canvas.transform.FindChild("CurrentHitpoints").GetComponent<RectTransform>();
 	}
 	private void Update()
@@ -68,29 +68,24 @@ public class Player : Character
 	}
 	private void Move(Vector3 position)
 	{
-		Agent.StartPathTo(position, _moverData.MovementSpeed, () =>
+		Agent.StartPathTo(position, _moveData.MovementSpeed, () =>
 		{
 		});
 	}
-
-	public override void SetHealth(HealthData healthData)
+	public void SetToAttacker(AttackData attackerData)
 	{
-		Stats = new Stats(healthData);
+		_attackData = attackerData;
 	}
-	public void SetToAttacker(AttackerData attackerData)
+	public void SetToMover(MoveData moverData)
 	{
-		_attackerData = attackerData;
-	}
-	public void SetToMover(MoverData moverData)
-	{
-		_moverData = moverData;
+		_moveData = moverData;
 	}
 	public override void TakeDamage()
 	{
-		Stats.CurrentHealth--;
-		if (Stats.CurrentHealth > 0)
+		HealthData.CurrentHealth--;
+		if (HealthData.CurrentHealth > 0)
 		{
-			var fraction = Stats.CurrentHealth / Stats.TotalHitpoints;
+			var fraction = HealthData.CurrentHealth / HealthData.TotalHealth;
 			_bar.sizeDelta = new Vector2(fraction * 4, _bar.sizeDelta.y);
 		}
 	}
@@ -99,7 +94,13 @@ public class Player : Character
 		Agent.RotateAgent(direction);
 		Agent.SmoothStop();
 
-		var projectile = Instantiate(_attackerData.ProjectilePrefab);
-		projectile.GetComponent<Projectile>().Setup(_cachedTransform.position, direction, _attackerData.ProjectileSpeed);
+		var projectile = Instantiate(_attackData.ProjectilePrefab);
+		projectile.GetComponent<Projectile>().Setup(_cachedTransform.position, direction, _attackData.ProjectileSpeed);
+	}
+	public override void SetData(HealthData healthData, AttackData attackData, MoveData moveData, PerceptionData perceptionData)
+	{
+		HealthData = healthData;
+		_attackData = attackData;
+		_moveData = moveData;
 	}
 }

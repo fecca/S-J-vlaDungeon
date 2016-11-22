@@ -1,10 +1,8 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Enemy : Character, IAttacking, IMoving
 {
-	[SerializeField]
-	private Canvas _canvas = null;
+	private Canvas _canvas;
 	private RectTransform _bar;
 
 	private Transform _cachedTransform;
@@ -14,35 +12,24 @@ public class Enemy : Character, IAttacking, IMoving
 	private void Awake()
 	{
 		_cachedTransform = transform;
-		_target = FindObjectOfType<Player>().transform;
-		_brain = new Brain(this, _target);
-		_brain.EnterThought(ThoughtType.Idle);
+		_canvas = transform.FindChild("Canvas").GetComponent<Canvas>();
 		_bar = _canvas.transform.FindChild("CurrentHitpoints").GetComponent<RectTransform>();
 	}
 	private void Update()
 	{
-		_brain.Think();
+		if (_brain != null)
+		{
+			_brain.Think();
+		}
 		_canvas.transform.LookAt(Camera.main.transform.position);
 	}
 
-	public override void SetHealth(HealthData healthData)
-	{
-		Stats = new Stats(healthData);
-	}
-	public void SetToAttacker(AttackerData attackerData)
-	{
-		_brain.SetToAttacker(attackerData);
-	}
-	public void SetToMover(MoverData moverData)
-	{
-		_brain.SetToMover(moverData);
-	}
 	public override void TakeDamage()
 	{
-		Stats.CurrentHealth--;
-		if (Stats.CurrentHealth > 0)
+		HealthData.CurrentHealth--;
+		if (HealthData.CurrentHealth > 0)
 		{
-			var fraction = Stats.CurrentHealth / Stats.TotalHitpoints;
+			var fraction = HealthData.CurrentHealth / HealthData.TotalHealth;
 			_bar.sizeDelta = new Vector2(fraction * 4, _bar.sizeDelta.y);
 		}
 		else
@@ -52,7 +39,7 @@ public class Enemy : Character, IAttacking, IMoving
 			MessageHub.Instance.Publish(new EnemyDiedEvent(null));
 		}
 	}
-	public void Attack(AttackerData data)
+	public void Attack(AttackData data)
 	{
 		var targetPosition = _target.position;
 		targetPosition.y = _cachedTransform.position.y;
@@ -63,10 +50,21 @@ public class Enemy : Character, IAttacking, IMoving
 		var projectile = Instantiate(data.ProjectilePrefab);
 		projectile.GetComponent<Projectile>().Setup(_cachedTransform.position, direction, data.ProjectileSpeed);
 	}
-	public void Move(MoverData data)
+	public void Move(MoveData data)
 	{
 		Agent.StartPathTo(_target.position, data.MovementSpeed, () =>
 		{
 		});
+	}
+
+	public override void SetData(HealthData healthData, AttackData attackData, MoveData moveData, PerceptionData perceptionData)
+	{
+		HealthData = healthData;
+
+		_target = FindObjectOfType<Player>().transform;
+		_brain = new Brain(this, _target);
+		_brain.SetToAttacker(attackData);
+		_brain.SetToMover(moveData);
+		_brain.SetToPerceiver(perceptionData);
 	}
 }

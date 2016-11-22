@@ -1,9 +1,13 @@
-﻿using UnityEngine;
-
-[CreateAssetMenu]
-public class PerceptionData : ScriptableObject
+﻿public class PerceptionData
 {
-	public float InnerRadius = 20.0f;
-	public float OuterRadius = 40.0f;
-	public float UpdateInterval = 0.2f;
+	public float PerceptionUpdateInterval { get; private set; }
+	public float InnerRadius { get; private set; }
+	public float OuterRadius { get; private set; }
+
+	public PerceptionData(float perceptionUpdateInterval, float innerRadius, float outerRadius)
+	{
+		PerceptionUpdateInterval = perceptionUpdateInterval;
+		InnerRadius = innerRadius;
+		OuterRadius = outerRadius;
+	}
 }
