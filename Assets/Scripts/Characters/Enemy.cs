@@ -24,21 +24,6 @@ public class Enemy : Character, IAttacking, IMoving
 		_canvas.transform.LookAt(Camera.main.transform.position);
 	}
 
-	public override void TakeDamage()
-	{
-		HealthData.CurrentHealth--;
-		if (HealthData.CurrentHealth > 0)
-		{
-			var fraction = HealthData.CurrentHealth / HealthData.TotalHealth;
-			_bar.sizeDelta = new Vector2(fraction * 4, _bar.sizeDelta.y);
-		}
-		else
-		{
-			Agent.ClearNodes();
-			Destroy(gameObject);
-			MessageHub.Instance.Publish(new EnemyDiedEvent(null));
-		}
-	}
 	public void Attack(AttackData data)
 	{
 		var targetPosition = _target.position;
@@ -57,14 +42,41 @@ public class Enemy : Character, IAttacking, IMoving
 		});
 	}
 
-	public override void SetData(HealthData healthData, AttackData attackData, MoveData moveData, PerceptionData perceptionData)
+	public void InitializeBrain()
 	{
-		HealthData = healthData;
-
 		_target = FindObjectOfType<Player>().transform;
 		_brain = new Brain(this, _target);
+	}
+
+	public override void TakeDamage()
+	{
+		HealthData.CurrentHealth--;
+		if (HealthData.CurrentHealth > 0)
+		{
+			var fraction = HealthData.CurrentHealth / HealthData.TotalHealth;
+			_bar.sizeDelta = new Vector2(fraction * 4, _bar.sizeDelta.y);
+		}
+		else
+		{
+			Agent.ClearNodes();
+			Destroy(gameObject);
+			MessageHub.Instance.Publish(new EnemyDiedEvent(null));
+		}
+	}
+	public override void SetHealthData(HealthData healthData)
+	{
+		HealthData = healthData;
+	}
+	public override void SetAttackData(AttackData attackData)
+	{
 		_brain.SetToAttacker(attackData);
+	}
+	public override void SetMoveData(MoveData moveData)
+	{
 		_brain.SetToMover(moveData);
+	}
+	public override void SetPerceptionData(PerceptionData perceptionData)
+	{
 		_brain.SetToPerceiver(perceptionData);
 	}
 }

@@ -28,8 +28,8 @@
 	public const float SLOW_POSITION_UPDATE_INTERVAL = 0.8f;
 	public const float MEDIUM_POSITION_UPDATE_INTERVAL = 0.5f;
 	public const float FAST_POSITION_UPDATE_INTERVAL = 0.2f;
-	public const float SLOW_MOVEMENT_SPEED = 10.0f;
-	public const float MEDIUM_MOVEMENT_SPEED = 12.5f;
+	public const float SLOW_MOVEMENT_SPEED = 5.0f;
+	public const float MEDIUM_MOVEMENT_SPEED = 10.5f;
 	public const float FAST_MOVEMENT_SPEED = 15.0f;
 
 	public const float LOW_PERCEPTION_UPDATE_INTERVAL = 0.15f;

@@ -18,30 +18,23 @@ public class CharacterHandler : MonoBehaviour
 
 		MessageHub.Instance.Publish(new CharactersSpawnedEvent(null));
 	}
-	private void OnEnemyDiedEvent(EnemyDiedEvent enemyDiedEvent)
-	{
-		CreateEnemy();
-		CreateEnemy();
-	}
 	private void CreatePlayer()
 	{
-		var newGameObject = Instantiate(CharacterPrefab);
-		newGameObject.layer = LayerMask.NameToLayer("Player");
-
-		var player = CharacterFactory.CreatePlayer(newGameObject);
-		player.Initialize(FindObjectOfType<PathFinder>());
-	}
-	private void CreateEnemies()
-	{
-		CreateEnemy();
+		CharacterFactory.CreatePlayer(CharacterPrefab);
 	}
 	private void CreateEnemy()
 	{
-		var newGameObject = Instantiate(CharacterPrefab);
-		newGameObject.layer = LayerMask.NameToLayer("Enemy");
-		newGameObject.GetComponentInChildren<Light>().gameObject.SetActive(false);
-
-		var enemy = CharacterFactory.CreateEnemy(newGameObject, HealthType.Medium, AttackerType.Medium, MoverType.Medium, PerceptionType.Medium);
-		enemy.Initialize(FindObjectOfType<PathFinder>());
+		CharacterFactory.CreateRandomEnemy(CharacterPrefab);
+	}
+	private void OnEnemyDiedEvent(EnemyDiedEvent enemyDiedEvent)
+	{
+		CreateEnemy();
+	}
+	private void CreateEnemies()
+	{
+		for (var i = 0; i < 10; i++)
+		{
+			CreateEnemy();
+		}
 	}
 }

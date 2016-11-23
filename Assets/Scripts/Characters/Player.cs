@@ -72,14 +72,15 @@ public class Player : Character
 		{
 		});
 	}
-	public void SetToAttacker(AttackData attackerData)
+	public void Attack(Vector3 direction)
 	{
-		_attackData = attackerData;
+		Agent.RotateAgent(direction);
+		Agent.SmoothStop();
+
+		var projectile = Instantiate(_attackData.ProjectilePrefab);
+		projectile.GetComponent<Projectile>().Setup(_cachedTransform.position, direction, _attackData.ProjectileSpeed);
 	}
-	public void SetToMover(MoveData moverData)
-	{
-		_moveData = moverData;
-	}
+
 	public override void TakeDamage()
 	{
 		HealthData.CurrentHealth--;
@@ -89,18 +90,16 @@ public class Player : Character
 			_bar.sizeDelta = new Vector2(fraction * 4, _bar.sizeDelta.y);
 		}
 	}
-	public void Attack(Vector3 direction)
-	{
-		Agent.RotateAgent(direction);
-		Agent.SmoothStop();
-
-		var projectile = Instantiate(_attackData.ProjectilePrefab);
-		projectile.GetComponent<Projectile>().Setup(_cachedTransform.position, direction, _attackData.ProjectileSpeed);
-	}
-	public override void SetData(HealthData healthData, AttackData attackData, MoveData moveData, PerceptionData perceptionData)
+	public override void SetHealthData(HealthData healthData)
 	{
 		HealthData = healthData;
+	}
+	public override void SetAttackData(AttackData attackData)
+	{
 		_attackData = attackData;
+	}
+	public override void SetMoveData(MoveData moveData)
+	{
 		_moveData = moveData;
 	}
 }

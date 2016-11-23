@@ -66,12 +66,15 @@ public class Brain
 
 	public void Think()
 	{
-		CheckPerception();
-		if (_currentThought == null)
+		if (_perception != null)
 		{
-			return;
+			CheckPerception();
 		}
-		_currentThought.Think();
+
+		if (_currentThought != null)
+		{
+			_currentThought.Think();
+		}
 	}
 	public void EnterThought(ThoughtType thoughtType)
 	{
@@ -80,7 +83,7 @@ public class Brain
 			return;
 		}
 
-		Thought nextThought = null;
+		Thought nextThought;
 		switch (thoughtType)
 		{
 			case ThoughtType.Idle:
@@ -95,7 +98,13 @@ public class Brain
 			default:
 				throw new System.NotImplementedException("ThoughtType not implemented: " + thoughtType);
 		}
+
 		CurrentThoughtType = thoughtType;
+		if (nextThought == null)
+		{
+			nextThought = _idleThought;
+			CurrentThoughtType = ThoughtType.Idle;
+		}
 
 		if (_currentThought != null)
 		{
@@ -106,15 +115,24 @@ public class Brain
 	}
 	public void SetToAttacker(AttackData attackData)
 	{
-		_attackingThought = new AttackingThought(this, attackData);
+		if (attackData != null)
+		{
+			_attackingThought = new AttackingThought(this, attackData);
+		}
 	}
 	public void SetToMover(MoveData moveData)
 	{
-		_walkingThought = new WalkingThought(this, moveData);
+		if (moveData != null)
+		{
+			_walkingThought = new WalkingThought(this, moveData);
+		}
 	}
 	public void SetToPerceiver(PerceptionData perceptionData)
 	{
-		_perception = new Perception(perceptionData);
+		if (perceptionData != null)
+		{
+			_perception = new Perception(perceptionData);
+		}
 	}
 	public Enemy GetOwner()
 	{
