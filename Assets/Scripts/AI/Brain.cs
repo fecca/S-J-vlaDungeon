@@ -33,7 +33,7 @@ public class Brain
 	}
 	private void Perceive()
 	{
-		var perceptionState = _perception.GetPerceptionState(_owner.transform.position, _target.position);
+		var perceptionState = _perception.GetPerceptionState(_owner.transform, _target);
 		switch (perceptionState)
 		{
 			case PerceptionState.Outside:

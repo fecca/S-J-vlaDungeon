@@ -60,8 +60,8 @@ public class Player : Character
 			var hit = InputHandler.Instance.GetRaycastHit();
 			if (hit.transform != null)
 			{
-				var adjustedHitPoint = new Vector3(hit.point.x, _cachedTransform.position.y, hit.point.z);
-				var direction = (adjustedHitPoint - _cachedTransform.position).normalized;
+				var hitPosition = hit.point.WithY(_cachedTransform.position.y);
+				var direction = _cachedTransform.GetDirectionTo(hitPosition);
 				Attack(direction);
 			}
 		}

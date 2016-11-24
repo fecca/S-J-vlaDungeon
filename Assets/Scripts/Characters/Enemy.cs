@@ -26,9 +26,9 @@ public class Enemy : Character, IAttacking, IMoving
 
 	public void Attack(AttackData data)
 	{
-		var targetPosition = _target.position;
-		targetPosition.y = _cachedTransform.position.y;
-		var direction = (targetPosition - _cachedTransform.position).normalized;
+		var targetPosition = _target.position.WithY(_cachedTransform.position.y);
+		var direction = _cachedTransform.GetDirectionTo(targetPosition);
+
 		Agent.RotateAgent(direction);
 		Agent.SmoothStop();
 

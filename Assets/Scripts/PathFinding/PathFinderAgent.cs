@@ -40,9 +40,8 @@ public class PathFinderAgent : MonoBehaviour
 				{
 					_nextNode.SetOccupied(true);
 				}
-				var targetPosition = _nextNode.WorldCoordinates;
-				targetPosition.y = _cachedTransform.position.y;
-				RotateAgent((targetPosition - _cachedTransform.position).normalized);
+				var targetPosition = _nextNode.WorldCoordinates.WithY(_cachedTransform.position.y);
+				RotateAgent(_cachedTransform.GetDirectionTo(targetPosition));
 			}
 			MoveAlongPath();
 		}
@@ -54,7 +53,7 @@ public class PathFinderAgent : MonoBehaviour
 			for (var iteration = _path.First; iteration != null; iteration = iteration.Next)
 			{
 				Gizmos.color = Color.blue;
-				Gizmos.DrawSphere(new Vector3(iteration.Value.WorldCoordinates.x, 1, iteration.Value.WorldCoordinates.z), 0.25f);
+				Gizmos.DrawSphere(iteration.Value.WorldCoordinates.WithY(1), 0.25f);
 			}
 		}
 	}
@@ -85,7 +84,8 @@ public class PathFinderAgent : MonoBehaviour
 	}
 	public void StartPathTo(Tile targetTile, float movementSpeed, Action completed = null)
 	{
-		StartPathTo(new Vector3(targetTile.WorldCoordinates.x, _cachedTransform.position.y, targetTile.WorldCoordinates.z), movementSpeed, completed);
+		var position = targetTile.WorldCoordinates.WithY(_cachedTransform.position.y);
+		StartPathTo(position, movementSpeed, completed);
 	}
 	public void SmoothStop()
 	{
@@ -114,7 +114,7 @@ public class PathFinderAgent : MonoBehaviour
 
 	private void MoveAlongPath()
 	{
-		var targetPosition = new Vector3(_nextNode.WorldCoordinates.x, _cachedTransform.position.y, _nextNode.WorldCoordinates.z);
+		var targetPosition = _nextNode.WorldCoordinates.WithY(_cachedTransform.position.y);
 		_cachedTransform.position = Vector3.MoveTowards(_cachedTransform.position, targetPosition, Time.deltaTime * _movementSpeed);
 
 		if (Vector3.Distance(_cachedTransform.position, targetPosition) < 0.1f)

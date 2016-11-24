@@ -17,4 +17,24 @@ public static class Extensions
 
 		return component;
 	}
+	public static Vector3 WithY(this Vector3 vector, float y)
+	{
+		return new Vector3(vector.x, y, vector.z);
+	}
+	public static Vector3 GetDirectionTo(this Transform from, Transform to)
+	{
+		return (to.position - from.position).normalized;
+	}
+	public static Vector3 GetDirectionTo(this Transform from, Vector3 to)
+	{
+		return (to - from.position).normalized;
+	}
+	public static Vector3 GetDirectionTo(this Vector3 from, Transform to)
+	{
+		return (to.position - from).normalized;
+	}
+	public static Vector3 GetDirectionTo(this Vector3 from, Vector3 to)
+	{
+		return (to - from).normalized;
+	}
 }

@@ -301,7 +301,7 @@ public class MapGenerator : MonoBehaviour
 			for (var y = 0; y < Height; y++)
 			{
 				var tile = _map[x, y];
-				var position = new Vector3(tile.WorldCoordinates.x, 0, tile.WorldCoordinates.z);
+				var position = tile.WorldCoordinates.WithY(0);
 				if (RandomizeVertexPositions)
 				{
 					position += Vector3.one * UnityEngine.Random.Range(-(TileSize * 0.1f), TileSize * 0.1f);
