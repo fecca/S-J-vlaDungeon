@@ -4,11 +4,9 @@ Inventory
 UI
 Crafting
 Loot
-Make direction extension
 
 Bugs
 ----
-Unreachable areas in generated map
 Failed pathing when close to agent
+Unreachable areas in generated map
 Spike when automoving on big maps
-Handle moving outside of map

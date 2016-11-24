@@ -233,6 +233,24 @@ public class PathFinder : MonoBehaviour
 		yield break;
 	}
 
+	public void GetPath(Vector3 from, Vector3 to, Action<LinkedList<PathfindingNode>> completed)
+	{
+		var startNode = GetNode(from, true);
+		var endNode = GetNode(to, true);
+
+		Debug.Log(endNode);
+
+		if (!startNode.Walkable || !endNode.Walkable)
+		{
+			completed(new LinkedList<PathfindingNode>());
+			return;
+		}
+
+		StartCoroutine(GetPath(startNode, endNode, (lastNode) =>
+		{
+			completed(RetracePath(lastNode));
+		}));
+	}
 	public PathfindingNode GetNode(Vector3 worldPosition, bool copy)
 	{
 		worldPosition /= _tileSize;
@@ -248,21 +266,6 @@ public class PathFinder : MonoBehaviour
 		}
 
 		return node;
-	}
-	public void GetPath(Vector3 from, Vector3 to, Action<LinkedList<PathfindingNode>> completed)
-	{
-		var startNode = GetNode(from, true);
-		var endNode = GetNode(to, true);
-
-		if (!startNode.Walkable || !endNode.Walkable)
-		{
-			completed(new LinkedList<PathfindingNode>());
-		}
-
-		StartCoroutine(GetPath(startNode, endNode, (lastNode) =>
-		{
-			completed(RetracePath(lastNode));
-		}));
 	}
 	public PathfindingNode GetRandomWalkableNode()
 	{
