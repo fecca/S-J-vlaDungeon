@@ -28,6 +28,7 @@ public class PathfindingNode : IHeapItem<PathfindingNode>
 		WorldCoordinates = copy.WorldCoordinates;
 		Neighbours = copy.Neighbours;
 		Walkable = copy.Walkable;
+		Occupied = copy.Occupied;
 	}
 
 	public override bool Equals(object other)

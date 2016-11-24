@@ -128,8 +128,6 @@ public static class CharacterFactory
 	{
 		switch (perceptionType)
 		{
-			case PerceptionType.None:
-				return null;
 			case PerceptionType.Low:
 				return new PerceptionData(Constants.LOW_PERCEPTION_UPDATE_INTERVAL, Constants.LOW_INNER_RADIUS, Constants.LOW_OUTER_RADIUS);
 			case PerceptionType.Medium:

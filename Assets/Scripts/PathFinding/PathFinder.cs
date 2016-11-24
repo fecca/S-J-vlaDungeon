@@ -167,7 +167,7 @@ public class PathFinder : MonoBehaviour
 
 		return neighbours;
 	}
-	private LinkedList<PathfindingNode> RetracePath(PathfindingNode lastNode)
+	private LinkedList<PathfindingNode> RevertPath(PathfindingNode lastNode)
 	{
 		var path = new LinkedList<PathfindingNode>();
 		if (lastNode == null)
@@ -182,7 +182,18 @@ public class PathFinder : MonoBehaviour
 			path.AddFirst(parent);
 			parent = parent.Parent;
 		}
+
 		path.RemoveFirst();
+		RemoveOccupiedEndings(path);
+
+		return path;
+	}
+	private LinkedList<PathfindingNode> RemoveOccupiedEndings(LinkedList<PathfindingNode> path)
+	{
+		while (path.Count > 0 && path.First.Value.Occupied)
+		{
+			path.RemoveFirst();
+		}
 
 		return path;
 	}
@@ -238,8 +249,6 @@ public class PathFinder : MonoBehaviour
 		var startNode = GetNode(from, true);
 		var endNode = GetNode(to, true);
 
-		Debug.Log(endNode);
-
 		if (!startNode.Walkable || !endNode.Walkable)
 		{
 			completed(new LinkedList<PathfindingNode>());
@@ -248,7 +257,7 @@ public class PathFinder : MonoBehaviour
 
 		StartCoroutine(GetPath(startNode, endNode, (lastNode) =>
 		{
-			completed(RetracePath(lastNode));
+			completed(RevertPath(lastNode));
 		}));
 	}
 	public PathfindingNode GetNode(Vector3 worldPosition, bool copy)
