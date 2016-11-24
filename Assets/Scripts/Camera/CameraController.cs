@@ -29,6 +29,9 @@ public class CameraController : MonoBehaviour
 		}
 		Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, 5, 20);
 
-		_cachedTransform.position = Vector3.Lerp(_cachedTransform.position, _player.transform.position + Vector3.up * 25f + Vector3.forward * -25, Time.deltaTime * MovementSpeed);
+		if (_player != null)
+		{
+			_cachedTransform.position = Vector3.Lerp(_cachedTransform.position, _player.transform.position + Vector3.up * 25f + Vector3.forward * -25, Time.deltaTime * MovementSpeed);
+		}
 	}
 }

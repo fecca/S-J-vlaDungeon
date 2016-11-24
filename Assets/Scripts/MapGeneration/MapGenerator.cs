@@ -33,8 +33,8 @@ public class MapGenerator : MonoBehaviour
 	private bool RandomizeVertexPositions = false;
 
 	private Tile[,] _map;
-	private List<Room> _survivingRooms = new List<Room>(128);
-	private List<Tile> _walkableTiles = new List<Tile>();
+	private List<Room> _survivingRooms;
+	private List<Tile> _walkableTiles;
 
 	private void Awake()
 	{
@@ -47,14 +47,19 @@ public class MapGenerator : MonoBehaviour
 			return;
 		}
 
-		//if (_map == null)
-		//{
-		//	return;
-		//}
+		if (_survivingRooms == null)
+		{
+			return;
+		}
 
-		//foreach (var tile in _map)
-		//{
-		//}
+		Gizmos.color = Color.green;
+		foreach (Room room in _survivingRooms)
+		{
+			foreach (Tile tile in room.Tiles)
+			{
+				Gizmos.DrawCube(tile.WorldCoordinates + Vector3.up, Vector3.one * 0.5f);
+			}
+		}
 	}
 
 	private void OnGameStarted(GameStartedEvent gameStartedEvent)
@@ -70,6 +75,7 @@ public class MapGenerator : MonoBehaviour
 	private IEnumerator GenerateMap(Action completed)
 	{
 		_map = new Tile[Width, Height];
+		_walkableTiles = new List<Tile>(_map.Length);
 
 		RandomFillMap();
 		GenerateClusters();
@@ -144,6 +150,8 @@ public class MapGenerator : MonoBehaviour
 	}
 	private void FilterRooms()
 	{
+		_survivingRooms = new List<Room>(128);
+
 		var roomRegions = GetRegions(TileType.Floor);
 		for (var i = 0; i < roomRegions.Count; i++)
 		{
@@ -152,7 +160,7 @@ public class MapGenerator : MonoBehaviour
 			{
 				for (var j = 0; j < roomRegion.Count; j++)
 				{
-					_map[(int)roomRegion[j].GridCoordinates.X, (int)roomRegion[j].GridCoordinates.Y].Type = TileType.None;
+					_map[roomRegion[j].GridCoordinates.X, roomRegion[j].GridCoordinates.Y].Type = TileType.None;
 				}
 			}
 			else

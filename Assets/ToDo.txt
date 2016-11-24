@@ -1,4 +1,7 @@
-Input handler - Key bindings - Listen to keys
+
+Features
+----
+Listen to keys
 Level transition
 Inventory
 UI
@@ -7,6 +10,5 @@ Loot
 
 Bugs
 ----
-Failed pathing when close to agent
 Unreachable areas in generated map
 Spike when automoving on big maps
