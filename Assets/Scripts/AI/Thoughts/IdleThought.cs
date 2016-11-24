@@ -1,12 +1,7 @@
-﻿using UnityEngine;
-
-public class IdleThought : Thought
+﻿public class IdleThought : Thought
 {
-	private Brain _brain;
-
 	public IdleThought(Brain brain)
 	{
-		_brain = brain;
 	}
 
 	public override void Enter()
