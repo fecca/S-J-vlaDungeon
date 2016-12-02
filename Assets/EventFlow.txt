@@ -1,0 +1,15 @@
+Event flow
+----
+CreateGame =>
+	GenerateMap => MapCreated
+	GenerateMesh => MeshCreated
+	CreatePathNodes => PathNodesCreated
+	SpawnCharacters => CharactersCreated
+=> GameCreated
+
+DestroyGame =>
+	DestroyCharacters => CharactersDestroyed
+	DestroyPathNodes => PathNodesDestroyed
+	DestroyMesh => MeshDestroyed
+	DestroyMap => MapDestroyed
+=> GameDestroyed

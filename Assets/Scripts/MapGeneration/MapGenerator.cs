@@ -38,8 +38,8 @@ public class MapGenerator : MonoBehaviour
 
 	private void Awake()
 	{
-		MessageHub.Instance.Subscribe<GameStartedEvent>(OnGameStarted);
-		MessageHub.Instance.Subscribe<MapResetEvent>(OnMapResetEvent);
+		MessageHub.Instance.Subscribe<CreateGameEvent>(OnCreateGameEvent);
+		MessageHub.Instance.Subscribe<MeshDestroyedEvent>(OnMeshDestroyedEvent);
 	}
 	private void OnDrawGizmos()
 	{
@@ -63,37 +63,25 @@ public class MapGenerator : MonoBehaviour
 		}
 	}
 
-	private void OnGameStarted(GameStartedEvent gameStartedEvent)
+	private void OnCreateGameEvent(CreateGameEvent createGameEvent)
 	{
-		StartCoroutine(GenerateMap(() =>
+		StartCoroutine(CreateMap(() =>
 		{
-			MessageHub.Instance.Publish(new MapGeneratedEvent(null)
+			MessageHub.Instance.Publish(new MapCreatedEvent(null)
 			{
 				Map = _map
 			});
 		}));
 	}
-	private void OnMapResetEvent(MapResetEvent mapResetEvent)
+	private void OnMeshDestroyedEvent(MeshDestroyedEvent meshDestroyedEvent)
 	{
-		Destroy(GameObject.Find("Floor"));
-		Destroy(GameObject.Find("Walls"));
-		Destroy(GameObject.Find("Roof"));
-		Destroy(FindObjectOfType<Player>().gameObject);
-		var enemies = FindObjectsOfType<Enemy>();
-		for (var i = 0; i < enemies.Length; i++)
-		{
-			Destroy(enemies[i].gameObject);
-		}
+		_map = null;
+		_survivingRooms.Clear();
+		_walkableTiles.Clear();
 
-		StartCoroutine(GenerateMap(() =>
-		{
-			MessageHub.Instance.Publish(new MapGeneratedEvent(null)
-			{
-				Map = _map
-			});
-		}));
+		MessageHub.Instance.Publish(new MapDestroyedEvent(null));
 	}
-	private IEnumerator GenerateMap(Action completed)
+	private IEnumerator CreateMap(Action completed)
 	{
 		_map = new Tile[Width, Height];
 		_walkableTiles = new List<Tile>(_map.Length);

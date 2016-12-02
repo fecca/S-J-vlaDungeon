@@ -15,7 +15,8 @@ public class PathFinder : MonoBehaviour
 
 	private void Awake()
 	{
-		MessageHub.Instance.Subscribe<MeshGeneratedEvent>(OnMeshGenerated);
+		MessageHub.Instance.Subscribe<MeshCreatedEvent>(OnMeshCreatedEvent);
+		MessageHub.Instance.Subscribe<CharactersDestroyedEvent>(OnCharactersDestroyedEvent);
 	}
 	private void OnDrawGizmos()
 	{
@@ -34,14 +35,21 @@ public class PathFinder : MonoBehaviour
 		}
 	}
 
-	private void OnMeshGenerated(MeshGeneratedEvent mapGeneratedEvent)
+	private void OnMeshCreatedEvent(MeshCreatedEvent meshCreatedEvent)
 	{
-		StartCoroutine(RegisterMap(mapGeneratedEvent.Map, () =>
+		StartCoroutine(CreatePathNodes(meshCreatedEvent.Map, () =>
 		{
-			MessageHub.Instance.Publish(new MapRegisteredEvent(null));
+			MessageHub.Instance.Publish(new PathNodesCreatedEvent(null));
 		}));
 	}
-	private IEnumerator RegisterMap(Tile[,] map, Action completed)
+	private void OnCharactersDestroyedEvent(CharactersDestroyedEvent charactersDestroyedEvent)
+	{
+		_nodes = null;
+		_walkableNodes.Clear();
+
+		MessageHub.Instance.Publish(new PathNodesDestroyedEvent(null));
+	}
+	private IEnumerator CreatePathNodes(Tile[,] map, Action completed)
 	{
 		_tileSize = 3;
 		CreateNodes(map);
@@ -55,7 +63,6 @@ public class PathFinder : MonoBehaviour
 	{
 		_nodes = new PathfindingNode[tiles.GetLength(0) * 2, tiles.GetLength(1) * 2];
 		_walkableNodes = new List<PathfindingNode>();
-
 		for (var x = 0; x < tiles.GetLength(0); x++)
 		{
 			for (var y = 0; y < tiles.GetLength(1); y++)

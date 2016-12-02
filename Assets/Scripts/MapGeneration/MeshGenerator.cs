@@ -17,18 +17,27 @@ public class MeshGenerator : MonoBehaviour
 
 	private void Awake()
 	{
-		MessageHub.Instance.Subscribe<MapGeneratedEvent>(OnMapGenerated);
+		MessageHub.Instance.Subscribe<MapCreatedEvent>(OnMapCreatedEvent);
+		MessageHub.Instance.Subscribe<PathNodesDestroyedEvent>(OnPathNodesDestroyedEvent);
 	}
 
-	private void OnMapGenerated(MapGeneratedEvent mapGeneratedEvent)
+	private void OnMapCreatedEvent(MapCreatedEvent mapCreatedEvent)
 	{
-		StartCoroutine(GenerateMesh(mapGeneratedEvent.Map, () =>
+		StartCoroutine(GenerateMesh(mapCreatedEvent.Map, () =>
 		{
-			MessageHub.Instance.Publish(new MeshGeneratedEvent(null)
+			MessageHub.Instance.Publish(new MeshCreatedEvent(null)
 			{
-				Map = mapGeneratedEvent.Map
+				Map = mapCreatedEvent.Map
 			});
 		}));
+	}
+	private void OnPathNodesDestroyedEvent(PathNodesDestroyedEvent pathNodesDestroyedEvent)
+	{
+		Destroy(GameObject.Find("Floor"));
+		Destroy(GameObject.Find("Walls"));
+		Destroy(GameObject.Find("Roof"));
+
+		MessageHub.Instance.Publish(new MeshDestroyedEvent(null));
 	}
 	private IEnumerator GenerateMesh(Tile[,] map, Action completed)
 	{

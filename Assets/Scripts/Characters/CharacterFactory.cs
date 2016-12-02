@@ -52,11 +52,11 @@ public static class CharacterFactory
 		var perceptionData = GetPerceptionData(perceptionType);
 		enemy.SetPerceptionData(perceptionData);
 
-		Debug.Log("Created Enemy: " +
-			"Health: [" + healthType + "], " +
-			"Attacker: [" + attackerType + "], " +
-			"Mover: [" + moverType + "], " +
-			"Perception: [" + perceptionType + "]");
+		//Debug.Log("Created Enemy: " +
+		//	"Health: [" + healthType + "], " +
+		//	"Attacker: [" + attackerType + "], " +
+		//	"Mover: [" + moverType + "], " +
+		//	"Perception: [" + perceptionType + "]");
 
 		return enemy;
 	}

@@ -10,12 +10,8 @@ public class CameraController : MonoBehaviour
 
 	private void Awake()
 	{
-		MessageHub.Instance.Subscribe<CharactersSpawnedEvent>(OnCharacterSpawnedEvent);
+		MessageHub.Instance.Subscribe<CharactersCreatedEvent>(OnCharactersCreatedEvent);
 		_cachedTransform = transform;
-	}
-	private void OnCharacterSpawnedEvent(CharactersSpawnedEvent charactersSpawnedEvent)
-	{
-		_player = FindObjectOfType<Player>();
 	}
 	private void Update()
 	{
@@ -33,5 +29,10 @@ public class CameraController : MonoBehaviour
 		{
 			_cachedTransform.position = Vector3.Lerp(_cachedTransform.position, _player.transform.position + Vector3.up * 25f + Vector3.forward * -25, Time.deltaTime * MovementSpeed);
 		}
+	}
+
+	private void OnCharactersCreatedEvent(CharactersCreatedEvent charactersCreatedEvent)
+	{
+		_player = FindObjectOfType<Player>();
 	}
 }

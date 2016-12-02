@@ -10,15 +10,20 @@ public class Game : MonoBehaviour
 {
 	private void Awake()
 	{
-		MessageHub.Instance.Subscribe<CharactersSpawnedEvent>(OnCharactersSpawnedEvent);
+		MessageHub.Instance.Subscribe<CharactersCreatedEvent>(OnCharactersCreatedEvent);
+		MessageHub.Instance.Subscribe<MapDestroyedEvent>(OnMapDestroyedEvent);
 	}
 	private void Start()
 	{
-		MessageHub.Instance.Publish(new GameStartedEvent(null));
+		MessageHub.Instance.Publish(new CreateGameEvent(null));
 	}
 
-	private void OnCharactersSpawnedEvent(CharactersSpawnedEvent charactersSpawnedEvent)
+	private void OnCharactersCreatedEvent(CharactersCreatedEvent charactersCreatedEvent)
 	{
-		MessageHub.Instance.Publish(new GameInitializedEvent(null));
+		MessageHub.Instance.Publish(new GameCreatedEvent(null));
+	}
+	private void OnMapDestroyedEvent(MapDestroyedEvent mapDestroyedEvent)
+	{
+		MessageHub.Instance.Publish(new CreateGameEvent(null));
 	}
 }

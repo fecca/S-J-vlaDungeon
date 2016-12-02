@@ -60,7 +60,6 @@ public class Enemy : Character, IAttacking, IMoving
 		{
 			Agent.ClearNodes();
 			Destroy(gameObject);
-			MessageHub.Instance.Publish(new EnemyDiedEvent(null));
 		}
 	}
 	public override void SetHealthData(HealthData healthData)
