@@ -1,6 +1,6 @@
-
 Features
 ----
+Click outside map and move to closest node
 Listen to keys
 Level transition
 Inventory

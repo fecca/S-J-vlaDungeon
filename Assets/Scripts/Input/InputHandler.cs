@@ -37,6 +37,10 @@ public class InputHandler : MonoBehaviour
 
 	private void SetupKeyboardBindings()
 	{
+		_keyboardBindings.Add(KeyCode.Return, new List<TinyMessageBase>
+		{
+			new MapResetEvent(null)
+		});
 	}
 
 	public RaycastHit GetRaycastHit()

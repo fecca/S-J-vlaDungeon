@@ -4,6 +4,8 @@ public class CharacterHandler : MonoBehaviour
 {
 	[SerializeField]
 	private GameObject CharacterPrefab = null;
+	[SerializeField]
+	private int NumberOfEnemies = 1;
 
 	private void Awake()
 	{
@@ -14,7 +16,7 @@ public class CharacterHandler : MonoBehaviour
 	private void OnMapRegisteredEvent(MapRegisteredEvent mapGeneratedEvent)
 	{
 		CreatePlayer();
-		//CreateEnemies();
+		CreateEnemies(NumberOfEnemies);
 
 		MessageHub.Instance.Publish(new CharactersSpawnedEvent(null));
 	}
@@ -22,19 +24,15 @@ public class CharacterHandler : MonoBehaviour
 	{
 		CharacterFactory.CreatePlayer(CharacterPrefab);
 	}
-	private void CreateEnemy()
-	{
-		CharacterFactory.CreateRandomEnemy(CharacterPrefab);
-	}
 	private void OnEnemyDiedEvent(EnemyDiedEvent enemyDiedEvent)
 	{
-		CreateEnemy();
+		CreateEnemies(1);
 	}
-	private void CreateEnemies()
+	private void CreateEnemies(int numberOfEnemies)
 	{
-		for (var i = 0; i < 10; i++)
+		for (var i = 0; i < numberOfEnemies; i++)
 		{
-			CreateEnemy();
+			CharacterFactory.CreateRandomEnemy(CharacterPrefab);
 		}
 	}
 }

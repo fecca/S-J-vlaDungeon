@@ -1,13 +1,13 @@
 ﻿using System;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using Random = System.Random;
 
 public static class CharacterFactory
 {
 	public static Player CreatePlayer(GameObject prefab)
 	{
 		var newGameObject = Object.Instantiate(prefab);
+		newGameObject.name = "Player";
 		newGameObject.layer = LayerMask.NameToLayer("Player");
 
 		var player = newGameObject.AddComponent<Player>();
@@ -32,6 +32,7 @@ public static class CharacterFactory
 		PerceptionType perceptionType)
 	{
 		var newGameObject = Object.Instantiate(prefab);
+		newGameObject.name = "Enemy";
 		newGameObject.layer = LayerMask.NameToLayer("Enemy");
 		newGameObject.GetComponentInChildren<Light>().gameObject.SetActive(false);
 

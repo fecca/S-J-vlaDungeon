@@ -10,7 +10,7 @@ public class PathFinder : MonoBehaviour
 	private bool DrawGizmos = false;
 
 	private PathfindingNode[,] _nodes;
-	private List<PathfindingNode> _walkableNodes = new List<PathfindingNode>();
+	private List<PathfindingNode> _walkableNodes;
 	private int _tileSize;
 
 	private void Awake()
@@ -54,6 +54,7 @@ public class PathFinder : MonoBehaviour
 	private void CreateNodes(Tile[,] tiles)
 	{
 		_nodes = new PathfindingNode[tiles.GetLength(0) * 2, tiles.GetLength(1) * 2];
+		_walkableNodes = new List<PathfindingNode>();
 
 		for (var x = 0; x < tiles.GetLength(0); x++)
 		{

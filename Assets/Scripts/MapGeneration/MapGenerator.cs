@@ -20,7 +20,7 @@ public class MapGenerator : MonoBehaviour
 	private int TileSize = 1;
 	[SerializeField]
 	[Range(45, 55)]
-	private int RandomFillPercent = 50;
+	private int RoomFillPercentage = 50;
 	[SerializeField]
 	private int WallThresholdSize = 50;
 	[SerializeField]
@@ -39,6 +39,7 @@ public class MapGenerator : MonoBehaviour
 	private void Awake()
 	{
 		MessageHub.Instance.Subscribe<GameStartedEvent>(OnGameStarted);
+		MessageHub.Instance.Subscribe<MapResetEvent>(OnMapResetEvent);
 	}
 	private void OnDrawGizmos()
 	{
@@ -64,6 +65,26 @@ public class MapGenerator : MonoBehaviour
 
 	private void OnGameStarted(GameStartedEvent gameStartedEvent)
 	{
+		StartCoroutine(GenerateMap(() =>
+		{
+			MessageHub.Instance.Publish(new MapGeneratedEvent(null)
+			{
+				Map = _map
+			});
+		}));
+	}
+	private void OnMapResetEvent(MapResetEvent mapResetEvent)
+	{
+		Destroy(GameObject.Find("Floor"));
+		Destroy(GameObject.Find("Walls"));
+		Destroy(GameObject.Find("Roof"));
+		Destroy(FindObjectOfType<Player>().gameObject);
+		var enemies = FindObjectsOfType<Enemy>();
+		for (var i = 0; i < enemies.Length; i++)
+		{
+			Destroy(enemies[i].gameObject);
+		}
+
 		StartCoroutine(GenerateMap(() =>
 		{
 			MessageHub.Instance.Publish(new MapGeneratedEvent(null)
@@ -107,7 +128,7 @@ public class MapGenerator : MonoBehaviour
 				}
 				else
 				{
-					var tileType = rng.Next(0, 100) < RandomFillPercent ? TileType.Floor : TileType.None;
+					var tileType = rng.Next(0, 100) < RoomFillPercentage ? TileType.Floor : TileType.None;
 					_map[x, y] = new Tile(x, y, tileType, TileSize);
 				}
 			}
