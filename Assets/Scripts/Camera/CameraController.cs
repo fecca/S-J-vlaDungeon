@@ -3,7 +3,9 @@
 public class CameraController : MonoBehaviour
 {
 	[SerializeField]
-	private float MovementSpeed = 10;
+	private float FollowSpeed = 10;
+	[SerializeField]
+	private float RotationSpeed = 1;
 
 	private Transform _cachedTransform;
 	private Player _player;
@@ -27,7 +29,11 @@ public class CameraController : MonoBehaviour
 
 		if (_player != null)
 		{
-			_cachedTransform.position = Vector3.Lerp(_cachedTransform.position, _player.transform.position + Vector3.up * 25f + Vector3.forward * -25, Time.deltaTime * MovementSpeed);
+			if (Input.GetMouseButton(2))
+			{
+				_cachedTransform.Rotate(Vector3.up, Input.GetAxisRaw("Mouse X") * RotationSpeed);
+			}
+			_cachedTransform.position = Vector3.Lerp(_cachedTransform.position, _player.transform.position, Time.deltaTime * FollowSpeed);
 		}
 	}
 

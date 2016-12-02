@@ -53,12 +53,13 @@ public class MapGenerator : MonoBehaviour
 			return;
 		}
 
-		Gizmos.color = Color.green;
-		foreach (Room room in _survivingRooms)
+		for (var x = 0; x < _map.GetLength(0); x++)
 		{
-			foreach (Tile tile in room.Tiles)
+			for (var y = 0; y < _map.GetLength(1); y++)
 			{
-				Gizmos.DrawCube(tile.WorldCoordinates + Vector3.up, Vector3.one * 0.5f);
+				var tile = _map[x, y];
+				Gizmos.color = tile.Type == TileType.Floor ? Color.green : tile.Type == TileType.Wall ? Color.red : tile.Type == TileType.Roof ? Color.blue : Color.cyan;
+				Gizmos.DrawCube(tile.WorldCoordinates + (Vector3.one * TileSize * 0.5f) + (Vector3.up * 5.0f), Vector3.one * 0.5f);
 			}
 		}
 	}
@@ -112,11 +113,11 @@ public class MapGenerator : MonoBehaviour
 			{
 				if (x == 0 || x == Width - 1 || y == 0 || y == Height - 1)
 				{
-					_map[x, y] = new Tile(x, y, TileType.None, TileSize);
+					_map[x, y] = new Tile(x, y, TileType.Roof, TileSize);
 				}
 				else
 				{
-					var tileType = rng.Next(0, 100) < RoomFillPercentage ? TileType.Floor : TileType.None;
+					var tileType = rng.Next(0, 100) < RoomFillPercentage ? TileType.Floor : TileType.Roof;
 					_map[x, y] = new Tile(x, y, tileType, TileSize);
 				}
 			}
@@ -136,7 +137,7 @@ public class MapGenerator : MonoBehaviour
 					}
 					else if (GetNumberOfNeighbouringTiles(x, y) < 4)
 					{
-						_map[x, y].Type = TileType.None;
+						_map[x, y].Type = TileType.Roof;
 					}
 				}
 			}
@@ -144,7 +145,7 @@ public class MapGenerator : MonoBehaviour
 	}
 	private void FilterWalls()
 	{
-		var wallRegions = GetRegions(TileType.None);
+		var wallRegions = GetRegions(TileType.Roof);
 		for (var i = 0; i < wallRegions.Count; i++)
 		{
 			var wallRegion = wallRegions[i];
@@ -169,7 +170,7 @@ public class MapGenerator : MonoBehaviour
 			{
 				for (var j = 0; j < roomRegion.Count; j++)
 				{
-					_map[roomRegion[j].GridCoordinates.X, roomRegion[j].GridCoordinates.Y].Type = TileType.None;
+					_map[roomRegion[j].GridCoordinates.X, roomRegion[j].GridCoordinates.Y].Type = TileType.Roof;
 				}
 			}
 			else
@@ -300,8 +301,8 @@ public class MapGenerator : MonoBehaviour
 			{
 				if (x * x + y * y <= r * r)
 				{
-					var drawX = (int)c.X + x;
-					var drawY = (int)c.Y + y;
+					var drawX = c.X + x;
+					var drawY = c.Y + y;
 					if (IsInMapRange(drawX, drawY))
 					{
 						_map[drawX, drawY].Type = TileType.Floor;

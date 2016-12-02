@@ -41,9 +41,10 @@ public class Tile
 	public void SetConfiguration(ControlNode topLeft, ControlNode topRight, ControlNode bottomRight, ControlNode bottomLeft)
 	{
 		ConfigurationSquare = new ConfigurationSquare(topLeft, topRight, bottomRight, bottomLeft);
-		if (ConfigurationSquare.Configuration > 0)
+
+		if (ConfigurationSquare != null && ConfigurationSquare.Configuration > 0 && ConfigurationSquare.Configuration < 15)
 		{
-			Type = TileType.Floor;
+			Type = TileType.Wall;
 		}
 	}
 	public void AddWallVertices(params Vector3[] vertices)
