@@ -52,12 +52,6 @@ public static class CharacterFactory
 		var perceptionData = GetPerceptionData(perceptionType);
 		enemy.SetPerceptionData(perceptionData);
 
-		//Debug.Log("Created Enemy: " +
-		//	"Health: [" + healthType + "], " +
-		//	"Attacker: [" + attackerType + "], " +
-		//	"Mover: [" + moverType + "], " +
-		//	"Perception: [" + perceptionType + "]");
-
 		return enemy;
 	}
 	public static Enemy CreateRandomEnemy(
@@ -98,7 +92,6 @@ public static class CharacterFactory
 		switch (attackerType)
 		{
 			case AttackerType.None:
-				return null;
 			case AttackerType.Slow:
 				return new AttackData(Constants.SLOW_TIME_BETWEEN_ATTACKS, Constants.SLOW_PROJECTILE_SPEED, Constants.ENEMY_PROJECTILE_NAME);
 			case AttackerType.Medium:
@@ -114,7 +107,6 @@ public static class CharacterFactory
 		switch (moverType)
 		{
 			case MoverType.None:
-				return null;
 			case MoverType.Slow:
 				return new MoveData(Constants.SLOW_POSITION_UPDATE_INTERVAL, Constants.SLOW_MOVEMENT_SPEED);
 			case MoverType.Medium:
