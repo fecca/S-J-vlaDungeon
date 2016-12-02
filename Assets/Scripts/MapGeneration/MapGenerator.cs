@@ -312,7 +312,7 @@ public class MapGenerator : MonoBehaviour
 				var position = tile.WorldCoordinates.WithY(0);
 				if (RandomizeVertexPositions)
 				{
-					position += Vector3.one * UnityEngine.Random.Range(-(TileSize * 0.1f), TileSize * 0.1f);
+					position += Vector3.one * UnityEngine.Random.Range(-(TileSize * 0.05f), TileSize * 0.05f);
 				}
 				controlNodes[x, y] = new ControlNode(position, tile.Type == TileType.Floor, TileSize);
 			}

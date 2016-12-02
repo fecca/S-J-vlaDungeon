@@ -14,7 +14,7 @@ public class CharacterHandler : MonoBehaviour
 	private void OnMapRegisteredEvent(MapRegisteredEvent mapGeneratedEvent)
 	{
 		CreatePlayer();
-		CreateEnemies();
+		//CreateEnemies();
 
 		MessageHub.Instance.Publish(new CharactersSpawnedEvent(null));
 	}
