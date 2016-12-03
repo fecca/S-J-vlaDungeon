@@ -8,6 +8,9 @@ Crafting
 Loot
 Give player a brain
 Add spot lights and point lights to enemies and player
+Bullet raycast
+Water
+Wall vertex offset
 
 Bugs
 ----

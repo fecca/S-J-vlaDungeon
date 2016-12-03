@@ -30,7 +30,20 @@ public class MapGenerator : MonoBehaviour
 	[SerializeField]
 	private int SmoothingLoops = 5;
 	[SerializeField]
-	private bool RandomizeVertexPositions = false;
+	private bool RandomizeVertexPositionsX = false;
+	[SerializeField]
+	[Range(0f, 0.2f)]
+	private float VertexOffsetX = 0f;
+	[SerializeField]
+	private bool RandomizeVertexPositionsY = false;
+	[SerializeField]
+	[Range(0f, 0.2f)]
+	private float VertexOffsetY = 0f;
+	[SerializeField]
+	private bool RandomizeVertexPositionsZ = false;
+	[SerializeField]
+	[Range(0f, 0.2f)]
+	private float VertexOffsetZ = 0f;
 
 	private Tile[,] _map;
 	private List<Room> _survivingRooms;
@@ -320,10 +333,20 @@ public class MapGenerator : MonoBehaviour
 			{
 				var tile = _map[x, y];
 				var position = tile.WorldCoordinates.WithY(0);
-				if (RandomizeVertexPositions)
+
+				if (RandomizeVertexPositionsX)
 				{
-					position += Vector3.one * UnityEngine.Random.Range(-(TileSize * 0.05f), TileSize * 0.05f);
+					position += Vector3.right * UnityEngine.Random.Range(-(TileSize * VertexOffsetX), TileSize * VertexOffsetX);
 				}
+				if (RandomizeVertexPositionsY)
+				{
+					position += Vector3.up * UnityEngine.Random.Range(-(TileSize * VertexOffsetY), TileSize * VertexOffsetY);
+				}
+				if (RandomizeVertexPositionsZ)
+				{
+					position += Vector3.forward * UnityEngine.Random.Range(-(TileSize * VertexOffsetZ), TileSize * VertexOffsetZ);
+				}
+
 				controlNodes[x, y] = new ControlNode(position, tile.Type == TileType.Floor, TileSize);
 			}
 		}

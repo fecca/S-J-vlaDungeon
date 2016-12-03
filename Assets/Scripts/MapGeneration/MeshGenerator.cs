@@ -144,7 +144,7 @@ public class MeshGenerator : MonoBehaviour
 		floorGameObject.layer = LayerMask.NameToLayer("Ground");
 
 		var meshRenderer = floorGameObject.GetOrAddComponent<MeshRenderer>();
-		meshRenderer.sharedMaterial = Resources.Load<Material>("MeshMaterial");
+		meshRenderer.sharedMaterial = Resources.Load<Material>("FloorMaterial");
 
 		var mesh = new Mesh();
 		mesh.SetVertices(_floorVertices);
@@ -159,8 +159,6 @@ public class MeshGenerator : MonoBehaviour
 	}
 	private void BuildFloorTriangleFromPoints(params Node[] points)
 	{
-		AssignFloorVertices(points);
-
 		if (points.Length == 3)
 		{
 			CreateFloorTriangle(points[0], points[1], points[2]);
@@ -184,20 +182,15 @@ public class MeshGenerator : MonoBehaviour
 			CreateFloorTriangle(points[0], points[4], points[5]);
 		}
 	}
-	private void AssignFloorVertices(Node[] points)
-	{
-		for (var i = 0; i < points.Length; i++)
-		{
-			var point = points[i];
-			point.VertexIndex = _floorVertices.Count;
-			_floorVertices.Add(point.Position);
-		}
-	}
 	private void CreateFloorTriangle(Node a, Node b, Node c)
 	{
-		_floorTriangles.Add(a.VertexIndex);
-		_floorTriangles.Add(b.VertexIndex);
-		_floorTriangles.Add(c.VertexIndex);
+		_floorVertices.Add(a.Position);
+		_floorVertices.Add(b.Position);
+		_floorVertices.Add(c.Position);
+
+		_floorTriangles.Add(_floorVertices.Count - 3);
+		_floorTriangles.Add(_floorVertices.Count - 2);
+		_floorTriangles.Add(_floorVertices.Count - 1);
 	}
 
 	private void GenerateWallMesh(Tile[,] map)
@@ -208,6 +201,10 @@ public class MeshGenerator : MonoBehaviour
 		{
 			for (var y = 0; y < map.GetLength(1); y++)
 			{
+				if (!map[x, y].IsEdgeTile)
+				{
+					continue;
+				}
 				TriangulateWall(map[x, y]);
 			}
 		}
@@ -317,7 +314,7 @@ public class MeshGenerator : MonoBehaviour
 		wallGameObject.layer = LayerMask.NameToLayer("Wall");
 
 		var meshRenderer = wallGameObject.GetOrAddComponent<MeshRenderer>();
-		meshRenderer.sharedMaterial = Resources.Load<Material>("MeshMaterial");
+		meshRenderer.sharedMaterial = Resources.Load<Material>("WallMaterial");
 
 		var mesh = new Mesh();
 		mesh.SetVertices(_wallVertices);
@@ -427,7 +424,7 @@ public class MeshGenerator : MonoBehaviour
 		roofGameObject.layer = LayerMask.NameToLayer("Roof");
 
 		var meshRenderer = roofGameObject.GetOrAddComponent<MeshRenderer>();
-		meshRenderer.sharedMaterial = Resources.Load<Material>("MeshMaterial");
+		meshRenderer.sharedMaterial = Resources.Load<Material>("RoofMaterial");
 
 		var mesh = new Mesh();
 		mesh.SetVertices(_roofVertices);
@@ -442,8 +439,6 @@ public class MeshGenerator : MonoBehaviour
 	}
 	private void BuildRoofTriangleFromPoints(params Node[] points)
 	{
-		AssignRoofVertices(points);
-
 		if (points.Length == 3)
 		{
 			CreateRoofTriangle(points[0], points[1], points[2]);
@@ -467,19 +462,14 @@ public class MeshGenerator : MonoBehaviour
 			CreateRoofTriangle(points[0], points[4], points[5]);
 		}
 	}
-	private void AssignRoofVertices(Node[] points)
-	{
-		for (var i = 0; i < points.Length; i++)
-		{
-			var point = points[i];
-			point.VertexIndex = _roofVertices.Count;
-			_roofVertices.Add(point.Position);
-		}
-	}
 	private void CreateRoofTriangle(Node a, Node b, Node c)
 	{
-		_roofTriangles.Add(a.VertexIndex);
-		_roofTriangles.Add(b.VertexIndex);
-		_roofTriangles.Add(c.VertexIndex);
+		_roofVertices.Add(a.Position);
+		_roofVertices.Add(b.Position);
+		_roofVertices.Add(c.Position);
+
+		_roofTriangles.Add(_roofVertices.Count - 3);
+		_roofTriangles.Add(_roofVertices.Count - 2);
+		_roofTriangles.Add(_roofVertices.Count - 1);
 	}
 }
