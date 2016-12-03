@@ -2,18 +2,22 @@
 
 public class Enemy : Character, IAttacking, IMoving
 {
-	private Canvas _canvas;
-	private RectTransform _bar;
+	//private Canvas _canvas;
+	//private RectTransform _bar;
 
 	private Transform _cachedTransform;
 	private Brain _brain;
 	private Transform _target;
+	private Light _pointLight;
+	private Light _spotLight;
 
 	private void Awake()
 	{
 		_cachedTransform = transform;
-		_canvas = transform.FindChild("Canvas").GetComponent<Canvas>();
-		_bar = _canvas.transform.FindChild("CurrentHitpoints").GetComponent<RectTransform>();
+		_pointLight = _cachedTransform.FindChild("PointLight").GetComponent<Light>();
+		_spotLight = _cachedTransform.FindChild("SpotLight").GetComponent<Light>();
+		//_canvas = transform.FindChild("Canvas").GetComponent<Canvas>();
+		//_bar = _canvas.transform.FindChild("CurrentHitpoints").GetComponent<RectTransform>();
 	}
 	private void Update()
 	{
@@ -21,7 +25,7 @@ public class Enemy : Character, IAttacking, IMoving
 		{
 			_brain.Think();
 		}
-		_canvas.transform.LookAt(Camera.main.transform.position);
+		//_canvas.transform.LookAt(Camera.main.transform.position);
 	}
 
 	public void Attack(AttackData data)
@@ -47,6 +51,18 @@ public class Enemy : Character, IAttacking, IMoving
 		_target = FindObjectOfType<Player>().transform;
 		_brain = new Brain(this, _target);
 	}
+	public void ActivateLights()
+	{
+		Debug.Log("ActivateLights");
+		_pointLight.intensity = 1;
+		_spotLight.intensity = 1;
+	}
+	public void DeactivateLights()
+	{
+		Debug.Log("DeactivateLights");
+		_pointLight.intensity = 0;
+		_spotLight.intensity = 0;
+	}
 
 	public override void TakeDamage()
 	{
@@ -54,7 +70,7 @@ public class Enemy : Character, IAttacking, IMoving
 		if (HealthData.CurrentHealth > 0)
 		{
 			var fraction = HealthData.CurrentHealth / HealthData.TotalHealth;
-			_bar.sizeDelta = new Vector2(fraction * 4, _bar.sizeDelta.y);
+			//_bar.sizeDelta = new Vector2(fraction * 4, _bar.sizeDelta.y);
 		}
 		else
 		{

@@ -153,7 +153,7 @@ public class MapGenerator : MonoBehaviour
 			{
 				for (var j = 0; j < wallRegion.Count; j++)
 				{
-					_map[(int)wallRegion[j].GridCoordinates.X, (int)wallRegion[j].GridCoordinates.Y].Type = TileType.Floor;
+					_map[wallRegion[j].GridCoordinates.X, wallRegion[j].GridCoordinates.Y].Type = TileType.Floor;
 				}
 			}
 		}

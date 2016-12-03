@@ -34,7 +34,6 @@ public static class CharacterFactory
 		var newGameObject = Object.Instantiate(prefab);
 		newGameObject.name = "Enemy";
 		newGameObject.layer = LayerMask.NameToLayer("Enemy");
-		newGameObject.GetComponentInChildren<Light>().gameObject.SetActive(false);
 
 		var enemy = newGameObject.AddComponent<Enemy>();
 		enemy.InitializeBrain();

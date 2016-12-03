@@ -2,8 +2,8 @@
 
 public class Player : Character
 {
-	private Canvas _canvas;
-	private RectTransform _bar;
+	//private Canvas _canvas;
+	//private RectTransform _bar;
 
 	private AttackData _attackData;
 	private MoveData _moveData;
@@ -14,13 +14,13 @@ public class Player : Character
 	private void Awake()
 	{
 		_cachedTransform = transform;
-		_canvas = transform.FindChild("Canvas").GetComponent<Canvas>();
-		_bar = _canvas.transform.FindChild("CurrentHitpoints").GetComponent<RectTransform>();
+		//_canvas = transform.FindChild("Canvas").GetComponent<Canvas>();
+		//_bar = _canvas.transform.FindChild("CurrentHitpoints").GetComponent<RectTransform>();
 	}
 	private void Update()
 	{
 		HandleInput();
-		_canvas.transform.LookAt(Camera.main.transform.position);
+		//_canvas.transform.LookAt(Camera.main.transform.position);
 	}
 
 	private void HandleInput()
@@ -87,7 +87,7 @@ public class Player : Character
 		if (HealthData.CurrentHealth > 0)
 		{
 			var fraction = HealthData.CurrentHealth / HealthData.TotalHealth;
-			_bar.sizeDelta = new Vector2(fraction * 4, _bar.sizeDelta.y);
+			//_bar.sizeDelta = new Vector2(fraction * 4, _bar.sizeDelta.y);
 		}
 	}
 	public override void SetHealthData(HealthData healthData)

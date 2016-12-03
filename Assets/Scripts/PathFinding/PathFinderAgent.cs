@@ -48,14 +48,14 @@ public class PathFinderAgent : MonoBehaviour
 	}
 	private void OnDrawGizmos()
 	{
-		//if (_path != null)
-		//{
-		//	for (var iteration = _path.First; iteration != null; iteration = iteration.Next)
-		//	{
-		//		Gizmos.color = Color.blue;
-		//		Gizmos.DrawSphere(iteration.Value.WorldCoordinates.WithY(1), 0.25f);
-		//	}
-		//}
+		if (_path != null)
+		{
+			for (var iteration = _path.First; iteration != null; iteration = iteration.Next)
+			{
+				Gizmos.color = Color.blue;
+				Gizmos.DrawSphere(iteration.Value.WorldCoordinates.WithY(1), 0.25f);
+			}
+		}
 	}
 
 	public void Setup(PathFinder pathFinder, PathfindingNode startingNode)

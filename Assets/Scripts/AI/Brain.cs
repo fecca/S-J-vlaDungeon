@@ -23,6 +23,11 @@ public class Brain
 
 	private void CheckPerception()
 	{
+		if (_perception == null)
+		{
+			return;
+		}
+
 		if (_perceptionTimer > _perception.GetRandomUpdateInterval())
 		{
 			_perceptionTimer = 0f;
@@ -66,10 +71,7 @@ public class Brain
 
 	public void Think()
 	{
-		if (_perception != null)
-		{
-			CheckPerception();
-		}
+		CheckPerception();
 
 		if (_currentThought != null)
 		{
