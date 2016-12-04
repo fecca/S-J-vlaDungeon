@@ -9,18 +9,6 @@ public class Tile
 	public ConfigurationSquare ConfigurationSquare;
 	public List<Vector3> CoreVertices = new List<Vector3>(4);
 
-	public bool IsEdgeTile
-	{
-		get
-		{
-			return ConfigurationSquare != null && ConfigurationSquare.Configuration > 0 && ConfigurationSquare.Configuration < 15;
-		}
-	}
-	public bool IsWalkable
-	{
-		get { return Type == TileType.Floor && ConfigurationSquare != null && ConfigurationSquare.Configuration == 15; }
-	}
-
 	public Tile(int x, int y, TileType type, int tileSize)
 	{
 		GridCoordinates = new Coordinates(x, y);
@@ -41,10 +29,9 @@ public class Tile
 	public void SetConfiguration(ControlNode topLeft, ControlNode topRight, ControlNode bottomRight, ControlNode bottomLeft)
 	{
 		ConfigurationSquare = new ConfigurationSquare(topLeft, topRight, bottomRight, bottomLeft);
-
 		if (ConfigurationSquare != null && ConfigurationSquare.Configuration > 0 && ConfigurationSquare.Configuration < 15)
 		{
-			Type = TileType.Wall;
+			Type = TileType.Floor;
 		}
 	}
 	public void AddWallVertices(params Vector3[] vertices)

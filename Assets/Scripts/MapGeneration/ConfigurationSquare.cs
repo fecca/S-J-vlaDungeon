@@ -25,11 +25,6 @@
 		ConfigureSquare();
 	}
 
-	public override string ToString()
-	{
-		return Configuration.ToString();
-	}
-
 	private void ConfigureSquare()
 	{
 		if (BottomLeft.Active)

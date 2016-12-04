@@ -66,15 +66,15 @@ public class MapGenerator : MonoBehaviour
 			return;
 		}
 
-		for (var x = 0; x < _map.GetLength(0); x++)
-		{
-			for (var y = 0; y < _map.GetLength(1); y++)
-			{
-				var tile = _map[x, y];
-				Gizmos.color = tile.Type == TileType.Floor ? Color.green : tile.Type == TileType.Wall ? Color.red : tile.Type == TileType.Roof ? Color.blue : Color.cyan;
-				Gizmos.DrawCube(tile.WorldCoordinates + (Vector3.one * TileSize * 0.5f) + (Vector3.up * 5.0f), Vector3.one * 0.5f);
-			}
-		}
+		//for (var x = 0; x < _map.GetLength(0); x++)
+		//{
+		//	for (var y = 0; y < _map.GetLength(1); y++)
+		//	{
+		//		var tile = _map[x, y];
+		//		Gizmos.color = tile.Type == TileType.Floor ? Color.green : tile.Type == TileType.Wall ? Color.red : tile.Type == TileType.Roof ? Color.blue : Color.cyan;
+		//		Gizmos.DrawCube(tile.WorldCoordinates + (Vector3.one * TileSize * 0.5f) + (Vector3.up * 5.0f), Vector3.one * 0.5f);
+		//	}
+		//}
 	}
 
 	private void OnCreateGameEvent(CreateGameEvent createGameEvent)
@@ -105,6 +105,7 @@ public class MapGenerator : MonoBehaviour
 		FilterWalls();
 		FilterRooms();
 		ConnectClosestRooms();
+		//CreateWater();
 		ConfigureTiles();
 		RegisterWalkableTiles();
 
@@ -324,6 +325,29 @@ public class MapGenerator : MonoBehaviour
 			}
 		}
 	}
+	private void CreateWater()
+	{
+		for (var i = 0; i < _survivingRooms.Count; i++)
+		{
+			var room = _survivingRooms[i];
+			var maximumWaterTiles = 50;
+			var waterTiles = 0;
+			for (var j = 0; j < room.Tiles.Count; j++)
+			{
+				var tile = room.Tiles[j];
+				if (tile.Type == TileType.Floor)
+				{
+					_map[tile.GridCoordinates.X, tile.GridCoordinates.Y].Type = TileType.Water;
+					waterTiles++;
+				}
+
+				if (waterTiles >= maximumWaterTiles || waterTiles >= room.Tiles.Count * 0.5f)
+				{
+					break;
+				}
+			}
+		}
+	}
 	private void ConfigureTiles()
 	{
 		var controlNodes = new ControlNode[Width, Height];
@@ -366,9 +390,10 @@ public class MapGenerator : MonoBehaviour
 		{
 			for (var y = 0; y < Height; y++)
 			{
-				if (_map[x, y].IsWalkable)
+				var tile = _map[x, y];
+				if (tile.Type == TileType.Floor && tile.ConfigurationSquare != null && tile.ConfigurationSquare.Configuration == 15)
 				{
-					_walkableTiles.Add(_map[x, y]);
+					_walkableTiles.Add(tile);
 				}
 			}
 		}
@@ -412,8 +437,8 @@ public class MapGenerator : MonoBehaviour
 
 					for (var i = 0; i < regionTiles.Count; i++)
 					{
-						var xRegion = (int)regionTiles[i].GridCoordinates.X;
-						var yRegion = (int)regionTiles[i].GridCoordinates.Y;
+						var xRegion = regionTiles[i].GridCoordinates.X;
+						var yRegion = regionTiles[i].GridCoordinates.Y;
 						mapFlags[xRegion, yRegion] = true;
 					}
 				}
