@@ -53,7 +53,7 @@ public class MeshGenerator : MonoBehaviour
 		{
 			for (var y = 0; y < mapHeight; y++)
 			{
-				GenerateWalls(map[x, y]);
+				//GenerateWalls(map[x, y]);
 			}
 		}
 		CreateRoofMesh();
@@ -74,36 +74,132 @@ public class MeshGenerator : MonoBehaviour
 		var bottomRight = tile.WorldCoordinates + (Vector3.right * Constants.TileSize);
 		if (tile.TopNeighbour != null)
 		{
-			if (tile.TopNeighbour.Type == tile.Type)
-			{
-				topLeft = tile.TopNeighbour.WorldCoordinates;
-			}
-			else
-			{
-				topLeft = tile.TopNeighbour.WorldCoordinates.WithY(tile.WorldCoordinates.y);
-			}
+			//if (tile.TopNeighbour.Type == tile.Type)
+			//{
+			topLeft = tile.TopNeighbour.WorldCoordinates;
+			//}
+			//else
+			//{
+			//	if (tile.Type == TileType.Floor)
+			//	{
+			//		if (tile.TopNeighbour.Type == TileType.Water)
+			//		{
+			//			topLeft = tile.TopNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight;
+			//		}
+			//		else
+			//		{
+			//			topLeft = tile.TopNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight;
+			//		}
+			//	}
+			//	if (tile.Type == TileType.Roof)
+			//	{
+			//		if (tile.TopNeighbour.Type == TileType.Water)
+			//		{
+			//			topLeft = tile.TopNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight * 2;
+			//		}
+			//		else
+			//		{
+			//			topLeft = tile.TopNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight;
+			//		}
+			//	}
+			//	if (tile.Type == TileType.Water)
+			//	{
+			//		if (tile.TopNeighbour.Type == TileType.Floor)
+			//		{
+			//			topLeft = tile.TopNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight;
+			//		}
+			//		else
+			//		{
+			//			topLeft = tile.TopNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight * 2;
+			//		}
+			//	}
+			//}
 		}
 		if (tile.TopRightNeighbour != null)
 		{
-			if (tile.TopRightNeighbour.Type == tile.Type)
-			{
-				topRight = tile.TopRightNeighbour.WorldCoordinates;
-			}
-			else
-			{
-				topRight = tile.TopRightNeighbour.WorldCoordinates.WithY(tile.WorldCoordinates.y);
-			}
+			//if (tile.TopRightNeighbour.Type == tile.Type)
+			//{
+			topRight = tile.TopRightNeighbour.WorldCoordinates;
+			//}
+			//else
+			//{
+			//	if (tile.Type == TileType.Floor)
+			//	{
+			//		if (tile.TopRightNeighbour.Type == TileType.Water)
+			//		{
+			//			topRight = tile.TopRightNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight;
+			//		}
+			//		else
+			//		{
+			//			topRight = tile.TopRightNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight;
+			//		}
+			//	}
+			//	if (tile.Type == TileType.Roof)
+			//	{
+			//		if (tile.TopRightNeighbour.Type == TileType.Water)
+			//		{
+			//			topRight = tile.TopRightNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight * 2;
+			//		}
+			//		else
+			//		{
+			//			topRight = tile.TopRightNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight;
+			//		}
+			//	}
+			//	if (tile.Type == TileType.Water)
+			//	{
+			//		if (tile.TopRightNeighbour.Type == TileType.Floor)
+			//		{
+			//			topRight = tile.TopRightNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight;
+			//		}
+			//		else
+			//		{
+			//			topRight = tile.TopRightNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight * 2;
+			//		}
+			//	}
+			//}
 		}
 		if (tile.RightNeighbour != null)
 		{
-			if (tile.RightNeighbour.Type == tile.Type)
-			{
-				bottomRight = tile.RightNeighbour.WorldCoordinates;
-			}
-			else
-			{
-				bottomRight = tile.RightNeighbour.WorldCoordinates.WithY(tile.WorldCoordinates.y);
-			}
+			//if (tile.RightNeighbour.Type == tile.Type)
+			//{
+			bottomRight = tile.RightNeighbour.WorldCoordinates;
+			//}
+			//else
+			//{
+			//	if (tile.Type == TileType.Floor)
+			//	{
+			//		if (tile.RightNeighbour.Type == TileType.Water)
+			//		{
+			//			bottomRight = tile.RightNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight;
+			//		}
+			//		else
+			//		{
+			//			bottomRight = tile.RightNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight;
+			//		}
+			//	}
+			//	if (tile.Type == TileType.Roof)
+			//	{
+			//		if (tile.RightNeighbour.Type == TileType.Water)
+			//		{
+			//			bottomRight = tile.RightNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight * 2;
+			//		}
+			//		else
+			//		{
+			//			bottomRight = tile.RightNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight;
+			//		}
+			//	}
+			//	if (tile.Type == TileType.Water)
+			//	{
+			//		if (tile.RightNeighbour.Type == TileType.Floor)
+			//		{
+			//			bottomRight = tile.RightNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight;
+			//		}
+			//		else
+			//		{
+			//			bottomRight = tile.RightNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight * 2;
+			//		}
+			//	}
+			//}
 		}
 
 		CreateTriangle(tile.Type,
