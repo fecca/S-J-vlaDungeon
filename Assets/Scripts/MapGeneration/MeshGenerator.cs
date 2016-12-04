@@ -68,41 +68,52 @@ public class MeshGenerator : MonoBehaviour
 
 	private void GenerateTileMesh(Tile tile)
 	{
-		switch (tile.Type)
+		var bottomLeft = tile.WorldCoordinates;
+		var topLeft = tile.WorldCoordinates + (Vector3.forward * Constants.TileSize);
+		var topRight = tile.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize);
+		var bottomRight = tile.WorldCoordinates + (Vector3.right * Constants.TileSize);
+		if (tile.TopNeighbour != null)
 		{
-			case TileType.Floor:
-				CreateFloorTriangle(
-					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
-					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize),
-					tile.WorldCoordinates + (Vector3.right * Constants.TileSize));
-				CreateFloorTriangle(
-					tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
-					tile.WorldCoordinates,
-					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize));
-				break;
-			case TileType.Roof:
-				CreateRoofTriangle(
-					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
-					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize),
-					tile.WorldCoordinates + (Vector3.right * Constants.TileSize));
-				CreateRoofTriangle(
-					tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
-					tile.WorldCoordinates,
-					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize));
-				break;
-			case TileType.Water:
-				CreateWaterTriangle(
-					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
-					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize),
-					tile.WorldCoordinates + (Vector3.right * Constants.TileSize));
-				CreateWaterTriangle(
-					tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
-					tile.WorldCoordinates,
-					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize));
-				break;
-			default:
-				break;
+			if (tile.TopNeighbour.Type == tile.Type)
+			{
+				topLeft = tile.TopNeighbour.WorldCoordinates;
+			}
+			else
+			{
+				topLeft = tile.TopNeighbour.WorldCoordinates.WithY(tile.WorldCoordinates.y);
+			}
 		}
+		if (tile.TopRightNeighbour != null)
+		{
+			if (tile.TopRightNeighbour.Type == tile.Type)
+			{
+				topRight = tile.TopRightNeighbour.WorldCoordinates;
+			}
+			else
+			{
+				topRight = tile.TopRightNeighbour.WorldCoordinates.WithY(tile.WorldCoordinates.y);
+			}
+		}
+		if (tile.RightNeighbour != null)
+		{
+			if (tile.RightNeighbour.Type == tile.Type)
+			{
+				bottomRight = tile.RightNeighbour.WorldCoordinates;
+			}
+			else
+			{
+				bottomRight = tile.RightNeighbour.WorldCoordinates.WithY(tile.WorldCoordinates.y);
+			}
+		}
+
+		CreateTriangle(tile.Type,
+			bottomLeft,
+			topLeft,
+			topRight);
+		CreateTriangle(tile.Type,
+			topRight,
+			bottomRight,
+			bottomLeft);
 	}
 	private void GenerateWalls(Tile tile)
 	{
@@ -111,14 +122,19 @@ public class MeshGenerator : MonoBehaviour
 			case TileType.Floor:
 				if (tile.LeftNeighbour != null && tile.LeftNeighbour.Type == TileType.Water)
 				{
+					var bottomLeft = tile.LeftNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize);
+					var topLeft = tile.WorldCoordinates + (Vector3.forward * Constants.TileSize);
+					var topRight = tile.WorldCoordinates;
+					var bottomRight = tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize);
+
 					CreateWallTriangle(
-						tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
-						tile.WorldCoordinates,
-						tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize));
+						bottomLeft,
+						topLeft,
+						topRight);
 					CreateWallTriangle(
-						tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize),
-						tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
-						tile.WorldCoordinates + (Vector3.forward * Constants.TileSize));
+						topRight,
+						bottomRight,
+						bottomLeft);
 				}
 
 				if (tile.TopNeighbour != null && tile.TopNeighbour.Type == TileType.Water)
@@ -213,16 +229,6 @@ public class MeshGenerator : MonoBehaviour
 		}
 	}
 
-	private void CreateRoofTriangle(Vector3 a, Vector3 b, Vector3 c)
-	{
-		_roofVertices.Add(a);
-		_roofVertices.Add(b);
-		_roofVertices.Add(c);
-
-		_roofTriangles.Add(_roofVertices.Count - 3);
-		_roofTriangles.Add(_roofVertices.Count - 2);
-		_roofTriangles.Add(_roofVertices.Count - 1);
-	}
 	private void CreateRoofMesh()
 	{
 		var roofGameObject = new GameObject("Roof");
@@ -243,20 +249,45 @@ public class MeshGenerator : MonoBehaviour
 		meshCollider.sharedMesh = mesh;
 	}
 
-	private void CreateFloorTriangle(Vector3 a, Vector3 b, Vector3 c)
+	private void CreateTriangle(TileType type, Vector3 a, Vector3 b, Vector3 c)
 	{
-		_floorVertices.Add(a);
-		_floorVertices.Add(b);
-		_floorVertices.Add(c);
+		switch (type)
+		{
+			case TileType.Floor:
+				_floorVertices.Add(a);
+				_floorVertices.Add(b);
+				_floorVertices.Add(c);
 
-		_floorTriangles.Add(_floorVertices.Count - 3);
-		_floorTriangles.Add(_floorVertices.Count - 2);
-		_floorTriangles.Add(_floorVertices.Count - 1);
+				_floorTriangles.Add(_floorVertices.Count - 3);
+				_floorTriangles.Add(_floorVertices.Count - 2);
+				_floorTriangles.Add(_floorVertices.Count - 1);
+				break;
+			case TileType.Roof:
+				_roofVertices.Add(a);
+				_roofVertices.Add(b);
+				_roofVertices.Add(c);
+
+				_roofTriangles.Add(_roofVertices.Count - 3);
+				_roofTriangles.Add(_roofVertices.Count - 2);
+				_roofTriangles.Add(_roofVertices.Count - 1);
+				break;
+			case TileType.Water:
+				_waterVertices.Add(a);
+				_waterVertices.Add(b);
+				_waterVertices.Add(c);
+
+				_waterTriangles.Add(_waterVertices.Count - 3);
+				_waterTriangles.Add(_waterVertices.Count - 2);
+				_waterTriangles.Add(_waterVertices.Count - 1);
+				break;
+			default:
+				break;
+		}
 	}
+
 	private void CreateFloorMesh()
 	{
 		var floorGameObject = new GameObject("Floor");
-		//floorGameObject.transform.position -= Vector3.up * WallHeight * 1.0f;
 		floorGameObject.layer = LayerMask.NameToLayer("Ground");
 
 		var meshRenderer = floorGameObject.GetOrAddComponent<MeshRenderer>();
@@ -304,20 +335,9 @@ public class MeshGenerator : MonoBehaviour
 		meshCollider.sharedMesh = mesh;
 	}
 
-	private void CreateWaterTriangle(Vector3 a, Vector3 b, Vector3 c)
-	{
-		_waterVertices.Add(a);
-		_waterVertices.Add(b);
-		_waterVertices.Add(c);
-
-		_waterTriangles.Add(_waterVertices.Count - 3);
-		_waterTriangles.Add(_waterVertices.Count - 2);
-		_waterTriangles.Add(_waterVertices.Count - 1);
-	}
 	private void CreateWaterMesh()
 	{
 		var waterGameObject = new GameObject("Water");
-		//waterGameObject.transform.position -= Vector3.up * WallHeight * 2.0f;
 		waterGameObject.layer = LayerMask.NameToLayer("Water");
 
 		var meshRenderer = waterGameObject.GetOrAddComponent<MeshRenderer>();

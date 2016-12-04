@@ -12,11 +12,13 @@ public class Tile
 	public Tile TopNeighbour;
 	public Tile RightNeighbour;
 	public Tile BottomNeighbour;
+	public Tile TopRightNeighbour;
 
 	public Tile(int x, int y, TileType type)
 	{
 		GridCoordinates = new Coordinates(x, y);
 		WorldCoordinates = new Vector3(x * Constants.TileSize, 0, y * Constants.TileSize);
+		WorldCoordinates += (Vector3.right * Random.Range(-0.5f, 0.5f)) + (Vector3.up * Random.Range(-0.5f, 0.5f)) + (Vector3.forward * Random.Range(-0.5f, 0.5f));
 		Type = type;
 	}
 

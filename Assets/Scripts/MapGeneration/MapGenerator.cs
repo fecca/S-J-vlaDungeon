@@ -354,8 +354,9 @@ public class MapGenerator : MonoBehaviour
 				tile.TopNeighbour = topNighbourIndex <= mapHeight ? _map[x, topNighbourIndex] : null;
 				tile.RightNeighbour = rightNighbourIndex <= mapWidth ? _map[rightNighbourIndex, y] : null;
 				tile.BottomNeighbour = bottomNighbourIndex >= 0 ? _map[x, bottomNighbourIndex] : null;
+				tile.TopRightNeighbour = rightNighbourIndex <= mapWidth && topNighbourIndex <= mapHeight ? _map[rightNighbourIndex, topNighbourIndex] : null;
 
-				var typeOffset = tile.Type == TileType.Floor ? -Vector3.up * 2 : tile.Type == TileType.Water ? -Vector3.up * 4 : Vector3.zero;
+				var typeOffset = tile.Type == TileType.Floor ? -Vector3.up * Constants.WallHeight : tile.Type == TileType.Water ? -Vector3.up * Constants.WallHeight * 2 : Vector3.zero;
 				tile.WorldCoordinates += typeOffset;
 			}
 		}
