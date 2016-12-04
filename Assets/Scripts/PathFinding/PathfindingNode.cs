@@ -15,12 +15,11 @@ public class PathfindingNode : IHeapItem<PathfindingNode>
 	public float FCost { get; set; }
 	public int HeapIndex { get; set; }
 
-	public PathfindingNode(int x, int y, bool walkable, int tileSize)
+	public PathfindingNode(int x, int y)
 	{
 		GridCoordinates = new Coordinates(x, y);
-		WorldCoordinates = FindWorldCoordinates(x, y, tileSize);
+		WorldCoordinates = FindWorldCoordinates(x, y);
 		Neighbours = new List<PathfindingNode>();
-		Walkable = walkable;
 	}
 	public PathfindingNode(PathfindingNode copy)
 	{
@@ -64,9 +63,9 @@ public class PathfindingNode : IHeapItem<PathfindingNode>
 		Occupied = occupied;
 	}
 
-	private Vector3 FindWorldCoordinates(float x, float y, int tileSize)
+	private Vector3 FindWorldCoordinates(float x, float y)
 	{
-		var worldPosition = new Vector3((x / 2f + 0.25f) * tileSize, 0, (y / 2f + 0.25f) * tileSize);
+		var worldPosition = new Vector3((x / 2f + 0.25f) * Constants.TileSize, 0, (y / 2f + 0.25f) * Constants.TileSize);
 		Ray ray = new Ray(worldPosition + Vector3.up * 2f, -Vector3.up);
 		RaycastHit hit;
 		if (Physics.Raycast(ray, out hit, 10f))

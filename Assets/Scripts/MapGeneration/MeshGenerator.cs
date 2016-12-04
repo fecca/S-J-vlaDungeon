@@ -14,9 +14,6 @@ public class MeshGenerator : MonoBehaviour
 	private readonly List<Vector3> _waterVertices = new List<Vector3>(16184);
 	private readonly List<int> _waterTriangles = new List<int>(32768);
 
-	[SerializeField]
-	private int WallHeight = 2;
-
 	private void Awake()
 	{
 		MessageHub.Instance.Subscribe<MapCreatedEvent>(OnMapCreatedEvent);
@@ -43,151 +40,214 @@ public class MeshGenerator : MonoBehaviour
 	}
 	private IEnumerator GenerateMesh(Tile[,] map, Action completed)
 	{
-		GenerateFloorMesh(map);
-		GenerateWallMesh(map);
-		GenerateRoofMesh(map);
-		//GenerateWaterMesh(map);
+		var mapWidth = map.GetLength(0) - 1;
+		var mapHeight = map.GetLength(1) - 1;
+		for (var x = 0; x < mapWidth; x++)
+		{
+			for (var y = 0; y < mapHeight; y++)
+			{
+				GenerateTileMesh(map[x, y]);
+			}
+		}
+		for (var x = 0; x < mapWidth; x++)
+		{
+			for (var y = 0; y < mapHeight; y++)
+			{
+				GenerateWalls(map[x, y]);
+			}
+		}
+		CreateRoofMesh();
+		CreateFloorMesh();
+		CreateWaterMesh();
+		CreateWallMesh();
 
 		completed();
 
 		yield break;
 	}
 
-	private void GenerateFloorMesh(Tile[,] map)
+	private void GenerateTileMesh(Tile tile)
 	{
-		_floorVertices.Clear();
-		_floorTriangles.Clear();
-		for (var x = 0; x < map.GetLength(0) - 1; x++)
+		switch (tile.Type)
 		{
-			for (var y = 0; y < map.GetLength(1) - 1; y++)
-			{
-				if (map[x, y].Type == TileType.Floor)
+			case TileType.Floor:
+				CreateFloorTriangle(
+					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize),
+					tile.WorldCoordinates + (Vector3.right * Constants.TileSize));
+				CreateFloorTriangle(
+					tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
+					tile.WorldCoordinates,
+					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize));
+				break;
+			case TileType.Roof:
+				CreateRoofTriangle(
+					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize),
+					tile.WorldCoordinates + (Vector3.right * Constants.TileSize));
+				CreateRoofTriangle(
+					tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
+					tile.WorldCoordinates,
+					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize));
+				break;
+			case TileType.Water:
+				CreateWaterTriangle(
+					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize),
+					tile.WorldCoordinates + (Vector3.right * Constants.TileSize));
+				CreateWaterTriangle(
+					tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
+					tile.WorldCoordinates,
+					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize));
+				break;
+			default:
+				break;
+		}
+	}
+	private void GenerateWalls(Tile tile)
+	{
+		switch (tile.Type)
+		{
+			case TileType.Floor:
+				if (tile.LeftNeighbour != null && tile.LeftNeighbour.Type == TileType.Water)
 				{
-					TriangulateFloor(map[x, y]);
+					CreateWallTriangle(
+						tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+						tile.WorldCoordinates,
+						tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize));
+					CreateWallTriangle(
+						tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize),
+						tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
+						tile.WorldCoordinates + (Vector3.forward * Constants.TileSize));
 				}
-			}
-		}
 
-		CreateFloorMesh();
-	}
-	private void TriangulateFloor(Tile tile)
-	{
-		var square = tile.ConfigurationSquare;
-		switch (square.Configuration)
-		{
-			// 0 points
-			case 0:
+				if (tile.TopNeighbour != null && tile.TopNeighbour.Type == TileType.Water)
+				{
+					CreateWallTriangle(
+						tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
+						tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+						tile.TopNeighbour.WorldCoordinates);
+					CreateWallTriangle(
+						tile.TopNeighbour.WorldCoordinates,
+						tile.TopNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize),
+						tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize));
+				}
+
+				if (tile.RightNeighbour != null && tile.RightNeighbour.Type == TileType.Water)
+				{
+					CreateWallTriangle(
+						tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
+						tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
+						tile.RightNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize));
+					CreateWallTriangle(
+						tile.RightNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+						tile.RightNeighbour.WorldCoordinates,
+						tile.WorldCoordinates + (Vector3.right * Constants.TileSize));
+				}
+
+				if (tile.BottomNeighbour != null && tile.BottomNeighbour.Type == TileType.Water)
+				{
+					CreateWallTriangle(
+						tile.WorldCoordinates,
+						tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
+						tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize));
+					CreateWallTriangle(
+						tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize),
+						tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+						tile.WorldCoordinates);
+				}
 				break;
+			case TileType.Roof:
+				if (tile.LeftNeighbour != null && tile.LeftNeighbour.Type != tile.Type)
+				{
+					CreateWallTriangle(
+						tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+						tile.WorldCoordinates,
+						tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize));
+					CreateWallTriangle(
+						tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize),
+						tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
+						tile.WorldCoordinates + (Vector3.forward * Constants.TileSize));
+				}
 
-			// 1 points
-			case 1:
-				BuildFloorTriangleFromPoints(tile.Type, square.BottomLeft, square.CenterLeft, square.CenterBottom);
+				if (tile.TopNeighbour != null && tile.TopNeighbour.Type != tile.Type)
+				{
+					CreateWallTriangle(
+						tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
+						tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+						tile.TopNeighbour.WorldCoordinates);
+					CreateWallTriangle(
+						tile.TopNeighbour.WorldCoordinates,
+						tile.TopNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize),
+						tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize));
+				}
+
+				if (tile.RightNeighbour != null && tile.RightNeighbour.Type != tile.Type)
+				{
+					CreateWallTriangle(
+						tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
+						tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
+						tile.RightNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize));
+					CreateWallTriangle(
+						tile.RightNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+						tile.RightNeighbour.WorldCoordinates,
+						tile.WorldCoordinates + (Vector3.right * Constants.TileSize));
+				}
+
+				if (tile.BottomNeighbour != null && tile.BottomNeighbour.Type != tile.Type)
+				{
+					CreateWallTriangle(
+						tile.WorldCoordinates,
+						tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
+						tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize));
+					CreateWallTriangle(
+						tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize),
+						tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+						tile.WorldCoordinates);
+				}
 				break;
-
-			case 2:
-				BuildFloorTriangleFromPoints(tile.Type, square.BottomRight, square.CenterBottom, square.CenterRight);
+			case TileType.Water:
 				break;
-
-			case 4:
-				BuildFloorTriangleFromPoints(tile.Type, square.TopRight, square.CenterRight, square.CenterTop);
+			default:
 				break;
-
-			case 8:
-				BuildFloorTriangleFromPoints(tile.Type, square.TopLeft, square.CenterTop, square.CenterLeft);
-				break;
-
-			// 2 points
-			case 3:
-				BuildFloorTriangleFromPoints(tile.Type, square.BottomLeft, square.CenterLeft, square.CenterRight, square.BottomRight);
-				break;
-
-			case 6:
-				BuildFloorTriangleFromPoints(tile.Type, square.BottomRight, square.CenterBottom, square.CenterTop, square.TopRight);
-				break;
-
-			case 12:
-				BuildFloorTriangleFromPoints(tile.Type, square.TopRight, square.CenterRight, square.CenterLeft, square.TopLeft);
-				break;
-
-			case 9:
-				BuildFloorTriangleFromPoints(tile.Type, square.TopLeft, square.CenterTop, square.CenterBottom, square.BottomLeft);
-				break;
-
-			case 5:
-				BuildFloorTriangleFromPoints(tile.Type, square.BottomLeft, square.CenterBottom, square.CenterRight, square.TopRight, square.CenterTop, square.CenterLeft);
-				break;
-
-			case 10:
-				BuildFloorTriangleFromPoints(tile.Type, square.BottomRight, square.CenterRight, square.CenterTop, square.TopLeft, square.CenterLeft, square.CenterBottom);
-				break;
-
-			// 3 points
-			case 11:
-				BuildFloorTriangleFromPoints(tile.Type, square.BottomLeft, square.TopLeft, square.CenterTop, square.CenterRight, square.BottomRight);
-				break;
-
-			case 7:
-				BuildFloorTriangleFromPoints(tile.Type, square.BottomRight, square.BottomLeft, square.CenterLeft, square.CenterTop, square.TopRight);
-				break;
-
-			case 14:
-				BuildFloorTriangleFromPoints(tile.Type, square.TopRight, square.BottomRight, square.CenterBottom, square.CenterLeft, square.TopLeft);
-				break;
-
-			case 13:
-				BuildFloorTriangleFromPoints(tile.Type, square.TopLeft, square.TopRight, square.CenterRight, square.CenterBottom, square.BottomLeft);
-				break;
-
-			// 4 points
-			case 15:
-				BuildFloorTriangleFromPoints(tile.Type, square.TopLeft, square.TopRight, square.BottomRight, square.BottomLeft);
-				break;
-		}
-	}
-	private void BuildFloorTriangleFromPoints(TileType type, params Node[] originalPoints)
-	{
-		var points = new Node[originalPoints.Length];
-		for (var i = 0; i < originalPoints.Length; i++)
-		{
-			points[i] = new Node(originalPoints[i].Position);
-			if (type == TileType.Water)
-			{
-				points[i].Position -= Vector3.up * WallHeight;
-			}
-			else if (type == TileType.Roof)
-			{
-				points[i].Position += Vector3.up * WallHeight;
-			}
-		}
-
-		if (points.Length == 3)
-		{
-			CreateFloorTriangle(points[0], points[1], points[2]);
-		}
-		if (points.Length == 4)
-		{
-			CreateFloorTriangle(points[0], points[1], points[2]);
-			CreateFloorTriangle(points[0], points[2], points[3]);
-		}
-		if (points.Length == 5)
-		{
-			CreateFloorTriangle(points[0], points[1], points[2]);
-			CreateFloorTriangle(points[0], points[2], points[3]);
-			CreateFloorTriangle(points[0], points[3], points[4]);
-		}
-		if (points.Length == 6)
-		{
-			CreateFloorTriangle(points[0], points[1], points[2]);
-			CreateFloorTriangle(points[0], points[2], points[3]);
-			CreateFloorTriangle(points[0], points[3], points[4]);
-			CreateFloorTriangle(points[0], points[4], points[5]);
 		}
 	}
-	private void CreateFloorTriangle(Node a, Node b, Node c)
+
+	private void CreateRoofTriangle(Vector3 a, Vector3 b, Vector3 c)
 	{
-		_floorVertices.Add(a.Position);
-		_floorVertices.Add(b.Position);
-		_floorVertices.Add(c.Position);
+		_roofVertices.Add(a);
+		_roofVertices.Add(b);
+		_roofVertices.Add(c);
+
+		_roofTriangles.Add(_roofVertices.Count - 3);
+		_roofTriangles.Add(_roofVertices.Count - 2);
+		_roofTriangles.Add(_roofVertices.Count - 1);
+	}
+	private void CreateRoofMesh()
+	{
+		var roofGameObject = new GameObject("Roof");
+		roofGameObject.layer = LayerMask.NameToLayer("Roof");
+
+		var meshRenderer = roofGameObject.GetOrAddComponent<MeshRenderer>();
+		meshRenderer.sharedMaterial = Resources.Load<Material>("RoofMaterial");
+
+		var mesh = new Mesh();
+		mesh.SetVertices(_roofVertices);
+		mesh.SetTriangles(_roofTriangles, 0);
+		mesh.RecalculateNormals();
+
+		var meshFilter = roofGameObject.GetOrAddComponent<MeshFilter>();
+		meshFilter.mesh = mesh;
+
+		var meshCollider = roofGameObject.GetOrAddComponent<MeshCollider>();
+		meshCollider.sharedMesh = mesh;
+	}
+
+	private void CreateFloorTriangle(Vector3 a, Vector3 b, Vector3 c)
+	{
+		_floorVertices.Add(a);
+		_floorVertices.Add(b);
+		_floorVertices.Add(c);
 
 		_floorTriangles.Add(_floorVertices.Count - 3);
 		_floorTriangles.Add(_floorVertices.Count - 2);
@@ -196,6 +256,7 @@ public class MeshGenerator : MonoBehaviour
 	private void CreateFloorMesh()
 	{
 		var floorGameObject = new GameObject("Floor");
+		//floorGameObject.transform.position -= Vector3.up * WallHeight * 1.0f;
 		floorGameObject.layer = LayerMask.NameToLayer("Ground");
 
 		var meshRenderer = floorGameObject.GetOrAddComponent<MeshRenderer>();
@@ -213,113 +274,11 @@ public class MeshGenerator : MonoBehaviour
 		meshCollider.sharedMesh = mesh;
 	}
 
-	private void GenerateWallMesh(Tile[,] map)
+	private void CreateWallTriangle(Vector3 a, Vector3 b, Vector3 c)
 	{
-		_wallVertices.Clear();
-		_wallTriangles.Clear();
-		for (var x = 0; x < map.GetLength(0) - 1; x++)
-		{
-			for (var y = 0; y < map.GetLength(1) - 1; y++)
-			{
-				var tile = map[x, y];
-				if (tile.ConfigurationSquare != null && tile.ConfigurationSquare.Configuration > 0 && tile.ConfigurationSquare.Configuration < 15)
-				{
-					TriangulateWall(map[x, y]);
-				}
-			}
-		}
-
-		CreateWallMesh();
-	}
-	private void TriangulateWall(Tile tile)
-	{
-		var square = tile.ConfigurationSquare;
-		if (square == null)
-		{
-			return;
-		}
-
-		switch (square.Configuration)
-		{
-			// 0 points
-			case 0:
-				break;
-
-			// 1 points
-			case 1:
-				tile.AddWallVertices(square.CenterBottom.Position, square.CenterLeft.Position);
-				break;
-
-			case 2:
-				tile.AddWallVertices(square.CenterRight.Position, square.CenterBottom.Position);
-				break;
-
-			case 4:
-				tile.AddWallVertices(square.CenterTop.Position, square.CenterRight.Position);
-				break;
-
-			case 8:
-				tile.AddWallVertices(square.CenterLeft.Position, square.CenterTop.Position);
-				break;
-
-			// 2 points
-			case 3:
-				tile.AddWallVertices(square.CenterRight.Position, square.CenterLeft.Position);
-				break;
-
-			case 6:
-				tile.AddWallVertices(square.CenterTop.Position, square.CenterBottom.Position);
-				break;
-
-			case 12:
-				tile.AddWallVertices(square.CenterLeft.Position, square.CenterRight.Position);
-				break;
-
-			case 9:
-				tile.AddWallVertices(square.CenterBottom.Position, square.CenterTop.Position);
-				break;
-
-			case 5:
-				tile.AddWallVertices(square.CenterRight.Position, square.CenterBottom.Position);
-				break;
-
-			case 10:
-				tile.AddWallVertices(square.CenterTop.Position, square.CenterRight.Position);
-				break;
-
-			// 3 points
-			case 11:
-				tile.AddWallVertices(square.CenterRight.Position, square.CenterTop.Position);
-				break;
-
-			case 7:
-				tile.AddWallVertices(square.CenterTop.Position, square.CenterLeft.Position);
-				break;
-
-			case 14:
-				tile.AddWallVertices(square.CenterLeft.Position, square.CenterBottom.Position);
-				break;
-
-			case 13:
-				tile.AddWallVertices(square.CenterBottom.Position, square.CenterRight.Position);
-				break;
-
-			// 4 points
-			case 15:
-				break;
-		}
-
-		_wallVertices.Add(tile.CoreVertices[0]);
-		_wallVertices.Add(tile.CoreVertices[1]);
-		_wallVertices.Add(tile.CoreVertices[1] + Vector3.up * WallHeight);
-
-		_wallTriangles.Add(_wallVertices.Count - 3);
-		_wallTriangles.Add(_wallVertices.Count - 2);
-		_wallTriangles.Add(_wallVertices.Count - 1);
-
-		_wallVertices.Add(tile.CoreVertices[1] + Vector3.up * WallHeight);
-		_wallVertices.Add(tile.CoreVertices[0] + Vector3.up * WallHeight);
-		_wallVertices.Add(tile.CoreVertices[0]);
+		_wallVertices.Add(a);
+		_wallVertices.Add(b);
+		_wallVertices.Add(c);
 
 		_wallTriangles.Add(_wallVertices.Count - 3);
 		_wallTriangles.Add(_wallVertices.Count - 2);
@@ -345,276 +304,11 @@ public class MeshGenerator : MonoBehaviour
 		meshCollider.sharedMesh = mesh;
 	}
 
-	private void GenerateRoofMesh(Tile[,] map)
+	private void CreateWaterTriangle(Vector3 a, Vector3 b, Vector3 c)
 	{
-		_roofVertices.Clear();
-		_roofTriangles.Clear();
-		for (var x = 0; x < map.GetLength(0) - 1; x++)
-		{
-			for (var y = 0; y < map.GetLength(1) - 1; y++)
-			{
-				//if (map[x, y].Type == TileType.Roof)
-				//{
-				TriangulateRoof(map[x, y]);
-				//}
-			}
-		}
-
-		CreateRoofMesh();
-	}
-	private void TriangulateRoof(Tile tile)
-	{
-		var square = tile.ConfigurationSquare;
-		var configuration = 15 - square.Configuration;
-		switch (configuration)
-		{
-			// 0 points
-			case 0:
-				break;
-
-			// 1 points
-			case 1:
-				BuildRoofTriangleFromPoints(square.BottomLeft, square.CenterLeft, square.CenterBottom);
-				break;
-
-			case 2:
-				BuildRoofTriangleFromPoints(square.BottomRight, square.CenterBottom, square.CenterRight);
-				break;
-
-			case 4:
-				BuildRoofTriangleFromPoints(square.TopRight, square.CenterRight, square.CenterTop);
-				break;
-
-			case 8:
-				BuildRoofTriangleFromPoints(square.TopLeft, square.CenterTop, square.CenterLeft);
-				break;
-
-			// 2 points
-			case 3:
-				BuildRoofTriangleFromPoints(square.BottomLeft, square.CenterLeft, square.CenterRight, square.BottomRight);
-				break;
-
-			case 6:
-				BuildRoofTriangleFromPoints(square.BottomRight, square.CenterBottom, square.CenterTop, square.TopRight);
-				break;
-
-			case 12:
-				BuildRoofTriangleFromPoints(square.TopRight, square.CenterRight, square.CenterLeft, square.TopLeft);
-				break;
-
-			case 9:
-				BuildRoofTriangleFromPoints(square.TopLeft, square.CenterTop, square.CenterBottom, square.BottomLeft);
-				break;
-
-			case 5:
-				BuildRoofTriangleFromPoints(square.BottomLeft, square.CenterBottom, square.CenterRight, square.TopRight, square.CenterTop, square.CenterLeft);
-				break;
-
-			case 10:
-				BuildRoofTriangleFromPoints(square.BottomRight, square.CenterRight, square.CenterTop, square.TopLeft, square.CenterLeft, square.CenterBottom);
-				break;
-
-			// 3 points
-			case 11:
-				BuildRoofTriangleFromPoints(square.BottomLeft, square.TopLeft, square.CenterTop, square.CenterRight, square.BottomRight);
-				break;
-
-			case 7:
-				BuildRoofTriangleFromPoints(square.BottomRight, square.BottomLeft, square.CenterLeft, square.CenterTop, square.TopRight);
-				break;
-
-			case 14:
-				BuildRoofTriangleFromPoints(square.TopRight, square.BottomRight, square.CenterBottom, square.CenterLeft, square.TopLeft);
-				break;
-
-			case 13:
-				BuildRoofTriangleFromPoints(square.TopLeft, square.TopRight, square.CenterRight, square.CenterBottom, square.BottomLeft);
-				break;
-
-			// 4 points
-			case 15:
-				BuildRoofTriangleFromPoints(square.TopLeft, square.TopRight, square.BottomRight, square.BottomLeft);
-				break;
-		}
-	}
-	private void BuildRoofTriangleFromPoints(params Node[] points)
-	{
-		if (points.Length == 3)
-		{
-			CreateRoofTriangle(points[0], points[1], points[2]);
-		}
-		if (points.Length == 4)
-		{
-			CreateRoofTriangle(points[0], points[1], points[2]);
-			CreateRoofTriangle(points[0], points[2], points[3]);
-		}
-		if (points.Length == 5)
-		{
-			CreateRoofTriangle(points[0], points[1], points[2]);
-			CreateRoofTriangle(points[0], points[2], points[3]);
-			CreateRoofTriangle(points[0], points[3], points[4]);
-		}
-		if (points.Length == 6)
-		{
-			CreateRoofTriangle(points[0], points[1], points[2]);
-			CreateRoofTriangle(points[0], points[2], points[3]);
-			CreateRoofTriangle(points[0], points[3], points[4]);
-			CreateRoofTriangle(points[0], points[4], points[5]);
-		}
-	}
-	private void CreateRoofTriangle(Node a, Node b, Node c)
-	{
-		_roofVertices.Add(a.Position);
-		_roofVertices.Add(b.Position);
-		_roofVertices.Add(c.Position);
-
-		_roofTriangles.Add(_roofVertices.Count - 3);
-		_roofTriangles.Add(_roofVertices.Count - 2);
-		_roofTriangles.Add(_roofVertices.Count - 1);
-	}
-	private void CreateRoofMesh()
-	{
-		var roofGameObject = new GameObject("Roof");
-		roofGameObject.transform.position += Vector3.up * WallHeight;
-		roofGameObject.layer = LayerMask.NameToLayer("Roof");
-
-		var meshRenderer = roofGameObject.GetOrAddComponent<MeshRenderer>();
-		meshRenderer.sharedMaterial = Resources.Load<Material>("RoofMaterial");
-
-		var mesh = new Mesh();
-		mesh.SetVertices(_roofVertices);
-		mesh.SetTriangles(_roofTriangles, 0);
-		mesh.RecalculateNormals();
-
-		var meshFilter = roofGameObject.GetOrAddComponent<MeshFilter>();
-		meshFilter.mesh = mesh;
-
-		var meshCollider = roofGameObject.GetOrAddComponent<MeshCollider>();
-		meshCollider.sharedMesh = mesh;
-	}
-
-	private void GenerateWaterMesh(Tile[,] map)
-	{
-		_waterVertices.Clear();
-		_waterTriangles.Clear();
-		for (var x = 0; x < map.GetLength(0) - 1; x++)
-		{
-			for (var y = 0; y < map.GetLength(1) - 1; y++)
-			{
-				if (map[x, y].Type == TileType.Water)
-				{
-					TriangulateWater(map[x, y]);
-				}
-			}
-		}
-
-		CreateWaterMesh();
-	}
-	private void TriangulateWater(Tile tile)
-	{
-		var square = tile.ConfigurationSquare;
-		var configuration = square.Configuration;
-		switch (configuration)
-		{
-			// 0 points
-			case 0:
-				break;
-
-			// 1 points
-			case 1:
-				BuildWaterTriangleFromPoints(square.BottomLeft, square.CenterLeft, square.CenterBottom);
-				break;
-
-			case 2:
-				BuildWaterTriangleFromPoints(square.BottomRight, square.CenterBottom, square.CenterRight);
-				break;
-
-			case 4:
-				BuildWaterTriangleFromPoints(square.TopRight, square.CenterRight, square.CenterTop);
-				break;
-
-			case 8:
-				BuildWaterTriangleFromPoints(square.TopLeft, square.CenterTop, square.CenterLeft);
-				break;
-
-			// 2 points
-			case 3:
-				BuildWaterTriangleFromPoints(square.BottomLeft, square.CenterLeft, square.CenterRight, square.BottomRight);
-				break;
-
-			case 6:
-				BuildWaterTriangleFromPoints(square.BottomRight, square.CenterBottom, square.CenterTop, square.TopRight);
-				break;
-
-			case 12:
-				BuildWaterTriangleFromPoints(square.TopRight, square.CenterRight, square.CenterLeft, square.TopLeft);
-				break;
-
-			case 9:
-				BuildWaterTriangleFromPoints(square.TopLeft, square.CenterTop, square.CenterBottom, square.BottomLeft);
-				break;
-
-			case 5:
-				BuildWaterTriangleFromPoints(square.BottomLeft, square.CenterBottom, square.CenterRight, square.TopRight, square.CenterTop, square.CenterLeft);
-				break;
-
-			case 10:
-				BuildWaterTriangleFromPoints(square.BottomRight, square.CenterRight, square.CenterTop, square.TopLeft, square.CenterLeft, square.CenterBottom);
-				break;
-
-			// 3 points
-			case 11:
-				BuildWaterTriangleFromPoints(square.BottomLeft, square.TopLeft, square.CenterTop, square.CenterRight, square.BottomRight);
-				break;
-
-			case 7:
-				BuildWaterTriangleFromPoints(square.BottomRight, square.BottomLeft, square.CenterLeft, square.CenterTop, square.TopRight);
-				break;
-
-			case 14:
-				BuildWaterTriangleFromPoints(square.TopRight, square.BottomRight, square.CenterBottom, square.CenterLeft, square.TopLeft);
-				break;
-
-			case 13:
-				BuildWaterTriangleFromPoints(square.TopLeft, square.TopRight, square.CenterRight, square.CenterBottom, square.BottomLeft);
-				break;
-
-			// 4 points
-			case 15:
-				BuildWaterTriangleFromPoints(square.TopLeft, square.TopRight, square.BottomRight, square.BottomLeft);
-				break;
-		}
-	}
-	private void BuildWaterTriangleFromPoints(params Node[] points)
-	{
-		if (points.Length == 3)
-		{
-			CreateWaterTriangle(points[0], points[1], points[2]);
-		}
-		if (points.Length == 4)
-		{
-			CreateWaterTriangle(points[0], points[1], points[2]);
-			CreateWaterTriangle(points[0], points[2], points[3]);
-		}
-		if (points.Length == 5)
-		{
-			CreateWaterTriangle(points[0], points[1], points[2]);
-			CreateWaterTriangle(points[0], points[2], points[3]);
-			CreateWaterTriangle(points[0], points[3], points[4]);
-		}
-		if (points.Length == 6)
-		{
-			CreateWaterTriangle(points[0], points[1], points[2]);
-			CreateWaterTriangle(points[0], points[2], points[3]);
-			CreateWaterTriangle(points[0], points[3], points[4]);
-			CreateWaterTriangle(points[0], points[4], points[5]);
-		}
-	}
-	private void CreateWaterTriangle(Node a, Node b, Node c)
-	{
-		_waterVertices.Add(a.Position);
-		_waterVertices.Add(b.Position);
-		_waterVertices.Add(c.Position);
+		_waterVertices.Add(a);
+		_waterVertices.Add(b);
+		_waterVertices.Add(c);
 
 		_waterTriangles.Add(_waterVertices.Count - 3);
 		_waterTriangles.Add(_waterVertices.Count - 2);
@@ -623,7 +317,7 @@ public class MeshGenerator : MonoBehaviour
 	private void CreateWaterMesh()
 	{
 		var waterGameObject = new GameObject("Water");
-		waterGameObject.transform.position -= Vector3.up * WallHeight;
+		//waterGameObject.transform.position -= Vector3.up * WallHeight * 2.0f;
 		waterGameObject.layer = LayerMask.NameToLayer("Water");
 
 		var meshRenderer = waterGameObject.GetOrAddComponent<MeshRenderer>();

@@ -11,7 +11,6 @@ public class PathFinder : MonoBehaviour
 
 	private PathfindingNode[,] _nodes;
 	private List<PathfindingNode> _walkableNodes;
-	private int _tileSize;
 
 	private void Awake()
 	{
@@ -51,7 +50,6 @@ public class PathFinder : MonoBehaviour
 	}
 	private IEnumerator CreatePathNodes(Tile[,] map, Action completed)
 	{
-		_tileSize = 3;
 		CreateNodes(map);
 		GetNeighbours();
 
@@ -70,60 +68,63 @@ public class PathFinder : MonoBehaviour
 				var xIndex = x * 2;
 				var yIndex = y * 2;
 				var tile = tiles[x, y];
-				var topLeftWalkable = false;
-				var topRightWalkable = false;
-				var bottomRightWalkable = false;
-				var bottomLeftWalkable = false;
+				//var topLeftWalkable = false;
+				//var topRightWalkable = false;
+				//var bottomRightWalkable = false;
+				//var bottomLeftWalkable = false;
 
-				if (tile.ConfigurationSquare != null)
+				//if (tile.ConfigurationSquare != null)
+				//{
+				//	switch (tile.ConfigurationSquare.Configuration)
+				//	{
+				//		case 13:
+				//			topLeftWalkable = true;
+				//			break;
+
+				//		case 11:
+				//			bottomLeftWalkable = true;
+				//			break;
+
+				//		case 7:
+				//			bottomRightWalkable = true;
+				//			break;
+
+				//		case 14:
+				//			topRightWalkable = true;
+				//			break;
+
+				//		case 15:
+				//			topLeftWalkable = true;
+				//			topRightWalkable = true;
+				//			bottomRightWalkable = true;
+				//			bottomLeftWalkable = true;
+				//			break;
+				//	}
+				//}
+
+				var topLeftNode = new PathfindingNode(xIndex, yIndex + 1);
+				var topRightNode = new PathfindingNode(xIndex + 1, yIndex + 1);
+				var bottomRightNode = new PathfindingNode(xIndex + 1, yIndex);
+				var bottomLeftNode = new PathfindingNode(xIndex, yIndex);
+
+				_nodes[xIndex, yIndex + 1] = topLeftNode;
+				_nodes[xIndex + 1, yIndex + 1] = topRightNode;
+				_nodes[xIndex + 1, yIndex] = bottomRightNode;
+				_nodes[xIndex, yIndex] = bottomLeftNode;
+
+				if (tile.Type == TileType.Floor)
 				{
-					switch (tile.ConfigurationSquare.Configuration)
-					{
-						case 13:
-							topLeftWalkable = true;
-							break;
+					topLeftNode.Walkable = tile.Type == TileType.Floor;
+					_walkableNodes.Add(topLeftNode);
 
-						case 11:
-							bottomLeftWalkable = true;
-							break;
+					topRightNode.Walkable = tile.Type == TileType.Floor;
+					_walkableNodes.Add(topRightNode);
 
-						case 7:
-							bottomRightWalkable = true;
-							break;
+					bottomRightNode.Walkable = tile.Type == TileType.Floor;
+					_walkableNodes.Add(bottomRightNode);
 
-						case 14:
-							topRightWalkable = true;
-							break;
-
-						case 15:
-							topLeftWalkable = true;
-							topRightWalkable = true;
-							bottomRightWalkable = true;
-							bottomLeftWalkable = true;
-							break;
-					}
-				}
-
-				_nodes[xIndex, yIndex + 1] = new PathfindingNode(xIndex, yIndex + 1, topLeftWalkable, _tileSize);
-				_nodes[xIndex + 1, yIndex + 1] = new PathfindingNode(xIndex + 1, yIndex + 1, topRightWalkable, _tileSize);
-				_nodes[xIndex + 1, yIndex] = new PathfindingNode(xIndex + 1, yIndex, bottomRightWalkable, _tileSize);
-				_nodes[xIndex, yIndex] = new PathfindingNode(xIndex, yIndex, bottomLeftWalkable, _tileSize);
-
-				if (topLeftWalkable)
-				{
-					_walkableNodes.Add(_nodes[xIndex, yIndex + 1]);
-				}
-				if (topRightWalkable)
-				{
-					_walkableNodes.Add(_nodes[xIndex + 1, yIndex + 1]);
-				}
-				if (bottomRightWalkable)
-				{
-					_walkableNodes.Add(_nodes[xIndex + 1, yIndex]);
-				}
-				if (bottomLeftWalkable)
-				{
-					_walkableNodes.Add(_nodes[xIndex, yIndex]);
+					bottomLeftNode.Walkable = tile.Type == TileType.Floor;
+					_walkableNodes.Add(bottomLeftNode);
 				}
 			}
 		}
@@ -270,7 +271,7 @@ public class PathFinder : MonoBehaviour
 	}
 	public PathfindingNode GetNode(Vector3 worldPosition, bool copy)
 	{
-		worldPosition /= _tileSize;
+		worldPosition /= Constants.TileSize;
 		var fromXFraction = worldPosition.x - (int)worldPosition.x;
 		var fromXNodeIndex = Mathf.RoundToInt((int)worldPosition.x * 2 + fromXFraction);
 		var fromYFraction = worldPosition.z - (int)worldPosition.z;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class MapGenerator : MonoBehaviour
@@ -16,8 +15,6 @@ public class MapGenerator : MonoBehaviour
 	private int Width = 64;
 	[SerializeField]
 	private int Height = 64;
-	[SerializeField]
-	private int TileSize = 1;
 	[SerializeField]
 	[Range(45, 55)]
 	private int RoomFillPercentage = 50;
@@ -65,16 +62,6 @@ public class MapGenerator : MonoBehaviour
 		{
 			return;
 		}
-
-		//for (var x = 0; x < _map.GetLength(0); x++)
-		//{
-		//	for (var y = 0; y < _map.GetLength(1); y++)
-		//	{
-		//		var tile = _map[x, y];
-		//		Gizmos.color = tile.Type == TileType.Floor ? Color.green : tile.Type == TileType.Wall ? Color.red : tile.Type == TileType.Roof ? Color.blue : Color.cyan;
-		//		Gizmos.DrawCube(tile.WorldCoordinates + (Vector3.one * TileSize * 0.5f) + (Vector3.up * 5.0f), Vector3.one * 0.5f);
-		//	}
-		//}
 	}
 
 	private void OnCreateGameEvent(CreateGameEvent createGameEvent)
@@ -105,7 +92,7 @@ public class MapGenerator : MonoBehaviour
 		FilterWalls();
 		FilterRooms();
 		ConnectClosestRooms();
-		//CreateWater();
+		CreateWater();
 		ConfigureTiles();
 		RegisterWalkableTiles();
 
@@ -127,12 +114,12 @@ public class MapGenerator : MonoBehaviour
 			{
 				if (x == 0 || x == Width - 1 || y == 0 || y == Height - 1)
 				{
-					_map[x, y] = new Tile(x, y, TileType.Roof, TileSize);
+					_map[x, y] = new Tile(x, y, TileType.Roof);
 				}
 				else
 				{
 					var tileType = rng.Next(0, 100) < RoomFillPercentage ? TileType.Floor : TileType.Roof;
-					_map[x, y] = new Tile(x, y, tileType, TileSize);
+					_map[x, y] = new Tile(x, y, tileType);
 				}
 			}
 		}
@@ -350,37 +337,26 @@ public class MapGenerator : MonoBehaviour
 	}
 	private void ConfigureTiles()
 	{
-		var controlNodes = new ControlNode[Width, Height];
-		for (var x = 0; x < Width; x++)
+		var mapWidth = _map.GetLength(0) - 1;
+		var mapHeight = _map.GetLength(1) - 1;
+
+		for (int x = 0; x < mapWidth; x++)
 		{
-			for (var y = 0; y < Height; y++)
+			for (int y = 0; y < mapHeight; y++)
 			{
 				var tile = _map[x, y];
-				var position = tile.WorldCoordinates.WithY(0);
+				var leftNighbourIndex = x - 1;
+				var topNighbourIndex = y + 1;
+				var rightNighbourIndex = x + 1;
+				var bottomNighbourIndex = y - 1;
 
-				if (RandomizeVertexPositionsX)
-				{
-					position += Vector3.right * UnityEngine.Random.Range(-(TileSize * VertexOffsetX), TileSize * VertexOffsetX);
-				}
-				if (RandomizeVertexPositionsY)
-				{
-					position += Vector3.up * UnityEngine.Random.Range(-(TileSize * VertexOffsetY), TileSize * VertexOffsetY);
-				}
-				if (RandomizeVertexPositionsZ)
-				{
-					position += Vector3.forward * UnityEngine.Random.Range(-(TileSize * VertexOffsetZ), TileSize * VertexOffsetZ);
-				}
+				tile.LeftNeighbour = leftNighbourIndex >= 0 ? _map[leftNighbourIndex, y] : null;
+				tile.TopNeighbour = topNighbourIndex <= mapHeight ? _map[x, topNighbourIndex] : null;
+				tile.RightNeighbour = rightNighbourIndex <= mapWidth ? _map[rightNighbourIndex, y] : null;
+				tile.BottomNeighbour = bottomNighbourIndex >= 0 ? _map[x, bottomNighbourIndex] : null;
 
-				controlNodes[x, y] = new ControlNode(position, tile.Type == TileType.Floor, TileSize);
-			}
-		}
-
-		for (var x = 0; x < Width - 1; x++)
-		{
-			for (var y = 0; y < Height - 1; y++)
-			{
-				var tile = _map[x, y];
-				tile.SetConfiguration(controlNodes[x, y + 1], controlNodes[x + 1, y + 1], controlNodes[x + 1, y], controlNodes[x, y]);
+				var typeOffset = tile.Type == TileType.Floor ? -Vector3.up * 2 : tile.Type == TileType.Water ? -Vector3.up * 4 : Vector3.zero;
+				tile.WorldCoordinates += typeOffset;
 			}
 		}
 	}
@@ -454,7 +430,7 @@ public class MapGenerator : MonoBehaviour
 		var tileType = _map[startX, startY].Type;
 		var queue = new Queue<Tile>();
 
-		queue.Enqueue(new Tile(startX, startY, tileType, TileSize));
+		queue.Enqueue(new Tile(startX, startY, tileType));
 		mapFlags[startX, startY] = true;
 
 		while (queue.Count > 0)
@@ -540,9 +516,5 @@ public class MapGenerator : MonoBehaviour
 	public Tile GetRandomWalkableTile()
 	{
 		return _walkableTiles.GetRandomElement();
-	}
-	public int GetTileSize()
-	{
-		return TileSize;
 	}
 }

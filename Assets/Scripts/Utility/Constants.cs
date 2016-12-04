@@ -1,5 +1,8 @@
 ﻿public class Constants
 {
+	public const int WallHeight = 4;
+	public const int TileSize = 3;
+
 	// -------- PATHFINDING DATA -------- //
 	public const int HorizontalTileWeight = 10;
 	public const int DiagonalTileWeight = 14;

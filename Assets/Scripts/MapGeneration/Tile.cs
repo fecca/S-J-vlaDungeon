@@ -8,11 +8,15 @@ public class Tile
 	public Vector3 WorldCoordinates;
 	public ConfigurationSquare ConfigurationSquare;
 	public List<Vector3> CoreVertices = new List<Vector3>(4);
+	public Tile LeftNeighbour;
+	public Tile TopNeighbour;
+	public Tile RightNeighbour;
+	public Tile BottomNeighbour;
 
-	public Tile(int x, int y, TileType type, int tileSize)
+	public Tile(int x, int y, TileType type)
 	{
 		GridCoordinates = new Coordinates(x, y);
-		WorldCoordinates = new Vector3(x * tileSize, 0, y * tileSize);
+		WorldCoordinates = new Vector3(x * Constants.TileSize, 0, y * Constants.TileSize);
 		Type = type;
 	}
 

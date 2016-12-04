@@ -8,7 +8,7 @@
 	public Node CenterRight;
 	public Node CenterBottom;
 	public Node CenterLeft;
-	public int Configuration;
+	public int Configuration = 15;
 
 	public ConfigurationSquare(ControlNode topLeft, ControlNode topRight, ControlNode bottomRight, ControlNode bottomLeft)
 	{
@@ -27,21 +27,21 @@
 
 	private void ConfigureSquare()
 	{
-		if (BottomLeft.Active)
-		{
-			Configuration += 1;
-		}
-		if (BottomRight.Active)
-		{
-			Configuration += 2;
-		}
-		if (TopRight.Active)
-		{
-			Configuration += 4;
-		}
-		if (TopLeft.Active)
-		{
-			Configuration += 8;
-		}
+		//if (BottomLeft.Active)
+		//{
+		//	Configuration += 1;
+		//}
+		//if (BottomRight.Active)
+		//{
+		//	Configuration += 2;
+		//}
+		//if (TopRight.Active)
+		//{
+		//	Configuration += 4;
+		//}
+		//if (TopLeft.Active)
+		//{
+		//	Configuration += 8;
+		//}
 	}
 }
