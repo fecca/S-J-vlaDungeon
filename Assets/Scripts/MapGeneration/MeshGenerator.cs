@@ -33,8 +33,9 @@ public class MeshGenerator : MonoBehaviour
 	private void OnPathNodesDestroyedEvent(PathNodesDestroyedEvent pathNodesDestroyedEvent)
 	{
 		Destroy(GameObject.Find("Floor"));
-		Destroy(GameObject.Find("Walls"));
+		//Destroy(GameObject.Find("Walls"));
 		Destroy(GameObject.Find("Roof"));
+		Destroy(GameObject.Find("Water"));
 
 		MessageHub.Instance.Publish(new MeshDestroyedEvent(null));
 	}
@@ -59,7 +60,7 @@ public class MeshGenerator : MonoBehaviour
 		CreateRoofMesh();
 		CreateFloorMesh();
 		CreateWaterMesh();
-		CreateWallMesh();
+		//CreateWallMesh();
 
 		completed();
 
@@ -72,258 +73,258 @@ public class MeshGenerator : MonoBehaviour
 		var topLeft = tile.WorldCoordinates + (Vector3.forward * Constants.TileSize);
 		var topRight = tile.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize);
 		var bottomRight = tile.WorldCoordinates + (Vector3.right * Constants.TileSize);
-		if (tile.TopNeighbour != null)
-		{
-			//if (tile.TopNeighbour.Type == tile.Type)
-			//{
-			topLeft = tile.TopNeighbour.WorldCoordinates;
-			//}
-			//else
-			//{
-			//	if (tile.Type == TileType.Floor)
-			//	{
-			//		if (tile.TopNeighbour.Type == TileType.Water)
-			//		{
-			//			topLeft = tile.TopNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight;
-			//		}
-			//		else
-			//		{
-			//			topLeft = tile.TopNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight;
-			//		}
-			//	}
-			//	if (tile.Type == TileType.Roof)
-			//	{
-			//		if (tile.TopNeighbour.Type == TileType.Water)
-			//		{
-			//			topLeft = tile.TopNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight * 2;
-			//		}
-			//		else
-			//		{
-			//			topLeft = tile.TopNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight;
-			//		}
-			//	}
-			//	if (tile.Type == TileType.Water)
-			//	{
-			//		if (tile.TopNeighbour.Type == TileType.Floor)
-			//		{
-			//			topLeft = tile.TopNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight;
-			//		}
-			//		else
-			//		{
-			//			topLeft = tile.TopNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight * 2;
-			//		}
-			//	}
-			//}
-		}
-		if (tile.TopRightNeighbour != null)
-		{
-			//if (tile.TopRightNeighbour.Type == tile.Type)
-			//{
-			topRight = tile.TopRightNeighbour.WorldCoordinates;
-			//}
-			//else
-			//{
-			//	if (tile.Type == TileType.Floor)
-			//	{
-			//		if (tile.TopRightNeighbour.Type == TileType.Water)
-			//		{
-			//			topRight = tile.TopRightNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight;
-			//		}
-			//		else
-			//		{
-			//			topRight = tile.TopRightNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight;
-			//		}
-			//	}
-			//	if (tile.Type == TileType.Roof)
-			//	{
-			//		if (tile.TopRightNeighbour.Type == TileType.Water)
-			//		{
-			//			topRight = tile.TopRightNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight * 2;
-			//		}
-			//		else
-			//		{
-			//			topRight = tile.TopRightNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight;
-			//		}
-			//	}
-			//	if (tile.Type == TileType.Water)
-			//	{
-			//		if (tile.TopRightNeighbour.Type == TileType.Floor)
-			//		{
-			//			topRight = tile.TopRightNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight;
-			//		}
-			//		else
-			//		{
-			//			topRight = tile.TopRightNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight * 2;
-			//		}
-			//	}
-			//}
-		}
-		if (tile.RightNeighbour != null)
-		{
-			//if (tile.RightNeighbour.Type == tile.Type)
-			//{
-			bottomRight = tile.RightNeighbour.WorldCoordinates;
-			//}
-			//else
-			//{
-			//	if (tile.Type == TileType.Floor)
-			//	{
-			//		if (tile.RightNeighbour.Type == TileType.Water)
-			//		{
-			//			bottomRight = tile.RightNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight;
-			//		}
-			//		else
-			//		{
-			//			bottomRight = tile.RightNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight;
-			//		}
-			//	}
-			//	if (tile.Type == TileType.Roof)
-			//	{
-			//		if (tile.RightNeighbour.Type == TileType.Water)
-			//		{
-			//			bottomRight = tile.RightNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight * 2;
-			//		}
-			//		else
-			//		{
-			//			bottomRight = tile.RightNeighbour.WorldCoordinates + Vector3.up * Constants.WallHeight;
-			//		}
-			//	}
-			//	if (tile.Type == TileType.Water)
-			//	{
-			//		if (tile.RightNeighbour.Type == TileType.Floor)
-			//		{
-			//			bottomRight = tile.RightNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight;
-			//		}
-			//		else
-			//		{
-			//			bottomRight = tile.RightNeighbour.WorldCoordinates - Vector3.up * Constants.WallHeight * 2;
-			//		}
-			//	}
-			//}
-		}
 
-		CreateTriangle(tile.Type,
-			bottomLeft,
-			topLeft,
-			topRight);
-		CreateTriangle(tile.Type,
-			topRight,
-			bottomRight,
-			bottomLeft);
-	}
-	private void GenerateWalls(Tile tile)
-	{
+		var topLeftTile = tile.TileNeighbours.TopLeft;
+		var topTile = tile.TileNeighbours.Top;
+		var topRightTile = tile.TileNeighbours.TopRight;
+		var rightTile = tile.TileNeighbours.Right;
+		var bottomRightTile = tile.TileNeighbours.BottomRight;
+		var bottomTile = tile.TileNeighbours.Bottom;
+		var bottomLeftTile = tile.TileNeighbours.BottomLeft;
+		var leftTile = tile.TileNeighbours.Left;
+
 		switch (tile.Type)
 		{
-			case TileType.Floor:
-				if (tile.LeftNeighbour != null && tile.LeftNeighbour.Type == TileType.Water)
-				{
-					var bottomLeft = tile.LeftNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize);
-					var topLeft = tile.WorldCoordinates + (Vector3.forward * Constants.TileSize);
-					var topRight = tile.WorldCoordinates;
-					var bottomRight = tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize);
-
-					CreateWallTriangle(
-						bottomLeft,
-						topLeft,
-						topRight);
-					CreateWallTriangle(
-						topRight,
-						bottomRight,
-						bottomLeft);
-				}
-
-				if (tile.TopNeighbour != null && tile.TopNeighbour.Type == TileType.Water)
-				{
-					CreateWallTriangle(
-						tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
-						tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
-						tile.TopNeighbour.WorldCoordinates);
-					CreateWallTriangle(
-						tile.TopNeighbour.WorldCoordinates,
-						tile.TopNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize),
-						tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize));
-				}
-
-				if (tile.RightNeighbour != null && tile.RightNeighbour.Type == TileType.Water)
-				{
-					CreateWallTriangle(
-						tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
-						tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
-						tile.RightNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize));
-					CreateWallTriangle(
-						tile.RightNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize),
-						tile.RightNeighbour.WorldCoordinates,
-						tile.WorldCoordinates + (Vector3.right * Constants.TileSize));
-				}
-
-				if (tile.BottomNeighbour != null && tile.BottomNeighbour.Type == TileType.Water)
-				{
-					CreateWallTriangle(
-						tile.WorldCoordinates,
-						tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
-						tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize));
-					CreateWallTriangle(
-						tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize),
-						tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize),
-						tile.WorldCoordinates);
-				}
-				break;
 			case TileType.Roof:
-				if (tile.LeftNeighbour != null && tile.LeftNeighbour.Type != tile.Type)
+				if (topTile != null)
 				{
-					CreateWallTriangle(
-						tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
-						tile.WorldCoordinates,
-						tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize));
-					CreateWallTriangle(
-						tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize),
-						tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
-						tile.WorldCoordinates + (Vector3.forward * Constants.TileSize));
+					topLeft = topTile.WorldCoordinates;
+				}
+				if (topRightTile != null)
+				{
+					topRight = topRightTile.WorldCoordinates;
+				}
+				if (rightTile != null)
+				{
+					bottomRight = rightTile.WorldCoordinates;
 				}
 
-				if (tile.TopNeighbour != null && tile.TopNeighbour.Type != tile.Type)
-				{
-					CreateWallTriangle(
-						tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
-						tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
-						tile.TopNeighbour.WorldCoordinates);
-					CreateWallTriangle(
-						tile.TopNeighbour.WorldCoordinates,
-						tile.TopNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize),
-						tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize));
-				}
+				CreateTriangle(tile.Type, bottomLeft, topLeft, topRight);
+				CreateTriangle(tile.Type, topRight, bottomRight, bottomLeft);
 
-				if (tile.RightNeighbour != null && tile.RightNeighbour.Type != tile.Type)
-				{
-					CreateWallTriangle(
-						tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
-						tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
-						tile.RightNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize));
-					CreateWallTriangle(
-						tile.RightNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize),
-						tile.RightNeighbour.WorldCoordinates,
-						tile.WorldCoordinates + (Vector3.right * Constants.TileSize));
-				}
-
-				if (tile.BottomNeighbour != null && tile.BottomNeighbour.Type != tile.Type)
-				{
-					CreateWallTriangle(
-						tile.WorldCoordinates,
-						tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
-						tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize));
-					CreateWallTriangle(
-						tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize),
-						tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize),
-						tile.WorldCoordinates);
-				}
 				break;
+
+			case TileType.Floor:
+				if (topTile != null)
+				{
+					topLeft = topTile.WorldCoordinates;
+				}
+				if (topRightTile != null)
+				{
+					topRight = topRightTile.WorldCoordinates;
+				}
+				if (rightTile != null)
+				{
+					bottomRight = rightTile.WorldCoordinates;
+				}
+
+				if (topTile.Type == TileType.Roof || topRightTile.Type == TileType.Roof || rightTile.Type == TileType.Roof)
+				{
+					tile.Type = TileType.Roof;
+				}
+
+				var topFloorTriangleType = tile.Type;
+				if (tile.WorldCoordinates.y < 1.0f && tile.WorldCoordinates.y > -1.0f)
+				{
+					if (topLeft.y < 1.0f && topLeft.y > -1.0f)
+					{
+						if (topRight.y < 1.0f && topRight.y > -1.0f)
+						{
+							topFloorTriangleType = TileType.Floor;
+						}
+					}
+				}
+
+				var bottomFloorTriangleType = tile.Type;
+				if (tile.WorldCoordinates.y < 1.0f && tile.WorldCoordinates.y > -1.0f)
+				{
+					if (bottomRight.y < 1.0f && bottomRight.y > -1.0f)
+					{
+						if (topRight.y < 1.0f && topRight.y > -1.0f)
+						{
+							bottomFloorTriangleType = TileType.Floor;
+						}
+					}
+				}
+
+				CreateTriangle(topFloorTriangleType, bottomLeft, topLeft, topRight);
+				CreateTriangle(bottomFloorTriangleType, topRight, bottomRight, bottomLeft);
+
+				break;
+
 			case TileType.Water:
+				if (topTile != null)
+				{
+					topLeft = topTile.WorldCoordinates;
+				}
+				if (topRightTile != null)
+				{
+					topRight = topRightTile.WorldCoordinates;
+				}
+				if (rightTile != null)
+				{
+					bottomRight = rightTile.WorldCoordinates;
+				}
+
+				if (topTile.Type != tile.Type)
+				{
+					tile.Type = topTile.Type;
+				}
+				else if (topRightTile.Type != tile.Type)
+				{
+					tile.Type = topRightTile.Type;
+				}
+				else if (rightTile.Type != tile.Type)
+				{
+					tile.Type = rightTile.Type;
+				}
+
+				var topWaterTriangleType = tile.Type;
+				if (tile.WorldCoordinates.y < -1.0f && tile.WorldCoordinates.y > -3.0f)
+				{
+					if (topLeft.y < -1.0f && topLeft.y > -3.0f)
+					{
+						if (topRight.y < -1.0f && topRight.y > -3.0f)
+						{
+							topWaterTriangleType = TileType.Water;
+						}
+					}
+				}
+
+				var bottomWaterTriangleType = tile.Type;
+				if (tile.WorldCoordinates.y < -1.0f && tile.WorldCoordinates.y > -3.0f)
+				{
+					if (bottomRight.y < -1.0f && bottomRight.y > -3.0f)
+					{
+						if (topRight.y < -1.0f && topRight.y > -3.0f)
+						{
+							bottomWaterTriangleType = TileType.Water;
+						}
+					}
+				}
+
+				CreateTriangle(topWaterTriangleType, bottomLeft, topLeft, topRight);
+				CreateTriangle(bottomWaterTriangleType, topRight, bottomRight, bottomLeft);
+
 				break;
+
 			default:
 				break;
 		}
 	}
+	//private void GenerateWalls(Tile tile)
+	//{
+	//	switch (tile.Type)
+	//	{
+	//		case TileType.Floor:
+	//			if (tile.LeftNeighbour != null && tile.LeftNeighbour.Type == TileType.Water)
+	//			{
+	//				var bottomLeft = tile.LeftNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize);
+	//				var topLeft = tile.WorldCoordinates + (Vector3.forward * Constants.TileSize);
+	//				var topRight = tile.WorldCoordinates;
+	//				var bottomRight = tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize);
+
+	//				CreateWallTriangle(
+	//					bottomLeft,
+	//					topLeft,
+	//					topRight);
+	//				CreateWallTriangle(
+	//					topRight,
+	//					bottomRight,
+	//					bottomLeft);
+	//			}
+
+	//			if (tile.TopNeighbour != null && tile.TopNeighbour.Type == TileType.Water)
+	//			{
+	//				CreateWallTriangle(
+	//					tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
+	//					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+	//					tile.TopNeighbour.WorldCoordinates);
+	//				CreateWallTriangle(
+	//					tile.TopNeighbour.WorldCoordinates,
+	//					tile.TopNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize),
+	//					tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize));
+	//			}
+
+	//			if (tile.RightNeighbour != null && tile.RightNeighbour.Type == TileType.Water)
+	//			{
+	//				CreateWallTriangle(
+	//					tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
+	//					tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
+	//					tile.RightNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize));
+	//				CreateWallTriangle(
+	//					tile.RightNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+	//					tile.RightNeighbour.WorldCoordinates,
+	//					tile.WorldCoordinates + (Vector3.right * Constants.TileSize));
+	//			}
+
+	//			if (tile.BottomNeighbour != null && tile.BottomNeighbour.Type == TileType.Water)
+	//			{
+	//				CreateWallTriangle(
+	//					tile.WorldCoordinates,
+	//					tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
+	//					tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize));
+	//				CreateWallTriangle(
+	//					tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize),
+	//					tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+	//					tile.WorldCoordinates);
+	//			}
+	//			break;
+	//		case TileType.Roof:
+	//			if (tile.LeftNeighbour != null && tile.LeftNeighbour.Type != tile.Type)
+	//			{
+	//				CreateWallTriangle(
+	//					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+	//					tile.WorldCoordinates,
+	//					tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize));
+	//				CreateWallTriangle(
+	//					tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize),
+	//					tile.LeftNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
+	//					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize));
+	//			}
+
+	//			if (tile.TopNeighbour != null && tile.TopNeighbour.Type != tile.Type)
+	//			{
+	//				CreateWallTriangle(
+	//					tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
+	//					tile.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+	//					tile.TopNeighbour.WorldCoordinates);
+	//				CreateWallTriangle(
+	//					tile.TopNeighbour.WorldCoordinates,
+	//					tile.TopNeighbour.WorldCoordinates + (Vector3.right * Constants.TileSize),
+	//					tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize));
+	//			}
+
+	//			if (tile.RightNeighbour != null && tile.RightNeighbour.Type != tile.Type)
+	//			{
+	//				CreateWallTriangle(
+	//					tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
+	//					tile.WorldCoordinates + (Vector3.right * Constants.TileSize) + (Vector3.forward * Constants.TileSize),
+	//					tile.RightNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize));
+	//				CreateWallTriangle(
+	//					tile.RightNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+	//					tile.RightNeighbour.WorldCoordinates,
+	//					tile.WorldCoordinates + (Vector3.right * Constants.TileSize));
+	//			}
+
+	//			if (tile.BottomNeighbour != null && tile.BottomNeighbour.Type != tile.Type)
+	//			{
+	//				CreateWallTriangle(
+	//					tile.WorldCoordinates,
+	//					tile.WorldCoordinates + (Vector3.right * Constants.TileSize),
+	//					tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize));
+	//				CreateWallTriangle(
+	//					tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize) + (Vector3.right * Constants.TileSize),
+	//					tile.BottomNeighbour.WorldCoordinates + (Vector3.forward * Constants.TileSize),
+	//					tile.WorldCoordinates);
+	//			}
+	//			break;
+	//		case TileType.Water:
+	//			break;
+	//		default:
+	//			break;
+	//	}
+	//}
 
 	private void CreateRoofMesh()
 	{
@@ -401,35 +402,35 @@ public class MeshGenerator : MonoBehaviour
 		meshCollider.sharedMesh = mesh;
 	}
 
-	private void CreateWallTriangle(Vector3 a, Vector3 b, Vector3 c)
-	{
-		_wallVertices.Add(a);
-		_wallVertices.Add(b);
-		_wallVertices.Add(c);
+	//private void CreateWallTriangle(Vector3 a, Vector3 b, Vector3 c)
+	//{
+	//	_wallVertices.Add(a);
+	//	_wallVertices.Add(b);
+	//	_wallVertices.Add(c);
 
-		_wallTriangles.Add(_wallVertices.Count - 3);
-		_wallTriangles.Add(_wallVertices.Count - 2);
-		_wallTriangles.Add(_wallVertices.Count - 1);
-	}
-	private void CreateWallMesh()
-	{
-		var wallGameObject = new GameObject("Walls");
-		wallGameObject.layer = LayerMask.NameToLayer("Wall");
+	//	_wallTriangles.Add(_wallVertices.Count - 3);
+	//	_wallTriangles.Add(_wallVertices.Count - 2);
+	//	_wallTriangles.Add(_wallVertices.Count - 1);
+	//}
+	//private void CreateWallMesh()
+	//{
+	//	var wallGameObject = new GameObject("Walls");
+	//	wallGameObject.layer = LayerMask.NameToLayer("Wall");
 
-		var meshRenderer = wallGameObject.GetOrAddComponent<MeshRenderer>();
-		meshRenderer.sharedMaterial = Resources.Load<Material>("WallMaterial");
+	//	var meshRenderer = wallGameObject.GetOrAddComponent<MeshRenderer>();
+	//	meshRenderer.sharedMaterial = Resources.Load<Material>("WallMaterial");
 
-		var mesh = new Mesh();
-		mesh.SetVertices(_wallVertices);
-		mesh.SetTriangles(_wallTriangles, 0);
-		mesh.RecalculateNormals();
+	//	var mesh = new Mesh();
+	//	mesh.SetVertices(_wallVertices);
+	//	mesh.SetTriangles(_wallTriangles, 0);
+	//	mesh.RecalculateNormals();
 
-		var meshFilter = wallGameObject.GetOrAddComponent<MeshFilter>();
-		meshFilter.mesh = mesh;
+	//	var meshFilter = wallGameObject.GetOrAddComponent<MeshFilter>();
+	//	meshFilter.mesh = mesh;
 
-		var meshCollider = wallGameObject.GetOrAddComponent<MeshCollider>();
-		meshCollider.sharedMesh = mesh;
-	}
+	//	var meshCollider = wallGameObject.GetOrAddComponent<MeshCollider>();
+	//	meshCollider.sharedMesh = mesh;
+	//}
 
 	private void CreateWaterMesh()
 	{

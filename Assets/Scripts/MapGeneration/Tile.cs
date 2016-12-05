@@ -1,6 +1,38 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+public class TileNeighbours
+{
+	public Tile TopLeft;
+	public Tile Top;
+	public Tile TopRight;
+	public Tile Right;
+	public Tile BottomRight;
+	public Tile Bottom;
+	public Tile BottomLeft;
+	public Tile Left;
+
+	public TileNeighbours(
+		Tile topLeftNeighbour,
+		Tile topNeighbour,
+		Tile topRightNeighbour,
+		Tile rightNeighbour,
+		Tile bottomRightNeighbour,
+		Tile bottomNeighbour,
+		Tile bottomLeftNeighbour,
+		Tile leftNeighbour)
+	{
+		TopLeft = topLeftNeighbour;
+		Top = topNeighbour;
+		TopRight = topRightNeighbour;
+		Right = rightNeighbour;
+		BottomRight = bottomRightNeighbour;
+		Bottom = bottomNeighbour;
+		BottomLeft = bottomLeftNeighbour;
+		Left = leftNeighbour;
+	}
+}
+
 public class Tile
 {
 	public TileType Type;
@@ -8,17 +40,12 @@ public class Tile
 	public Vector3 WorldCoordinates;
 	public ConfigurationSquare ConfigurationSquare;
 	public List<Vector3> CoreVertices = new List<Vector3>(4);
-	public Tile LeftNeighbour;
-	public Tile TopNeighbour;
-	public Tile RightNeighbour;
-	public Tile BottomNeighbour;
-	public Tile TopRightNeighbour;
+	public TileNeighbours TileNeighbours;
 
 	public Tile(int x, int y, TileType type)
 	{
 		GridCoordinates = new Coordinates(x, y);
 		WorldCoordinates = new Vector3(x * Constants.TileSize, 0, y * Constants.TileSize);
-		WorldCoordinates += (Vector3.right * Random.Range(-0.5f, 0.5f)) + (Vector3.up * Random.Range(-0.5f, 0.5f)) + (Vector3.forward * Random.Range(-0.5f, 0.5f));
 		Type = type;
 	}
 

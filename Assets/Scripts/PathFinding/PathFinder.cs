@@ -114,16 +114,16 @@ public class PathFinder : MonoBehaviour
 
 				if (tile.Type == TileType.Floor)
 				{
-					topLeftNode.Walkable = tile.Type == TileType.Floor;
+					topLeftNode.Walkable = true;
 					_walkableNodes.Add(topLeftNode);
 
-					topRightNode.Walkable = tile.Type == TileType.Floor;
+					topRightNode.Walkable = true;
 					_walkableNodes.Add(topRightNode);
 
-					bottomRightNode.Walkable = tile.Type == TileType.Floor;
+					bottomRightNode.Walkable = true;
 					_walkableNodes.Add(bottomRightNode);
 
-					bottomLeftNode.Walkable = tile.Type == TileType.Floor;
+					bottomLeftNode.Walkable = true;
 					_walkableNodes.Add(bottomLeftNode);
 				}
 			}

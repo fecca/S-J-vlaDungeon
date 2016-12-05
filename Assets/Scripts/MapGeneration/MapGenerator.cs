@@ -345,19 +345,41 @@ public class MapGenerator : MonoBehaviour
 			for (int y = 0; y < mapHeight; y++)
 			{
 				var tile = _map[x, y];
-				var leftNighbourIndex = x - 1;
-				var topNighbourIndex = y + 1;
-				var rightNighbourIndex = x + 1;
-				var bottomNighbourIndex = y - 1;
 
-				tile.LeftNeighbour = leftNighbourIndex >= 0 ? _map[leftNighbourIndex, y] : null;
-				tile.TopNeighbour = topNighbourIndex <= mapHeight ? _map[x, topNighbourIndex] : null;
-				tile.RightNeighbour = rightNighbourIndex <= mapWidth ? _map[rightNighbourIndex, y] : null;
-				tile.BottomNeighbour = bottomNighbourIndex >= 0 ? _map[x, bottomNighbourIndex] : null;
-				tile.TopRightNeighbour = rightNighbourIndex <= mapWidth && topNighbourIndex <= mapHeight ? _map[rightNighbourIndex, topNighbourIndex] : null;
+				var leftNeighbourIndex = x - 1;
+				var topNeighbourIndex = y + 1;
+				var rightNeighbourIndex = x + 1;
+				var bottomNeighbourIndex = y - 1;
 
-				var typeOffset = tile.Type == TileType.Floor ? -Vector3.up * Constants.WallHeight : tile.Type == TileType.Water ? -Vector3.up * Constants.WallHeight * 2 : Vector3.zero;
+				tile.TileNeighbours = new TileNeighbours(
+					leftNeighbourIndex >= 0 && topNeighbourIndex <= mapHeight ? _map[leftNeighbourIndex, topNeighbourIndex] : null,
+					topNeighbourIndex <= mapHeight ? _map[x, topNeighbourIndex] : null,
+					rightNeighbourIndex <= mapWidth && topNeighbourIndex <= mapHeight ? _map[rightNeighbourIndex, topNeighbourIndex] : null,
+					rightNeighbourIndex <= mapWidth ? _map[rightNeighbourIndex, y] : null,
+					rightNeighbourIndex <= mapWidth && bottomNeighbourIndex >= 0 ? _map[rightNeighbourIndex, bottomNeighbourIndex] : null,
+					bottomNeighbourIndex >= 0 ? _map[x, bottomNeighbourIndex] : null,
+					leftNeighbourIndex >= 0 && bottomNeighbourIndex >= 0 ? _map[leftNeighbourIndex, bottomNeighbourIndex] : null,
+					leftNeighbourIndex >= 0 ? _map[leftNeighbourIndex, y] : null);
+
+				var typeOffset = tile.Type == TileType.Roof ?
+					Vector3.up * Constants.WallHeight :
+					tile.Type == TileType.Water ?
+					-Vector3.up * Constants.WaterDepth :
+					Vector3.zero;
 				tile.WorldCoordinates += typeOffset;
+
+				if (RandomizeVertexPositionsX)
+				{
+					tile.WorldCoordinates += Vector3.right * Constants.TileSize * UnityEngine.Random.Range(-VertexOffsetX, VertexOffsetX);
+				}
+				if (RandomizeVertexPositionsY)
+				{
+					tile.WorldCoordinates += Vector3.up * Constants.TileSize * UnityEngine.Random.Range(-VertexOffsetY, VertexOffsetY);
+				}
+				if (RandomizeVertexPositionsZ)
+				{
+					tile.WorldCoordinates += Vector3.forward * Constants.TileSize * UnityEngine.Random.Range(-VertexOffsetZ, VertexOffsetZ);
+				}
 			}
 		}
 	}
@@ -439,9 +461,9 @@ public class MapGenerator : MonoBehaviour
 			var tile = queue.Dequeue();
 			tiles.Add(tile);
 
-			for (var x = (int)tile.GridCoordinates.X - 1; x <= tile.GridCoordinates.X + 1; x++)
+			for (var x = tile.GridCoordinates.X - 1; x <= tile.GridCoordinates.X + 1; x++)
 			{
-				for (var y = (int)tile.GridCoordinates.Y - 1; y <= tile.GridCoordinates.Y + 1; y++)
+				for (var y = tile.GridCoordinates.Y - 1; y <= tile.GridCoordinates.Y + 1; y++)
 				{
 					if (IsInMapRange(x, y) && (y == tile.GridCoordinates.Y || x == tile.GridCoordinates.X))
 					{
