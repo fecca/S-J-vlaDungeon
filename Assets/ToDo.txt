@@ -1,18 +1,15 @@
 Features
 ----
+Add tris to the right mesh(corners between mutiple types)
 Click outside map and move to closest node
+Give player a brain
+Add spot lights and point lights to enemies and player
+Bullet raycast
 Level transition
 Inventory
 UI
 Crafting
 Loot
-Give player a brain
-Add spot lights and point lights to enemies and player
-Bullet raycast
-Water
-Wall vertex offset
 
 Bugs
 ----
-Unreachable areas in generated map
-Spike when automoving on big maps

@@ -30,6 +30,13 @@ public class MeshGenerator : MonoBehaviour
 	}
 	private void OnPathNodesDestroyedEvent(PathNodesDestroyedEvent pathNodesDestroyedEvent)
 	{
+		_floorVertices.Clear();
+		_floorTriangles.Clear();
+		_roofVertices.Clear();
+		_roofTriangles.Clear();
+		_waterVertices.Clear();
+		_waterTriangles.Clear();
+
 		Destroy(GameObject.Find("Floor"));
 		Destroy(GameObject.Find("Roof"));
 		Destroy(GameObject.Find("Water"));
