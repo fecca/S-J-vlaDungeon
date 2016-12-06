@@ -1,7 +1,7 @@
 ﻿public class Constants
 {
-	public const int WallHeight = 3;
-	public const int WaterDepth = 2;
+	public const int WallHeight = 6;
+	public const int WaterDepth = 3;
 	public const int TileSize = 3;
 
 	// -------- PATHFINDING DATA -------- //
