@@ -337,8 +337,8 @@ public class MapGenerator : MonoBehaviour
 	}
 	private void ConfigureTiles()
 	{
-		var mapWidth = _map.GetLength(0) - 1;
-		var mapHeight = _map.GetLength(1) - 1;
+		var mapWidth = _map.GetLength(0);
+		var mapHeight = _map.GetLength(1);
 
 		for (int x = 0; x < mapWidth; x++)
 		{
@@ -352,11 +352,11 @@ public class MapGenerator : MonoBehaviour
 				var bottomNeighbourIndex = y - 1;
 
 				tile.TileNeighbours = new TileNeighbours(
-					leftNeighbourIndex >= 0 && topNeighbourIndex <= mapHeight ? _map[leftNeighbourIndex, topNeighbourIndex] : null,
-					topNeighbourIndex <= mapHeight ? _map[x, topNeighbourIndex] : null,
-					rightNeighbourIndex <= mapWidth && topNeighbourIndex <= mapHeight ? _map[rightNeighbourIndex, topNeighbourIndex] : null,
-					rightNeighbourIndex <= mapWidth ? _map[rightNeighbourIndex, y] : null,
-					rightNeighbourIndex <= mapWidth && bottomNeighbourIndex >= 0 ? _map[rightNeighbourIndex, bottomNeighbourIndex] : null,
+					leftNeighbourIndex >= 0 && topNeighbourIndex < mapHeight ? _map[leftNeighbourIndex, topNeighbourIndex] : null,
+					topNeighbourIndex < mapHeight ? _map[x, topNeighbourIndex] : null,
+					rightNeighbourIndex < mapWidth && topNeighbourIndex < mapHeight ? _map[rightNeighbourIndex, topNeighbourIndex] : null,
+					rightNeighbourIndex < mapWidth ? _map[rightNeighbourIndex, y] : null,
+					rightNeighbourIndex < mapWidth && bottomNeighbourIndex >= 0 ? _map[rightNeighbourIndex, bottomNeighbourIndex] : null,
 					bottomNeighbourIndex >= 0 ? _map[x, bottomNeighbourIndex] : null,
 					leftNeighbourIndex >= 0 && bottomNeighbourIndex >= 0 ? _map[leftNeighbourIndex, bottomNeighbourIndex] : null,
 					leftNeighbourIndex >= 0 ? _map[leftNeighbourIndex, y] : null);
