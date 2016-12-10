@@ -1,6 +1,5 @@
 Features
 ----
-Add tris to the right mesh(corners between mutiple types)
 Add handler for map and mesh
 Add static handler for handlers and other singletons - Handler<IMapHandler>.Instance
 Click outside map and move to closest node

@@ -1,6 +1,6 @@
 ﻿public class Constants
 {
-	public const int WallHeight = 6;
+	public const int WallHeight = 5;
 	public const int WaterDepth = 3;
 	public const int TileSize = 3;
 
