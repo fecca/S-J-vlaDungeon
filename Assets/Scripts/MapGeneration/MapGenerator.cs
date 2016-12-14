@@ -114,11 +114,11 @@ public class MapGenerator : MonoBehaviour
 			{
 				if (x == 0 || x == Width - 1 || y == 0 || y == Height - 1)
 				{
-					_map[x, y] = new Tile(x, y, TileType.Roof);
+					_map[x, y] = new Tile(x, y, TileType.Wall);
 				}
 				else
 				{
-					var tileType = rng.Next(0, 100) < RoomFillPercentage ? TileType.Floor : TileType.Roof;
+					var tileType = rng.Next(0, 100) < RoomFillPercentage ? TileType.Floor : TileType.Wall;
 					_map[x, y] = new Tile(x, y, tileType);
 				}
 			}
@@ -138,7 +138,7 @@ public class MapGenerator : MonoBehaviour
 					}
 					else if (GetNumberOfNeighbouringTiles(x, y) < 4)
 					{
-						_map[x, y].Type = TileType.Roof;
+						_map[x, y].Type = TileType.Wall;
 					}
 				}
 			}
@@ -146,7 +146,7 @@ public class MapGenerator : MonoBehaviour
 	}
 	private void FilterWalls()
 	{
-		var wallRegions = GetRegions(TileType.Roof);
+		var wallRegions = GetRegions(TileType.Wall);
 		for (var i = 0; i < wallRegions.Count; i++)
 		{
 			var wallRegion = wallRegions[i];
@@ -171,7 +171,7 @@ public class MapGenerator : MonoBehaviour
 			{
 				for (var j = 0; j < roomRegion.Count; j++)
 				{
-					_map[roomRegion[j].GridCoordinates.X, roomRegion[j].GridCoordinates.Y].Type = TileType.Roof;
+					_map[roomRegion[j].GridCoordinates.X, roomRegion[j].GridCoordinates.Y].Type = TileType.Wall;
 				}
 			}
 			else
@@ -317,7 +317,7 @@ public class MapGenerator : MonoBehaviour
 		for (var i = 0; i < _survivingRooms.Count; i++)
 		{
 			var room = _survivingRooms[i];
-			var maximumWaterTiles = 50;
+			var maximumWaterTiles = 100;
 			var waterTiles = 0;
 			for (var j = 0; j < room.Tiles.Count; j++)
 			{
@@ -337,8 +337,8 @@ public class MapGenerator : MonoBehaviour
 	}
 	private void ConfigureTiles()
 	{
-		var mapWidth = _map.GetLength(0) - 1;
-		var mapHeight = _map.GetLength(1) - 1;
+		var mapWidth = _map.GetLength(0);
+		var mapHeight = _map.GetLength(1);
 
 		for (int x = 0; x < mapWidth; x++)
 		{
@@ -352,16 +352,16 @@ public class MapGenerator : MonoBehaviour
 				var bottomNeighbourIndex = y - 1;
 
 				tile.TileNeighbours = new TileNeighbours(
-					leftNeighbourIndex >= 0 && topNeighbourIndex <= mapHeight ? _map[leftNeighbourIndex, topNeighbourIndex] : null,
-					topNeighbourIndex <= mapHeight ? _map[x, topNeighbourIndex] : null,
-					rightNeighbourIndex <= mapWidth && topNeighbourIndex <= mapHeight ? _map[rightNeighbourIndex, topNeighbourIndex] : null,
-					rightNeighbourIndex <= mapWidth ? _map[rightNeighbourIndex, y] : null,
-					rightNeighbourIndex <= mapWidth && bottomNeighbourIndex >= 0 ? _map[rightNeighbourIndex, bottomNeighbourIndex] : null,
+					leftNeighbourIndex >= 0 && topNeighbourIndex < mapHeight ? _map[leftNeighbourIndex, topNeighbourIndex] : null,
+					topNeighbourIndex < mapHeight ? _map[x, topNeighbourIndex] : null,
+					rightNeighbourIndex < mapWidth && topNeighbourIndex < mapHeight ? _map[rightNeighbourIndex, topNeighbourIndex] : null,
+					rightNeighbourIndex < mapWidth ? _map[rightNeighbourIndex, y] : null,
+					rightNeighbourIndex < mapWidth && bottomNeighbourIndex >= 0 ? _map[rightNeighbourIndex, bottomNeighbourIndex] : null,
 					bottomNeighbourIndex >= 0 ? _map[x, bottomNeighbourIndex] : null,
 					leftNeighbourIndex >= 0 && bottomNeighbourIndex >= 0 ? _map[leftNeighbourIndex, bottomNeighbourIndex] : null,
 					leftNeighbourIndex >= 0 ? _map[leftNeighbourIndex, y] : null);
 
-				var typeOffset = tile.Type == TileType.Roof ?
+				var typeOffset = tile.Type == TileType.Wall ?
 					Vector3.up * Constants.WallHeight :
 					tile.Type == TileType.Water ?
 					-Vector3.up * Constants.WaterDepth :

@@ -7,8 +7,8 @@ public class MeshGenerator : MonoBehaviour
 {
 	private readonly List<Vector3> _floorVertices = new List<Vector3>(16184);
 	private readonly List<int> _floorTriangles = new List<int>(32768);
-	private readonly List<Vector3> _roofVertices = new List<Vector3>(16184);
-	private readonly List<int> _roofTriangles = new List<int>(32768);
+	private readonly List<Vector3> _WallVertices = new List<Vector3>(16184);
+	private readonly List<int> _WallTriangles = new List<int>(32768);
 	private readonly List<Vector3> _waterVertices = new List<Vector3>(16184);
 	private readonly List<int> _waterTriangles = new List<int>(32768);
 
@@ -32,21 +32,23 @@ public class MeshGenerator : MonoBehaviour
 	{
 		_floorVertices.Clear();
 		_floorTriangles.Clear();
-		_roofVertices.Clear();
-		_roofTriangles.Clear();
+		_WallVertices.Clear();
+		_WallTriangles.Clear();
 		_waterVertices.Clear();
 		_waterTriangles.Clear();
 
 		Destroy(GameObject.Find("Floor"));
-		Destroy(GameObject.Find("Roof"));
+		Destroy(GameObject.Find("Wall"));
 		Destroy(GameObject.Find("Water"));
 
 		MessageHub.Instance.Publish(new MeshDestroyedEvent(null));
 	}
 	private IEnumerator GenerateMesh(Tile[,] map, Action completed)
 	{
-		var mapWidth = map.GetLength(0) - 1;
-		var mapHeight = map.GetLength(1) - 1;
+		var mapWidth = map.GetLength(0);
+		var mapHeight = map.GetLength(1);
+		Debug.Log(map.GetLength(0) + ", " + mapWidth);
+		Debug.Log(map.GetLength(1) + ", " + mapHeight);
 		for (var x = 0; x < mapWidth; x++)
 		{
 			for (var y = 0; y < mapHeight; y++)
@@ -54,7 +56,7 @@ public class MeshGenerator : MonoBehaviour
 				GenerateTileMesh(map[x, y]);
 			}
 		}
-		CreateRoofMesh();
+		CreateWallMesh();
 		CreateFloorMesh();
 		CreateWaterMesh();
 
@@ -74,89 +76,60 @@ public class MeshGenerator : MonoBehaviour
 		var topRightTile = tile.TileNeighbours.TopRight;
 		var rightTile = tile.TileNeighbours.Right;
 
+		if (topTile != null)
+		{
+			topLeft = topTile.WorldCoordinates;
+		}
+		if (topRightTile != null)
+		{
+			topRight = topRightTile.WorldCoordinates;
+		}
+		if (rightTile != null)
+		{
+			bottomRight = rightTile.WorldCoordinates;
+		}
+
+		var topTriangleType = tile.Type;
+		var bottomTriangleType = tile.Type;
+		if (tile.Type == TileType.Wall || topTile.Type == TileType.Wall || topRightTile.Type == TileType.Wall)
+		{
+			topTriangleType = TileType.Wall;
+		}
+		else if (tile.Type == TileType.Floor || topTile.Type == TileType.Floor || topRightTile.Type == TileType.Floor)
+		{
+			topTriangleType = TileType.Floor;
+		}
+		else
+		{
+			topTriangleType = TileType.Water;
+		}
+
+		if (tile.Type == TileType.Wall || topRightTile.Type == TileType.Wall || rightTile.Type == TileType.Wall)
+		{
+			bottomTriangleType = TileType.Wall;
+		}
+		else if (tile.Type == TileType.Floor || topRightTile.Type == TileType.Floor || rightTile.Type == TileType.Floor)
+		{
+			bottomTriangleType = TileType.Floor;
+		}
+		else
+		{
+			bottomTriangleType = TileType.Water;
+		}
+
 		switch (tile.Type)
 		{
-			case TileType.Roof:
-				if (topTile != null)
-				{
-					topLeft = topTile.WorldCoordinates;
-				}
-				if (topRightTile != null)
-				{
-					topRight = topRightTile.WorldCoordinates;
-				}
-				if (rightTile != null)
-				{
-					bottomRight = rightTile.WorldCoordinates;
-				}
-
-				CreateTriangle(tile.Type, bottomLeft, topLeft, topRight);
-				CreateTriangle(tile.Type, topRight, bottomRight, bottomLeft);
-
+			case TileType.Wall:
 				break;
 
 			case TileType.Floor:
-				if (topTile != null)
+				if (topTile.Type == TileType.Wall || topRightTile.Type == TileType.Wall || rightTile.Type == TileType.Wall)
 				{
-					topLeft = topTile.WorldCoordinates;
+					tile.Type = TileType.Wall;
 				}
-				if (topRightTile != null)
-				{
-					topRight = topRightTile.WorldCoordinates;
-				}
-				if (rightTile != null)
-				{
-					bottomRight = rightTile.WorldCoordinates;
-				}
-
-				if (topTile.Type == TileType.Roof || topRightTile.Type == TileType.Roof || rightTile.Type == TileType.Roof)
-				{
-					tile.Type = TileType.Roof;
-				}
-
-				var topFloorTriangleType = tile.Type;
-				if (tile.WorldCoordinates.y < 1.0f && tile.WorldCoordinates.y > -1.0f)
-				{
-					if (topLeft.y < 1.0f && topLeft.y > -1.0f)
-					{
-						if (topRight.y < 1.0f && topRight.y > -1.0f)
-						{
-							topFloorTriangleType = TileType.Floor;
-						}
-					}
-				}
-
-				var bottomFloorTriangleType = tile.Type;
-				if (tile.WorldCoordinates.y < 1.0f && tile.WorldCoordinates.y > -1.0f)
-				{
-					if (bottomRight.y < 1.0f && bottomRight.y > -1.0f)
-					{
-						if (topRight.y < 1.0f && topRight.y > -1.0f)
-						{
-							bottomFloorTriangleType = TileType.Floor;
-						}
-					}
-				}
-
-				CreateTriangle(topFloorTriangleType, bottomLeft, topLeft, topRight);
-				CreateTriangle(bottomFloorTriangleType, topRight, bottomRight, bottomLeft);
-
 				break;
 
 			case TileType.Water:
-				if (topTile != null)
-				{
-					topLeft = topTile.WorldCoordinates;
-				}
-				if (topRightTile != null)
-				{
-					topRight = topRightTile.WorldCoordinates;
-				}
-				if (rightTile != null)
-				{
-					bottomRight = rightTile.WorldCoordinates;
-				}
-
 				if (topTile.Type != tile.Type)
 				{
 					tile.Type = topTile.Type;
@@ -169,58 +142,14 @@ public class MeshGenerator : MonoBehaviour
 				{
 					tile.Type = rightTile.Type;
 				}
-
-				var topWaterTriangleType = tile.Type;
-				if (tile.WorldCoordinates.y < -1.0f && tile.WorldCoordinates.y > -3.0f)
-				{
-					if (topLeft.y < -1.0f && topLeft.y > -3.0f)
-					{
-						if (topRight.y < -1.0f && topRight.y > -3.0f)
-						{
-							topWaterTriangleType = TileType.Water;
-						}
-					}
-				}
-
-				var bottomWaterTriangleType = tile.Type;
-				if (tile.WorldCoordinates.y < -1.0f && tile.WorldCoordinates.y > -3.0f)
-				{
-					if (bottomRight.y < -1.0f && bottomRight.y > -3.0f)
-					{
-						if (topRight.y < -1.0f && topRight.y > -3.0f)
-						{
-							bottomWaterTriangleType = TileType.Water;
-						}
-					}
-				}
-
-				CreateTriangle(topWaterTriangleType, bottomLeft, topLeft, topRight);
-				CreateTriangle(bottomWaterTriangleType, topRight, bottomRight, bottomLeft);
-
 				break;
 
 			default:
 				break;
 		}
-	}
-	private void CreateRoofMesh()
-	{
-		var roofGameObject = new GameObject("Roof");
-		roofGameObject.layer = LayerMask.NameToLayer("Roof");
 
-		var meshRenderer = roofGameObject.GetOrAddComponent<MeshRenderer>();
-		meshRenderer.sharedMaterial = Resources.Load<Material>("RoofMaterial");
-
-		var mesh = new Mesh();
-		mesh.SetVertices(_roofVertices);
-		mesh.SetTriangles(_roofTriangles, 0);
-		mesh.RecalculateNormals();
-
-		var meshFilter = roofGameObject.GetOrAddComponent<MeshFilter>();
-		meshFilter.mesh = mesh;
-
-		var meshCollider = roofGameObject.GetOrAddComponent<MeshCollider>();
-		meshCollider.sharedMesh = mesh;
+		CreateTriangle(topTriangleType, bottomLeft, topLeft, topRight);
+		CreateTriangle(bottomTriangleType, topRight, bottomRight, bottomLeft);
 	}
 	private void CreateTriangle(TileType type, Vector3 a, Vector3 b, Vector3 c)
 	{
@@ -235,14 +164,14 @@ public class MeshGenerator : MonoBehaviour
 				_floorTriangles.Add(_floorVertices.Count - 2);
 				_floorTriangles.Add(_floorVertices.Count - 1);
 				break;
-			case TileType.Roof:
-				_roofVertices.Add(a);
-				_roofVertices.Add(b);
-				_roofVertices.Add(c);
+			case TileType.Wall:
+				_WallVertices.Add(a);
+				_WallVertices.Add(b);
+				_WallVertices.Add(c);
 
-				_roofTriangles.Add(_roofVertices.Count - 3);
-				_roofTriangles.Add(_roofVertices.Count - 2);
-				_roofTriangles.Add(_roofVertices.Count - 1);
+				_WallTriangles.Add(_WallVertices.Count - 3);
+				_WallTriangles.Add(_WallVertices.Count - 2);
+				_WallTriangles.Add(_WallVertices.Count - 1);
 				break;
 			case TileType.Water:
 				_waterVertices.Add(a);
@@ -256,6 +185,25 @@ public class MeshGenerator : MonoBehaviour
 			default:
 				break;
 		}
+	}
+	private void CreateWallMesh()
+	{
+		var WallGameObject = new GameObject("Wall");
+		WallGameObject.layer = LayerMask.NameToLayer("Wall");
+
+		var meshRenderer = WallGameObject.GetOrAddComponent<MeshRenderer>();
+		meshRenderer.sharedMaterial = Resources.Load<Material>("WallMaterial");
+
+		var mesh = new Mesh();
+		mesh.SetVertices(_WallVertices);
+		mesh.SetTriangles(_WallTriangles, 0);
+		mesh.RecalculateNormals();
+
+		var meshFilter = WallGameObject.GetOrAddComponent<MeshFilter>();
+		meshFilter.mesh = mesh;
+
+		var meshCollider = WallGameObject.GetOrAddComponent<MeshCollider>();
+		meshCollider.sharedMesh = mesh;
 	}
 	private void CreateFloorMesh()
 	{
