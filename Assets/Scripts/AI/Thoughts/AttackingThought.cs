@@ -20,7 +20,7 @@ public class AttackingThought : Thought
 		if (_updateTimer > _data.TimeBetweenAttacks)
 		{
 			_updateTimer = 0;
-			_brain.GetOwner().Attack(_data);
+			_brain.Attack(_data);
 		}
 
 		_updateTimer += Time.deltaTime;

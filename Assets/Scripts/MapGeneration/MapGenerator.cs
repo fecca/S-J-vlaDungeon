@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MapGenerator : MonoBehaviour
@@ -390,7 +391,7 @@ public class MapGenerator : MonoBehaviour
 			for (var y = 0; y < Height; y++)
 			{
 				var tile = _map[x, y];
-				if (tile.Type == TileType.Floor && tile.ConfigurationSquare != null && tile.ConfigurationSquare.Configuration == 15)
+				if (tile.Type == TileType.Floor)
 				{
 					_walkableTiles.Add(tile);
 				}
@@ -534,10 +535,5 @@ public class MapGenerator : MonoBehaviour
 		}
 
 		return line;
-	}
-
-	public Tile GetRandomWalkableTile()
-	{
-		return _walkableTiles.GetRandomElement();
 	}
 }

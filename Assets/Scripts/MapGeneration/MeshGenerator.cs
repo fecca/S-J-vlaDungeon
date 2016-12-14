@@ -47,8 +47,6 @@ public class MeshGenerator : MonoBehaviour
 	{
 		var mapWidth = map.GetLength(0);
 		var mapHeight = map.GetLength(1);
-		Debug.Log(map.GetLength(0) + ", " + mapWidth);
-		Debug.Log(map.GetLength(1) + ", " + mapHeight);
 		for (var x = 0; x < mapWidth; x++)
 		{
 			for (var y = 0; y < mapHeight; y++)
@@ -64,7 +62,6 @@ public class MeshGenerator : MonoBehaviour
 
 		yield break;
 	}
-
 	private void GenerateTileMesh(Tile tile)
 	{
 		var bottomLeft = tile.WorldCoordinates;
@@ -182,6 +179,7 @@ public class MeshGenerator : MonoBehaviour
 				_waterTriangles.Add(_waterVertices.Count - 2);
 				_waterTriangles.Add(_waterVertices.Count - 1);
 				break;
+
 			default:
 				break;
 		}
@@ -192,7 +190,7 @@ public class MeshGenerator : MonoBehaviour
 		WallGameObject.layer = LayerMask.NameToLayer("Wall");
 
 		var meshRenderer = WallGameObject.GetOrAddComponent<MeshRenderer>();
-		meshRenderer.sharedMaterial = Resources.Load<Material>("WallMaterial");
+		meshRenderer.sharedMaterial = Resources.Load<Material>("Materials/WallMaterial");
 
 		var mesh = new Mesh();
 		mesh.SetVertices(_WallVertices);
@@ -211,7 +209,7 @@ public class MeshGenerator : MonoBehaviour
 		floorGameObject.layer = LayerMask.NameToLayer("Ground");
 
 		var meshRenderer = floorGameObject.GetOrAddComponent<MeshRenderer>();
-		meshRenderer.sharedMaterial = Resources.Load<Material>("FloorMaterial");
+		meshRenderer.sharedMaterial = Resources.Load<Material>("Materials/FloorMaterial");
 
 		var mesh = new Mesh();
 		mesh.SetVertices(_floorVertices);
@@ -230,7 +228,7 @@ public class MeshGenerator : MonoBehaviour
 		waterGameObject.layer = LayerMask.NameToLayer("Water");
 
 		var meshRenderer = waterGameObject.GetOrAddComponent<MeshRenderer>();
-		meshRenderer.sharedMaterial = Resources.Load<Material>("WaterMaterial");
+		meshRenderer.sharedMaterial = Resources.Load<Material>("Materials/WaterMaterial");
 
 		var mesh = new Mesh();
 		mesh.SetVertices(_waterVertices);

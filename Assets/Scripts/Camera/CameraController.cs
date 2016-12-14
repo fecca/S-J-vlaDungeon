@@ -8,7 +8,7 @@ public class CameraController : MonoBehaviour
 	private float RotationSpeed = 1;
 
 	private Transform _cachedTransform;
-	private Player _player;
+	private ICharacter _player;
 
 	private void Awake()
 	{
@@ -33,12 +33,12 @@ public class CameraController : MonoBehaviour
 			{
 				_cachedTransform.Rotate(Vector3.up, Input.GetAxisRaw("Mouse X") * RotationSpeed);
 			}
-			_cachedTransform.position = Vector3.Lerp(_cachedTransform.position, _player.transform.position, Time.deltaTime * FollowSpeed);
+			_cachedTransform.position = Vector3.Lerp(_cachedTransform.position, _player.GetTransformPosition(), Time.deltaTime * FollowSpeed);
 		}
 	}
 
 	private void OnCharactersCreatedEvent(CharactersCreatedEvent charactersCreatedEvent)
 	{
-		_player = FindObjectOfType<Player>();
+		_player = ServiceLocator<ICharacter>.Instance;
 	}
 }

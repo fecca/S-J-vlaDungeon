@@ -1,13 +1,9 @@
 ﻿using UnityEngine;
 
-public class Enemy : Character, IAttacking, IMoving
+public class Enemy : Character
 {
-	//private Canvas _canvas;
-	//private RectTransform _bar;
-
 	private Transform _cachedTransform;
 	private Brain _brain;
-	private Transform _target;
 	private Light _pointLight;
 	private Light _spotLight;
 
@@ -16,8 +12,6 @@ public class Enemy : Character, IAttacking, IMoving
 		_cachedTransform = transform;
 		_pointLight = _cachedTransform.FindChild("PointLight").GetComponent<Light>();
 		_spotLight = _cachedTransform.FindChild("SpotLight").GetComponent<Light>();
-		//_canvas = transform.FindChild("Canvas").GetComponent<Canvas>();
-		//_bar = _canvas.transform.FindChild("CurrentHitpoints").GetComponent<RectTransform>();
 	}
 	private void Update()
 	{
@@ -25,31 +19,25 @@ public class Enemy : Character, IAttacking, IMoving
 		{
 			_brain.Think();
 		}
-		//_canvas.transform.LookAt(Camera.main.transform.position);
 	}
 
-	public void Attack(AttackData data)
+	public override void Attack(AttackData data, Vector3 direction)
 	{
-		var targetPosition = _target.position.WithY(_cachedTransform.position.y);
-		var direction = _cachedTransform.GetDirectionTo(targetPosition);
-
 		Agent.RotateAgent(direction);
 		Agent.SmoothStop();
 
 		var projectile = Instantiate(data.ProjectilePrefab);
 		projectile.GetComponent<Projectile>().Setup(_cachedTransform.position, direction, data.ProjectileSpeed);
 	}
-	public void Move(MoveData data)
+	public override void Move(MoveData data, Vector3 targetPosition)
 	{
-		Agent.StartPathTo(_target.position, data.MovementSpeed, () =>
+		Agent.StartPathTo(targetPosition, data.MovementSpeed, () =>
 		{
 		});
 	}
-
 	public void InitializeBrain()
 	{
-		_target = FindObjectOfType<Player>().transform;
-		_brain = new Brain(this, _target);
+		_brain = new Brain(this);
 	}
 	public void ActivateLights()
 	{
@@ -67,16 +55,18 @@ public class Enemy : Character, IAttacking, IMoving
 	public override void TakeDamage()
 	{
 		HealthData.CurrentHealth--;
-		if (HealthData.CurrentHealth > 0)
-		{
-			var fraction = HealthData.CurrentHealth / HealthData.TotalHealth;
-			//_bar.sizeDelta = new Vector2(fraction * 4, _bar.sizeDelta.y);
-		}
-		else
+		if (HealthData.CurrentHealth <= 0)
 		{
 			Agent.ClearNodes();
 			Destroy(gameObject);
 		}
+	}
+	public override void InitializePathfindingAgent()
+	{
+		var pathFinder = FindObjectOfType<PathFinder>();
+		var node = pathFinder.GetRandomWalkableNode();
+		transform.position = node.WorldCoordinates + Vector3.up * 5;
+		Agent.Setup(pathFinder, node);
 	}
 	public override void SetHealthData(HealthData healthData)
 	{
@@ -93,5 +83,9 @@ public class Enemy : Character, IAttacking, IMoving
 	public override void SetPerceptionData(PerceptionData perceptionData)
 	{
 		_brain.SetToPerceiver(perceptionData);
+	}
+	public override Vector3 GetTransformPosition()
+	{
+		return _cachedTransform.position;
 	}
 }

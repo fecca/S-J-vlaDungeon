@@ -2,9 +2,6 @@
 
 public class Player : Character
 {
-	//private Canvas _canvas;
-	//private RectTransform _bar;
-
 	private AttackData _attackData;
 	private MoveData _moveData;
 	private Transform _cachedTransform;
@@ -13,14 +10,12 @@ public class Player : Character
 
 	private void Awake()
 	{
+		ServiceLocator<ICharacter>.Instance = this;
 		_cachedTransform = transform;
-		//_canvas = transform.FindChild("Canvas").GetComponent<Canvas>();
-		//_bar = _canvas.transform.FindChild("CurrentHitpoints").GetComponent<RectTransform>();
 	}
 	private void Update()
 	{
 		HandleInput();
-		//_canvas.transform.LookAt(Camera.main.transform.position);
 	}
 
 	private void HandleInput()
@@ -32,7 +27,7 @@ public class Player : Character
 			{
 				if (hit.transform.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
 				{
-					Move(hit.point);
+					Move(_moveData, hit.point);
 				}
 			}
 		}
@@ -48,7 +43,7 @@ public class Player : Character
 				{
 					if (hit.transform.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
 					{
-						Move(hit.point);
+						Move(_moveData, hit.point);
 					}
 				}
 			}
@@ -62,33 +57,20 @@ public class Player : Character
 			{
 				var hitPosition = hit.point.WithY(_cachedTransform.position.y);
 				var direction = _cachedTransform.GetDirectionTo(hitPosition);
-				Attack(direction);
+				Attack(_attackData, direction);
 			}
 		}
 	}
-	private void Move(Vector3 position)
-	{
-		Agent.StartPathTo(position, _moveData.MovementSpeed, () =>
-		{
-		});
-	}
-	public void Attack(Vector3 direction)
-	{
-		Agent.RotateAgent(direction);
-		Agent.SmoothStop();
 
-		var projectile = Instantiate(_attackData.ProjectilePrefab);
-		projectile.GetComponent<Projectile>().Setup(_cachedTransform.position, direction, _attackData.ProjectileSpeed);
-	}
-
-	public override void TakeDamage()
+	public override void SetPerceptionData(PerceptionData perceptionData)
 	{
-		HealthData.CurrentHealth--;
-		if (HealthData.CurrentHealth > 0)
-		{
-			var fraction = HealthData.CurrentHealth / HealthData.TotalHealth;
-			//_bar.sizeDelta = new Vector2(fraction * 4, _bar.sizeDelta.y);
-		}
+	}
+	public override void InitializePathfindingAgent()
+	{
+		var pathFinder = ServiceLocator<IPathFinder>.Instance;
+		var node = pathFinder.GetRandomWalkableNode();
+		transform.position = node.WorldCoordinates + Vector3.up * 5;
+		Agent.Setup(pathFinder, node);
 	}
 	public override void SetHealthData(HealthData healthData)
 	{
@@ -101,5 +83,31 @@ public class Player : Character
 	public override void SetMoveData(MoveData moveData)
 	{
 		_moveData = moveData;
+	}
+	public override void TakeDamage()
+	{
+		HealthData.CurrentHealth--;
+		if (HealthData.CurrentHealth <= 0)
+		{
+			Destroy(gameObject);
+		}
+	}
+	public override Vector3 GetTransformPosition()
+	{
+		return _cachedTransform.position;
+	}
+	public override void Attack(AttackData data, Vector3 direction)
+	{
+		Agent.RotateAgent(direction);
+		Agent.SmoothStop();
+
+		var projectile = Instantiate(_attackData.ProjectilePrefab);
+		projectile.GetComponent<Projectile>().Setup(_cachedTransform.position, direction, _attackData.ProjectileSpeed);
+	}
+	public override void Move(MoveData data, Vector3 targetPosition)
+	{
+		Agent.StartPathTo(targetPosition, _moveData.MovementSpeed, () =>
+		{
+		});
 	}
 }

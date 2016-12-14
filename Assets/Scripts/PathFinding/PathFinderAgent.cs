@@ -5,7 +5,7 @@ using UnityEngine;
 public class PathFinderAgent : MonoBehaviour
 {
 	private LinkedList<PathfindingNode> _path = new LinkedList<PathfindingNode>();
-	private PathFinder _pathFinder;
+	private IPathFinder _pathFinder;
 	private Vector3 _pendingTo;
 	private Action _completedPath;
 	private bool _pendingNewPath;
@@ -58,7 +58,7 @@ public class PathFinderAgent : MonoBehaviour
 		//}
 	}
 
-	public void Setup(PathFinder pathFinder, PathfindingNode startingNode)
+	public void Setup(IPathFinder pathFinder, PathfindingNode startingNode)
 	{
 		_pathFinder = pathFinder;
 		_currentNode = startingNode;

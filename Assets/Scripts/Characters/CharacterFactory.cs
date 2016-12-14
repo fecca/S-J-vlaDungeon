@@ -1,12 +1,11 @@
 ﻿using System;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 public static class CharacterFactory
 {
-	public static Player CreatePlayer(GameObject prefab)
+	public static Character CreatePlayer(GameObject prefab)
 	{
-		var newGameObject = Object.Instantiate(prefab);
+		var newGameObject = UnityEngine.Object.Instantiate(prefab);
 		newGameObject.name = "Player";
 		newGameObject.layer = LayerMask.NameToLayer("Player");
 
@@ -24,14 +23,14 @@ public static class CharacterFactory
 
 		return player;
 	}
-	public static Enemy CreateEnemy(
+	public static Character CreateEnemy(
 		GameObject prefab,
 		HealthType healthType,
 		AttackerType attackerType,
 		MoverType moverType,
 		PerceptionType perceptionType)
 	{
-		var newGameObject = Object.Instantiate(prefab);
+		var newGameObject = UnityEngine.Object.Instantiate(prefab);
 		newGameObject.name = "Enemy";
 		newGameObject.layer = LayerMask.NameToLayer("Enemy");
 
@@ -53,7 +52,7 @@ public static class CharacterFactory
 
 		return enemy;
 	}
-	public static Enemy CreateRandomEnemy(
+	public static Character CreateRandomEnemy(
 		GameObject prefab)
 	{
 		return CreateEnemy(

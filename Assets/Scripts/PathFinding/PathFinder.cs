@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class PathFinder : MonoBehaviour
+public class PathFinder : MonoBehaviour, IPathFinder
 {
 	[SerializeField]
 	private bool DrawGizmos = false;
@@ -14,6 +14,7 @@ public class PathFinder : MonoBehaviour
 
 	private void Awake()
 	{
+		ServiceLocator<IPathFinder>.Instance = this;
 		MessageHub.Instance.Subscribe<MeshCreatedEvent>(OnMeshCreatedEvent);
 		MessageHub.Instance.Subscribe<CharactersDestroyedEvent>(OnCharactersDestroyedEvent);
 	}
@@ -197,14 +198,12 @@ public class PathFinder : MonoBehaviour
 
 		return path;
 	}
-	private LinkedList<PathfindingNode> RemoveOccupiedEndings(LinkedList<PathfindingNode> path)
+	private void RemoveOccupiedEndings(LinkedList<PathfindingNode> path)
 	{
 		while (path.Count > 0 && path.First.Value.Occupied)
 		{
 			path.RemoveFirst();
 		}
-
-		return path;
 	}
 	private IEnumerator GetPath(PathfindingNode startNode, PathfindingNode endNode, Action<PathfindingNode> completed)
 	{
@@ -255,8 +254,8 @@ public class PathFinder : MonoBehaviour
 
 	public void GetPath(Vector3 from, Vector3 to, Action<LinkedList<PathfindingNode>> completed)
 	{
-		var startNode = GetNode(from, true);
-		var endNode = GetNode(to, true);
+		var startNode = GetNodeCopy(from);
+		var endNode = GetNodeCopy(to);
 
 		if (!startNode.Walkable || !endNode.Walkable)
 		{
@@ -269,7 +268,7 @@ public class PathFinder : MonoBehaviour
 			completed(RevertPath(lastNode));
 		}));
 	}
-	public PathfindingNode GetNode(Vector3 worldPosition, bool copy)
+	public PathfindingNode GetNodeCopy(Vector3 worldPosition)
 	{
 		worldPosition /= Constants.TileSize;
 		var fromXFraction = worldPosition.x - (int)worldPosition.x;
@@ -278,12 +277,7 @@ public class PathFinder : MonoBehaviour
 		var fromYNodeIndex = Mathf.RoundToInt((int)worldPosition.z * 2 + fromYFraction);
 		var node = _nodes[fromXNodeIndex, fromYNodeIndex];
 
-		if (copy)
-		{
-			return new PathfindingNode(node);
-		}
-
-		return node;
+		return new PathfindingNode(node);
 	}
 	public PathfindingNode GetRandomWalkableNode()
 	{

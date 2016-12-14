@@ -2,9 +2,9 @@
 
 public class Brain
 {
-	private Enemy _owner;
+	private ICharacter _owner;
 	private Perception _perception;
-	private Transform _target;
+	private Vector3 _targetPosition;
 	private Thought _currentThought;
 	private Thought _attackingThought;
 	private Thought _idleThought;
@@ -13,10 +13,10 @@ public class Brain
 
 	public ThoughtType CurrentThoughtType { get; private set; }
 
-	public Brain(Enemy owner, Transform target)
+	public Brain(ICharacter owner)
 	{
 		_owner = owner;
-		_target = target;
+		_targetPosition = ServiceLocator<ICharacter>.Instance.GetTransformPosition();
 		_idleThought = new IdleThought(this);
 		EnterThought(ThoughtType.Idle);
 	}
@@ -38,7 +38,7 @@ public class Brain
 	}
 	private void Perceive()
 	{
-		var perceptionState = _perception.GetPerceptionState(_owner.transform, _target);
+		var perceptionState = _perception.GetPerceptionState(_owner.GetTransformPosition(), _targetPosition);
 		switch (perceptionState)
 		{
 			case PerceptionState.Outside:
@@ -136,12 +136,22 @@ public class Brain
 			_perception = new Perception(perceptionData);
 		}
 	}
-	public Enemy GetOwner()
+	public void Attack(AttackData data)
 	{
-		return _owner;
+		var targetPosition = _targetPosition.WithY(_owner.GetTransformPosition().y);
+		var direction = _owner.GetTransformPosition().GetDirectionTo(targetPosition);
+		_owner.Attack(data, direction);
 	}
-	public Vector3 GetTargetPosition()
+	public void Move(MoveData data)
 	{
-		return _target.position;
+		_owner.Move(data, _targetPosition);
+	}
+	public void SmoothStop()
+	{
+		_owner.Agent.SmoothStop();
+	}
+
+	public void DeactivateLights()
+	{
 	}
 }

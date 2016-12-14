@@ -20,13 +20,13 @@ public class WalkingThought : Thought
 		if (_updateTimer > _data.PositionUpdateInterval)
 		{
 			_updateTimer = 0;
-			_brain.GetOwner().Move(_data);
+			_brain.Move(_data);
 		}
 
 		_updateTimer += Time.deltaTime;
 	}
 	public override void Exit()
 	{
-		_brain.GetOwner().Agent.SmoothStop();
+		_brain.SmoothStop();
 	}
 }

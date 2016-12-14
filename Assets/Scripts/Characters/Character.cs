@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(PathFinderAgent))]
-public abstract class Character : MonoBehaviour, IDamagable
+public abstract class Character : MonoBehaviour, ICharacter
 {
+	public HealthData HealthData { get; protected set; }
 	private PathFinderAgent _agent;
 	public PathFinderAgent Agent
 	{
@@ -15,19 +16,13 @@ public abstract class Character : MonoBehaviour, IDamagable
 			return _agent;
 		}
 	}
-
-	public HealthData HealthData { get; protected set; }
-
-	public void InitializePathfindingAgent()
-	{
-		var pathFinder = FindObjectOfType<PathFinder>();
-		var node = pathFinder.GetRandomWalkableNode();
-		transform.position = node.WorldCoordinates + Vector3.up * 5;
-		Agent.Setup(pathFinder, node);
-	}
-	public virtual void SetHealthData(HealthData healthData) { }
-	public virtual void SetAttackData(AttackData attackData) { }
-	public virtual void SetMoveData(MoveData moveData) { }
-	public virtual void SetPerceptionData(PerceptionData perceptionData) { }
+	public abstract void InitializePathfindingAgent();
+	public abstract void SetHealthData(HealthData healthData);
+	public abstract void SetAttackData(AttackData attackData);
+	public abstract void SetMoveData(MoveData moveData);
+	public abstract void SetPerceptionData(PerceptionData perceptionData);
 	public abstract void TakeDamage();
+	public abstract Vector3 GetTransformPosition();
+	public abstract void Attack(AttackData data, Vector3 direction);
+	public abstract void Move(MoveData data, Vector3 targetPosition);
 }

@@ -9,9 +9,9 @@ public class Perception
 		_perceptionData = perceptionData;
 	}
 
-	public PerceptionState GetPerceptionState(Transform owner, Transform target)
+	public PerceptionState GetPerceptionState(Vector3 ownerPosition, Vector3 targetPosition)
 	{
-		var ray = new Ray(owner.position, owner.GetDirectionTo(target));
+		var ray = new Ray(ownerPosition, ownerPosition.GetDirectionTo(targetPosition));
 		var layerMask = (1 << 11) | (1 << 13) | (1 << 14);
 		layerMask = ~layerMask;
 		RaycastHit hit;
@@ -19,7 +19,7 @@ public class Perception
 		{
 			if (hit.collider.GetComponent<Player>() != null)
 			{
-				var distance = Vector3.Distance(target.position, owner.position);
+				var distance = Vector3.Distance(targetPosition, ownerPosition);
 				if (distance < _perceptionData.InnerRadius)
 				{
 					return PerceptionState.InnerCirle;
