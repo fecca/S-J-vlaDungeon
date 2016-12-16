@@ -3,8 +3,10 @@
 public class Brain
 {
 	private ICharacter _owner;
+	private ICharacter _target;
+	private IMover _mover;
+	private IAttacker _attacker;
 	private Perception _perception;
-	private Vector3 _targetPosition;
 	private Thought _currentThought;
 	private Thought _attackingThought;
 	private Thought _idleThought;
@@ -16,68 +18,34 @@ public class Brain
 	public Brain(ICharacter owner)
 	{
 		_owner = owner;
-		_targetPosition = ServiceLocator<ICharacter>.Instance.GetTransformPosition();
-		_idleThought = new IdleThought(this);
+		_idleThought = new IdleThought();
 		EnterThought(ThoughtType.Idle);
 	}
 
-	private void CheckPerception()
+	public void InitializeAttacker(AttackData attackData, IAttacker attacker)
 	{
-		if (_perception == null)
+		if (attackData != null)
 		{
-			return;
+			_attacker = attacker;
+			_attackingThought = new AttackingThought(this, attackData);
 		}
-
-		if (_perceptionTimer > _perception.GetRandomUpdateInterval())
-		{
-			_perceptionTimer = 0f;
-			Perceive();
-		}
-
-		_perceptionTimer += Time.deltaTime;
 	}
-	private void Perceive()
+	public void InitializeMover(MoveData moveData, IMover mover)
 	{
-		var perceptionState = _perception.GetPerceptionState(_owner.GetTransformPosition(), _targetPosition);
-		switch (perceptionState)
+		if (moveData != null)
 		{
-			case PerceptionState.Outside:
-				EnterThought(ThoughtType.Idle);
-				break;
-
-			case PerceptionState.InnerCirle:
-				EnterThought(ThoughtType.Attacking);
-				break;
-
-			case PerceptionState.OuterCircle:
-				EnterThought(ThoughtType.Walking);
-				break;
-
-			case PerceptionState.BehindWall:
-				if (CurrentThoughtType == ThoughtType.Walking || CurrentThoughtType == ThoughtType.Attacking)
-				{
-					EnterThought(ThoughtType.Walking);
-				}
-				else
-				{
-					EnterThought(ThoughtType.Idle);
-				}
-				break;
-
-			default:
-				throw new System.NotImplementedException("PlayerPosition type not implemented: " + perceptionState);
+			_mover = mover;
+			_walkingThought = new WalkingThought(this, moveData);
+		}
+	}
+	public void InitializePerception(PerceptionData perceptionData)
+	{
+		if (perceptionData != null)
+		{
+			_perception = new Perception(perceptionData);
 		}
 	}
 
-	public void Think()
-	{
-		CheckPerception();
-
-		if (_currentThought != null)
-		{
-			_currentThought.Think();
-		}
-	}
 	public void EnterThought(ThoughtType thoughtType)
 	{
 		if (thoughtType == CurrentThoughtType)
@@ -115,43 +83,77 @@ public class Brain
 		_currentThought = nextThought;
 		_currentThought.Enter();
 	}
-	public void SetToAttacker(AttackData attackData)
+	public void SetTarget(ICharacter target)
 	{
-		if (attackData != null)
+		_target = target;
+	}
+	public void Think()
+	{
+		if (_currentThought != null)
 		{
-			_attackingThought = new AttackingThought(this, attackData);
+			_currentThought.Think();
 		}
 	}
-	public void SetToMover(MoveData moveData)
+	public void Move(MoveData data, Vector3 targetPosition)
 	{
-		if (moveData != null)
-		{
-			_walkingThought = new WalkingThought(this, moveData);
-		}
-	}
-	public void SetToPerceiver(PerceptionData perceptionData)
-	{
-		if (perceptionData != null)
-		{
-			_perception = new Perception(perceptionData);
-		}
-	}
-	public void Attack(AttackData data)
-	{
-		var targetPosition = _targetPosition.WithY(_owner.GetTransformPosition().y);
-		var direction = _owner.GetTransformPosition().GetDirectionTo(targetPosition);
-		_owner.Attack(data, direction);
-	}
-	public void Move(MoveData data)
-	{
-		_owner.Move(data, _targetPosition);
+		_mover.Move(data, targetPosition);
 	}
 	public void SmoothStop()
 	{
-		_owner.Agent.SmoothStop();
+		_mover.SmoothStop();
+	}
+	public void Attack(AttackData data)
+	{
+		var targetPosition = _target.GetTransformPosition().WithY(_owner.GetTransformPosition().y);
+		var direction = _owner.GetTransformPosition().GetDirectionTo(targetPosition);
+		_attacker.Attack(data, direction);
 	}
 
-	public void DeactivateLights()
+	public void Perceive()
 	{
+		if (_perception == null)
+		{
+			return;
+		}
+
+		if (_perceptionTimer > _perception.GetRandomUpdateInterval())
+		{
+			_perceptionTimer = 0f;
+			HandlePerception();
+		}
+
+		_perceptionTimer += Time.deltaTime;
+	}
+	public void HandlePerception()
+	{
+		var perceptionState = _perception.GetPerceptionState(_owner.GetTransformPosition(), _target.GetTransformPosition());
+		switch (perceptionState)
+		{
+			case PerceptionState.Outside:
+				EnterThought(ThoughtType.Idle);
+				break;
+
+			case PerceptionState.InnerCirle:
+				EnterThought(ThoughtType.Attacking);
+				break;
+
+			case PerceptionState.OuterCircle:
+				EnterThought(ThoughtType.Walking);
+				break;
+
+			case PerceptionState.BehindWall:
+				if (CurrentThoughtType == ThoughtType.Walking || CurrentThoughtType == ThoughtType.Attacking)
+				{
+					EnterThought(ThoughtType.Walking);
+				}
+				else
+				{
+					EnterThought(ThoughtType.Idle);
+				}
+				break;
+
+			default:
+				throw new System.NotImplementedException("PlayerPosition type not implemented: " + perceptionState);
+		}
 	}
 }

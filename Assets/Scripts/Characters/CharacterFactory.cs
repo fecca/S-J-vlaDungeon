@@ -3,7 +3,7 @@ using UnityEngine;
 
 public static class CharacterFactory
 {
-	public static Character CreatePlayer(GameObject prefab)
+	public static Player CreatePlayer(GameObject prefab)
 	{
 		var newGameObject = UnityEngine.Object.Instantiate(prefab);
 		newGameObject.name = "Player";
@@ -13,17 +13,17 @@ public static class CharacterFactory
 		player.InitializePathfindingAgent();
 
 		var healthData = new HealthData(Constants.PLAYER_HEALTH);
-		player.SetHealthData(healthData);
+		player.InitializeHealth(healthData);
 
 		var attackData = new AttackData(0, Constants.PLAYER_PROJECTILE_SPEED, "PlayerProjectile");
-		player.SetAttackData(attackData);
+		player.InitializeAttacker(attackData);
 
 		var moveData = new MoveData(0, Constants.PLAYER_MOVEMENT_SPEED);
-		player.SetMoveData(moveData);
+		player.InitializeMover(moveData);
 
 		return player;
 	}
-	public static Character CreateEnemy(
+	public static Enemy CreateEnemy(
 		GameObject prefab,
 		HealthType healthType,
 		AttackerType attackerType,
@@ -39,20 +39,22 @@ public static class CharacterFactory
 		enemy.InitializePathfindingAgent();
 
 		var healthData = GetHealthData(healthType);
-		enemy.SetHealthData(healthData);
+		enemy.InitializeHealth(healthData);
 
 		var attackData = GetAttackerData(attackerType);
-		enemy.SetAttackData(attackData);
+		enemy.InitializeAttacker(attackData);
 
 		var moveData = GetMoverData(moverType);
-		enemy.SetMoveData(moveData);
+		enemy.InitializeMover(moveData);
 
 		var perceptionData = GetPerceptionData(perceptionType);
-		enemy.SetPerceptionData(perceptionData);
+		enemy.InitializerPerception(perceptionData);
+
+		enemy.SetTarget(ServiceLocator<ICharacter>.Instance);
 
 		return enemy;
 	}
-	public static Character CreateRandomEnemy(
+	public static Enemy CreateRandomEnemy(
 		GameObject prefab)
 	{
 		return CreateEnemy(

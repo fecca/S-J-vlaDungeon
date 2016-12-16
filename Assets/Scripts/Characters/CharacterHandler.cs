@@ -7,8 +7,8 @@ public class CharacterHandler : MonoBehaviour
 	[SerializeField]
 	private int NumberOfEnemies = 1;
 
-	private Character _player;
-	private Character[] _enemies;
+	private Player _player;
+	private Enemy[] _enemies;
 
 	private void Awake()
 	{
@@ -40,7 +40,7 @@ public class CharacterHandler : MonoBehaviour
 	}
 	private void CreateEnemies(int numberOfEnemies)
 	{
-		_enemies = new Character[numberOfEnemies];
+		_enemies = new Enemy[numberOfEnemies];
 		for (var i = 0; i < numberOfEnemies; i++)
 		{
 			_enemies[i] = CharacterFactory.CreateRandomEnemy(CharacterPrefab);

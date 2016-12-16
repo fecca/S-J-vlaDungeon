@@ -20,10 +20,10 @@ public class Projectile : MonoBehaviour
 	private void OnTriggerEnter(Collider collider)
 	{
 		Destroy(gameObject);
-		var character = collider.gameObject.GetComponent<Character>();
-		if (character != null)
+		var enemy = collider.gameObject.GetComponent<Enemy>();
+		if (enemy != null)
 		{
-			character.TakeDamage();
+			enemy.TakeDamage();
 		}
 	}
 

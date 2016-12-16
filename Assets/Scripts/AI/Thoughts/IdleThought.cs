@@ -1,10 +1,7 @@
 ﻿public class IdleThought : Thought
 {
-	private Brain _brain;
-
-	public IdleThought(Brain brain)
+	public IdleThought()
 	{
-		_brain = brain;
 	}
 
 	public override void Enter()
