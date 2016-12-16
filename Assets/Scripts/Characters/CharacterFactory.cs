@@ -10,6 +10,7 @@ public class CharacterFactory : ICharacterFactory
 		newGameObject.layer = LayerMask.NameToLayer("Player");
 
 		var player = newGameObject.AddComponent<Player>();
+		player.InitializeBrain();
 		player.InitializePathfindingAgent();
 		player.InitializeHealth(new HealthData(Constants.PLAYER_HEALTH));
 		player.InitializeAttacker(new AttackData(0, Constants.PLAYER_PROJECTILE_SPEED, "PlayerProjectile"));

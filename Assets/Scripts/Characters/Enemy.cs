@@ -3,11 +3,11 @@
 public class Enemy : MonoBehaviour, ICharacter, IMover, IAttacker, IPerceiver
 {
 	private Transform _cachedTransform;
-	private Brain _brain;
-	private IPathFinderAgent _agent;
+	private EnemyBrain _brain;
+	private PathFinderAgent _agent;
 
 	public HealthData HealthData { get; set; }
-	public IPathFinderAgent Agent
+	public PathFinderAgent Agent
 	{
 		get
 		{
@@ -34,7 +34,7 @@ public class Enemy : MonoBehaviour, ICharacter, IMover, IAttacker, IPerceiver
 
 	public void InitializeBrain()
 	{
-		_brain = new Brain(this);
+		_brain = new EnemyBrain(this);
 	}
 	public void InitializePathfindingAgent()
 	{

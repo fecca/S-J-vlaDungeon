@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Brain
+public class EnemyBrain : IBrain
 {
 	private ICharacter _owner;
 	private ICharacter _target;
@@ -15,7 +15,7 @@ public class Brain
 
 	public ThoughtType CurrentThoughtType { get; private set; }
 
-	public Brain(ICharacter owner)
+	public EnemyBrain(ICharacter owner)
 	{
 		_owner = owner;
 		_idleThought = new IdleThought();
@@ -46,6 +46,13 @@ public class Brain
 		}
 	}
 
+	public void Think()
+	{
+		if (_currentThought != null)
+		{
+			_currentThought.Think();
+		}
+	}
 	public void EnterThought(ThoughtType thoughtType)
 	{
 		if (thoughtType == CurrentThoughtType)
@@ -86,13 +93,6 @@ public class Brain
 	public void SetTarget(ICharacter target)
 	{
 		_target = target;
-	}
-	public void Think()
-	{
-		if (_currentThought != null)
-		{
-			_currentThought.Think();
-		}
 	}
 	public void Move(MoveData data, Vector3 targetPosition)
 	{

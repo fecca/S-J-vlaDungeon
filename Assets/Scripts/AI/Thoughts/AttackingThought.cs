@@ -2,11 +2,11 @@
 
 public class AttackingThought : IThought
 {
-	private Brain _brain;
+	private EnemyBrain _brain;
 	private AttackData _data;
 	private float _updateTimer;
 
-	public AttackingThought(Brain brain, AttackData data)
+	public AttackingThought(EnemyBrain brain, AttackData data)
 	{
 		_brain = brain;
 		_data = data;
