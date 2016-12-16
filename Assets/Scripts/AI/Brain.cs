@@ -7,10 +7,10 @@ public class Brain
 	private IMover _mover;
 	private IAttacker _attacker;
 	private Perception _perception;
-	private Thought _currentThought;
-	private Thought _attackingThought;
-	private Thought _idleThought;
-	private Thought _walkingThought;
+	private IThought _currentThought;
+	private IThought _attackingThought;
+	private IThought _idleThought;
+	private IThought _walkingThought;
 	private float _perceptionTimer;
 
 	public ThoughtType CurrentThoughtType { get; private set; }
@@ -53,7 +53,7 @@ public class Brain
 			return;
 		}
 
-		Thought nextThought;
+		IThought nextThought;
 		switch (thoughtType)
 		{
 			case ThoughtType.Idle:

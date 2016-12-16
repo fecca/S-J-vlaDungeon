@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class WalkingThought : Thought
+public class WalkingThought : IThought
 {
 	private Brain _brain;
 	private MoveData _data;
@@ -12,10 +12,10 @@ public class WalkingThought : Thought
 		_data = data;
 	}
 
-	public override void Enter()
+	public void Enter()
 	{
 	}
-	public override void Think()
+	public void Think()
 	{
 		if (_updateTimer > _data.PositionUpdateInterval)
 		{
@@ -25,7 +25,7 @@ public class WalkingThought : Thought
 
 		_updateTimer += Time.deltaTime;
 	}
-	public override void Exit()
+	public void Exit()
 	{
 		_brain.SmoothStop();
 	}

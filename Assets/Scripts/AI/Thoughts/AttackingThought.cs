@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class AttackingThought : Thought
+public class AttackingThought : IThought
 {
 	private Brain _brain;
 	private AttackData _data;
@@ -12,10 +12,10 @@ public class AttackingThought : Thought
 		_data = data;
 	}
 
-	public override void Enter()
+	public void Enter()
 	{
 	}
-	public override void Think()
+	public void Think()
 	{
 		if (_updateTimer > _data.TimeBetweenAttacks)
 		{
@@ -25,7 +25,7 @@ public class AttackingThought : Thought
 
 		_updateTimer += Time.deltaTime;
 	}
-	public override void Exit()
+	public void Exit()
 	{
 	}
 }

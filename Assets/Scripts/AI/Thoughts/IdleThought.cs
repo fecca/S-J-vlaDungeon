@@ -1,16 +1,16 @@
-﻿public class IdleThought : Thought
+﻿public class IdleThought : IThought
 {
 	public IdleThought()
 	{
 	}
 
-	public override void Enter()
+	public void Enter()
 	{
 	}
-	public override void Think()
+	public void Think()
 	{
 	}
-	public override void Exit()
+	public void Exit()
 	{
 	}
 }
