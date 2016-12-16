@@ -52,6 +52,7 @@ public class Player : MonoBehaviour, ICharacter, IMover, IAttacker
 	{
 		_brain.InitializeMover(moveData, this);
 	}
+
 	public void TakeDamage()
 	{
 		HealthData.CurrentHealth--;

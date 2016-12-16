@@ -36,7 +36,7 @@ public class CharacterFactory : ICharacterFactory
 		enemy.InitializeHealth(GetHealthData(healthType));
 		enemy.InitializeAttacker(GetAttackerData(attackerType));
 		enemy.InitializeMover(GetMoverData(moverType));
-		enemy.InitializerPerception(GetPerceptionData(perceptionType));
+		enemy.InitializePerception(GetPerceptionData(perceptionType));
 		enemy.SetTarget(target);
 
 		return enemy;
