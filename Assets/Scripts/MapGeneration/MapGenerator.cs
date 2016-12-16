@@ -295,7 +295,7 @@ public class MapGenerator : MonoBehaviour
 			CreateCorridor(line[i], CorridorThickness);
 		}
 	}
-	private void CreateCorridor(Coordinates c, int r)
+	private void CreateCorridor(Point c, int r)
 	{
 		for (var x = -r; x <= r; x++)
 		{
@@ -480,9 +480,9 @@ public class MapGenerator : MonoBehaviour
 
 		return tiles;
 	}
-	private List<Coordinates> GetLine(Coordinates from, Coordinates to)
+	private List<Point> GetLine(Point from, Point to)
 	{
-		var line = new List<Coordinates>(64);
+		var line = new List<Point>(64);
 
 		var x = from.X;
 		var y = from.Y;
@@ -509,7 +509,7 @@ public class MapGenerator : MonoBehaviour
 		var gradientAccumulation = longest / 2;
 		for (var i = 0; i < longest; i++)
 		{
-			line.Add(new Coordinates(x, y));
+			line.Add(new Point(x, y));
 			if (inverted)
 			{
 				y += step;

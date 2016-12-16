@@ -39,6 +39,6 @@ public class CameraController : MonoBehaviour
 
 	private void OnCharactersCreatedEvent(CharactersCreatedEvent charactersCreatedEvent)
 	{
-		_player = ServiceLocator<ICharacter>.Instance;
+		_player = ServiceLocator<ICharacterHandler>.Instance.GetPlayer();
 	}
 }

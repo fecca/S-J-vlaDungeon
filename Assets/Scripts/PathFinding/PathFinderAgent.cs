@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PathFinderAgent : MonoBehaviour
+public class PathFinderAgent : MonoBehaviour, IPathFinderAgent
 {
 	private LinkedList<PathfindingNode> _path = new LinkedList<PathfindingNode>();
 	private IPathFinder _pathFinder;
@@ -17,6 +17,10 @@ public class PathFinderAgent : MonoBehaviour
 	private void Awake()
 	{
 		_cachedTransform = transform;
+	}
+	private void Start()
+	{
+		_pathFinder = ServiceLocator<IPathFinder>.Instance;
 	}
 	private void FixedUpdate()
 	{
@@ -38,7 +42,7 @@ public class PathFinderAgent : MonoBehaviour
 				}
 				else
 				{
-					_nextNode.SetOccupied(true);
+					_nextNode.Occupied = true;
 				}
 				var targetPosition = _nextNode.WorldCoordinates.WithY(_cachedTransform.position.y);
 				RotateAgent(_cachedTransform.GetDirectionTo(targetPosition));
@@ -46,23 +50,13 @@ public class PathFinderAgent : MonoBehaviour
 			MoveAlongPath();
 		}
 	}
-	private void OnDrawGizmos()
-	{
-		//if (_path != null)
-		//{
-		//	for (var iteration = _path.First; iteration != null; iteration = iteration.Next)
-		//	{
-		//		Gizmos.color = Color.blue;
-		//		Gizmos.DrawSphere(iteration.Value.WorldCoordinates.WithY(1), 0.25f);
-		//	}
-		//}
-	}
 
-	public void Setup(IPathFinder pathFinder, PathfindingNode startingNode)
+	public void Initialize()
 	{
-		_pathFinder = pathFinder;
-		_currentNode = startingNode;
-		_currentNode.SetOccupied(true);
+		_currentNode = ServiceLocator<IPathFinder>.Instance.GetRandomWalkableNode();
+		_currentNode.Occupied = true;
+
+		_cachedTransform.position = _currentNode.WorldCoordinates + Vector3.up * 5;
 	}
 	public void StartPathTo(Vector3 targetPosition, float movementSpeed, Action completed = null)
 	{
@@ -82,11 +76,6 @@ public class PathFinderAgent : MonoBehaviour
 			});
 		}
 	}
-	public void StartPathTo(Tile targetTile, float movementSpeed, Action completed = null)
-	{
-		var position = targetTile.WorldCoordinates.WithY(_cachedTransform.position.y);
-		StartPathTo(position, movementSpeed, completed);
-	}
 	public void SmoothStop()
 	{
 		var firstNode = _path.First;
@@ -96,15 +85,15 @@ public class PathFinderAgent : MonoBehaviour
 			_path.AddFirst(firstNode);
 		}
 	}
-	public void ClearNodes()
+	public void ClearOccupiedNodes()
 	{
 		if (_currentNode != null)
 		{
-			_currentNode.SetOccupied(false);
+			_currentNode.Occupied = false;
 		}
 		if (_nextNode != null)
 		{
-			_nextNode.SetOccupied(false);
+			_nextNode.Occupied = false;
 		}
 	}
 	public void RotateAgent(Vector3 direction)
@@ -124,7 +113,7 @@ public class PathFinderAgent : MonoBehaviour
 	}
 	private void ArrivedAtNode()
 	{
-		_currentNode.SetOccupied(false);
+		_currentNode.Occupied = false;
 		_currentNode = _nextNode;
 		_nextNode = null;
 

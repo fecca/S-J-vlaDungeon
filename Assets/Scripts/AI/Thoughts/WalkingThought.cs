@@ -20,7 +20,7 @@ public class WalkingThought : Thought
 		if (_updateTimer > _data.PositionUpdateInterval)
 		{
 			_updateTimer = 0;
-			_brain.Move(_data, ServiceLocator<ICharacter>.Instance.GetTransformPosition());
+			_brain.Move(_data, ServiceLocator<ICharacterHandler>.Instance.GetPlayer().GetTransformPosition());
 		}
 
 		_updateTimer += Time.deltaTime;

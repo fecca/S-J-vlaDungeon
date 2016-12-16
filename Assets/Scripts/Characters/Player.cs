@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Player : MonoBehaviour, ICharacter, IMover, IAttacker
 {
@@ -7,10 +8,10 @@ public class Player : MonoBehaviour, ICharacter, IMover, IAttacker
 	private Transform _cachedTransform;
 	private float _mouseDragTimer;
 	private float _mouseDragUpdateInterval = 0.1f;
-	private PathFinderAgent _agent;
+	private IPathFinderAgent _agent;
 
 	public HealthData HealthData { get; set; }
-	public PathFinderAgent Agent
+	public IPathFinderAgent Agent
 	{
 		get
 		{
@@ -34,10 +35,7 @@ public class Player : MonoBehaviour, ICharacter, IMover, IAttacker
 
 	public void InitializePathfindingAgent()
 	{
-		var pathFinder = ServiceLocator<IPathFinder>.Instance;
-		var node = pathFinder.GetRandomWalkableNode();
-		transform.position = node.WorldCoordinates + Vector3.up * 5;
-		Agent.Setup(pathFinder, node);
+		Agent.Initialize();
 	}
 	public void InitializeHealth(HealthData healthData)
 	{
@@ -54,7 +52,6 @@ public class Player : MonoBehaviour, ICharacter, IMover, IAttacker
 	public void InitializerPerception(PerceptionData perceptionData)
 	{
 	}
-
 	public void TakeDamage()
 	{
 		HealthData.CurrentHealth--;
@@ -81,6 +78,10 @@ public class Player : MonoBehaviour, ICharacter, IMover, IAttacker
 	{
 		Agent.SmoothStop();
 	}
+	public GameObject GetGameObject()
+	{
+		return gameObject;
+	}
 	public Vector3 GetTransformPosition()
 	{
 		return _cachedTransform.position;
@@ -90,7 +91,7 @@ public class Player : MonoBehaviour, ICharacter, IMover, IAttacker
 	{
 		if (Input.GetMouseButtonDown(0))
 		{
-			var hit = InputHandler.Instance.GetRaycastHit();
+			var hit = ServiceLocator<IInputHandler>.Instance.GetRaycastHit();
 			if (hit.transform)
 			{
 				if (hit.transform.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
@@ -106,7 +107,7 @@ public class Player : MonoBehaviour, ICharacter, IMover, IAttacker
 			{
 				_mouseDragTimer = 0f;
 
-				var hit = InputHandler.Instance.GetRaycastHit();
+				var hit = ServiceLocator<IInputHandler>.Instance.GetRaycastHit();
 				if (hit.transform)
 				{
 					if (hit.transform.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
@@ -120,7 +121,7 @@ public class Player : MonoBehaviour, ICharacter, IMover, IAttacker
 
 		if (Input.GetMouseButtonDown(1))
 		{
-			var hit = InputHandler.Instance.GetRaycastHit();
+			var hit = ServiceLocator<IInputHandler>.Instance.GetRaycastHit();
 			if (hit.transform != null)
 			{
 				var hitPosition = hit.point.WithY(_cachedTransform.position.y);

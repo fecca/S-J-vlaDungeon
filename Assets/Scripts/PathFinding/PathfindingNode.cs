@@ -4,12 +4,12 @@ using UnityEngine;
 public class PathfindingNode : IHeapItem<PathfindingNode>
 {
 	public PathfindingNode Parent;
-	public Coordinates GridCoordinates;
+	public Point GridCoordinates;
 	public Vector3 WorldCoordinates;
 	public List<PathfindingNode> Neighbours;
 	public bool Walkable;
 
-	public bool Occupied { get; private set; }
+	public bool Occupied { get; set; }
 	public float GCost { get; set; }
 	public float HCost { get; set; }
 	public float FCost { get; set; }
@@ -17,7 +17,7 @@ public class PathfindingNode : IHeapItem<PathfindingNode>
 
 	public PathfindingNode(int x, int y)
 	{
-		GridCoordinates = new Coordinates(x, y);
+		GridCoordinates = new Point(x, y);
 		WorldCoordinates = FindWorldCoordinates(x, y);
 		Neighbours = new List<PathfindingNode>();
 	}
@@ -30,6 +30,16 @@ public class PathfindingNode : IHeapItem<PathfindingNode>
 		Occupied = copy.Occupied;
 	}
 
+	public int CompareTo(PathfindingNode other)
+	{
+		var compare = FCost.CompareTo(other.FCost);
+		if (compare == 0)
+		{
+			compare = HCost.CompareTo(other.HCost);
+		}
+
+		return -compare;
+	}
 	public override bool Equals(object other)
 	{
 		var otherNode = (PathfindingNode)other;
@@ -47,20 +57,6 @@ public class PathfindingNode : IHeapItem<PathfindingNode>
 			"Walkable: {2}, " +
 			"Occupied: {3}, ",
 			GridCoordinates, WorldCoordinates, Walkable, Occupied);
-	}
-	public int CompareTo(PathfindingNode other)
-	{
-		var compare = FCost.CompareTo(other.FCost);
-		if (compare == 0)
-		{
-			compare = HCost.CompareTo(other.HCost);
-		}
-
-		return -compare;
-	}
-	public void SetOccupied(bool occupied)
-	{
-		Occupied = occupied;
 	}
 
 	private Vector3 FindWorldCoordinates(float x, float y)

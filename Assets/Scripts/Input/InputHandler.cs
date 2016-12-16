@@ -2,22 +2,13 @@
 using System.Linq;
 using UnityEngine;
 
-public class InputHandler : MonoBehaviour
+public class InputHandler : MonoBehaviour, IInputHandler
 {
 	private IDictionary<KeyCode, List<TinyMessageBase>> _keyboardBindings = new Dictionary<KeyCode, List<TinyMessageBase>>();
 
-	private static InputHandler _instance;
-	public static InputHandler Instance
-	{
-		get
-		{
-			return _instance;
-		}
-	}
-
 	private void Awake()
 	{
-		_instance = this;
+		ServiceLocator<IInputHandler>.Instance = this;
 		SetupKeyboardBindings();
 	}
 	private void Update()
@@ -34,7 +25,6 @@ public class InputHandler : MonoBehaviour
 			}
 		}
 	}
-
 	private void SetupKeyboardBindings()
 	{
 		_keyboardBindings.Add(KeyCode.Return, new List<TinyMessageBase>

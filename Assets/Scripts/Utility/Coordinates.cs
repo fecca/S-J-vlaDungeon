@@ -1,9 +1,9 @@
-﻿public struct Coordinates
+﻿public struct Point
 {
 	public int X { get; private set; }
 	public int Y { get; private set; }
 
-	public Coordinates(int x, int y)
+	public Point(int x, int y)
 	{
 		X = x;
 		Y = y;
@@ -11,6 +11,6 @@
 
 	public override string ToString()
 	{
-		return X + "; " + Y;
+		return "[" + X + ";" + Y + "]";
 	}
 }

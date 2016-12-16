@@ -1,9 +1,9 @@
 ﻿using System;
 using UnityEngine;
 
-public static class CharacterFactory
+public class CharacterFactory : ICharacterFactory
 {
-	public static Player CreatePlayer(GameObject prefab)
+	public Player CreatePlayer(GameObject prefab)
 	{
 		var newGameObject = UnityEngine.Object.Instantiate(prefab);
 		newGameObject.name = "Player";
@@ -11,24 +11,19 @@ public static class CharacterFactory
 
 		var player = newGameObject.AddComponent<Player>();
 		player.InitializePathfindingAgent();
-
-		var healthData = new HealthData(Constants.PLAYER_HEALTH);
-		player.InitializeHealth(healthData);
-
-		var attackData = new AttackData(0, Constants.PLAYER_PROJECTILE_SPEED, "PlayerProjectile");
-		player.InitializeAttacker(attackData);
-
-		var moveData = new MoveData(0, Constants.PLAYER_MOVEMENT_SPEED);
-		player.InitializeMover(moveData);
+		player.InitializeHealth(new HealthData(Constants.PLAYER_HEALTH));
+		player.InitializeAttacker(new AttackData(0, Constants.PLAYER_PROJECTILE_SPEED, "PlayerProjectile"));
+		player.InitializeMover(new MoveData(0, Constants.PLAYER_MOVEMENT_SPEED));
 
 		return player;
 	}
-	public static Enemy CreateEnemy(
+	public Enemy CreateEnemy(
 		GameObject prefab,
 		HealthType healthType,
 		AttackerType attackerType,
 		MoverType moverType,
-		PerceptionType perceptionType)
+		PerceptionType perceptionType,
+		ICharacter target)
 	{
 		var newGameObject = UnityEngine.Object.Instantiate(prefab);
 		newGameObject.name = "Enemy";
@@ -37,35 +32,28 @@ public static class CharacterFactory
 		var enemy = newGameObject.AddComponent<Enemy>();
 		enemy.InitializeBrain();
 		enemy.InitializePathfindingAgent();
-
-		var healthData = GetHealthData(healthType);
-		enemy.InitializeHealth(healthData);
-
-		var attackData = GetAttackerData(attackerType);
-		enemy.InitializeAttacker(attackData);
-
-		var moveData = GetMoverData(moverType);
-		enemy.InitializeMover(moveData);
-
-		var perceptionData = GetPerceptionData(perceptionType);
-		enemy.InitializerPerception(perceptionData);
-
-		enemy.SetTarget(ServiceLocator<ICharacter>.Instance);
+		enemy.InitializeHealth(GetHealthData(healthType));
+		enemy.InitializeAttacker(GetAttackerData(attackerType));
+		enemy.InitializeMover(GetMoverData(moverType));
+		enemy.InitializerPerception(GetPerceptionData(perceptionType));
+		enemy.SetTarget(target);
 
 		return enemy;
 	}
-	public static Enemy CreateRandomEnemy(
-		GameObject prefab)
+	public Enemy CreateRandomEnemy(
+		GameObject prefab,
+		ICharacter target)
 	{
 		return CreateEnemy(
 			prefab,
 			GetRandomOfType<HealthType>(),
 			GetRandomOfType<AttackerType>(),
 			GetRandomOfType<MoverType>(),
-			GetRandomOfType<PerceptionType>());
+			GetRandomOfType<PerceptionType>(),
+			target);
 	}
 
-	private static T GetRandomOfType<T>()
+	private T GetRandomOfType<T>()
 	{
 		var values = Enum.GetValues(typeof(T));
 		var random = UnityEngine.Random.Range(0, values.Length);
@@ -73,7 +61,7 @@ public static class CharacterFactory
 
 		return (T)value;
 	}
-	private static HealthData GetHealthData(HealthType healthType)
+	private HealthData GetHealthData(HealthType healthType)
 	{
 		switch (healthType)
 		{
@@ -87,7 +75,7 @@ public static class CharacterFactory
 				throw new NotImplementedException("HealthType not implemented: " + healthType);
 		}
 	}
-	private static AttackData GetAttackerData(AttackerType attackerType)
+	private AttackData GetAttackerData(AttackerType attackerType)
 	{
 		switch (attackerType)
 		{
@@ -102,7 +90,7 @@ public static class CharacterFactory
 				throw new NotImplementedException("AttackerType not implemented: " + attackerType);
 		}
 	}
-	private static MoveData GetMoverData(MoverType moverType)
+	private MoveData GetMoverData(MoverType moverType)
 	{
 		switch (moverType)
 		{
@@ -117,7 +105,7 @@ public static class CharacterFactory
 				throw new NotImplementedException("MoverType not implemented: " + moverType);
 		}
 	}
-	private static PerceptionData GetPerceptionData(PerceptionType perceptionType)
+	private PerceptionData GetPerceptionData(PerceptionType perceptionType)
 	{
 		switch (perceptionType)
 		{

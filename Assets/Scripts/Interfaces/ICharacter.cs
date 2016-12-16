@@ -3,7 +3,8 @@
 public interface ICharacter
 {
 	HealthData HealthData { get; set; }
-	PathFinderAgent Agent { get; }
+	IPathFinderAgent Agent { get; }
+	GameObject GetGameObject();
 	Vector3 GetTransformPosition();
 	void InitializePathfindingAgent();
 	void InitializeAttacker(AttackData attackData);
