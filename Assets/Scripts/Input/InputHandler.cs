@@ -25,13 +25,6 @@ public class InputHandler : MonoBehaviour, IInputHandler
 			}
 		}
 	}
-	private void SetupKeyboardBindings()
-	{
-		_keyboardBindings.Add(KeyCode.Return, new List<TinyMessageBase>
-		{
-			new DestroyGameEvent(null)
-		});
-	}
 
 	public RaycastHit GetRaycastHit()
 	{
@@ -39,5 +32,13 @@ public class InputHandler : MonoBehaviour, IInputHandler
 		RaycastHit hit;
 		Physics.Raycast(ray, out hit, 500f);
 		return hit;
+	}
+
+	private void SetupKeyboardBindings()
+	{
+		_keyboardBindings.Add(KeyCode.Return, new List<TinyMessageBase>
+		{
+			new DestroyGameEvent(null)
+		});
 	}
 }

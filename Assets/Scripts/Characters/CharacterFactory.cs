@@ -37,7 +37,7 @@ public class CharacterFactory : ICharacterFactory
 		enemy.InitializeAttacker(GetAttackerData(attackerType));
 		enemy.InitializeMover(GetMoverData(moverType));
 		enemy.InitializePerception(GetPerceptionData(perceptionType));
-		enemy.SetTarget(target);
+		enemy.InitializeTarget(target);
 
 		return enemy;
 	}

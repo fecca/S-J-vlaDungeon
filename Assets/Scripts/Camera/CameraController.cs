@@ -8,7 +8,7 @@ public class CameraController : MonoBehaviour
 	private float RotationSpeed = 1;
 
 	private Transform _cachedTransform;
-	private ICharacter _player;
+	private ICharacter _target;
 
 	private void Awake()
 	{
@@ -27,18 +27,18 @@ public class CameraController : MonoBehaviour
 		}
 		Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, 5, 20);
 
-		if (_player != null)
+		if (_target != null)
 		{
 			if (Input.GetMouseButton(2))
 			{
 				_cachedTransform.Rotate(Vector3.up, Input.GetAxisRaw("Mouse X") * RotationSpeed);
 			}
-			_cachedTransform.position = Vector3.Lerp(_cachedTransform.position, _player.GetTransformPosition(), Time.deltaTime * FollowSpeed);
+			_cachedTransform.position = Vector3.Lerp(_cachedTransform.position, _target.GetTransformPosition(), Time.deltaTime * FollowSpeed);
 		}
 	}
 
 	private void OnCharactersCreatedEvent(CharactersCreatedEvent charactersCreatedEvent)
 	{
-		_player = ServiceLocator<ICharacterHandler>.Instance.GetPlayer();
+		_target = ServiceLocator<ICharacterHandler>.Instance.GetPlayer();
 	}
 }

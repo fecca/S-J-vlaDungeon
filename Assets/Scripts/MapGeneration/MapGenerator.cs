@@ -83,6 +83,7 @@ public class MapGenerator : MonoBehaviour
 
 		MessageHub.Instance.Publish(new MapDestroyedEvent(null));
 	}
+
 	private IEnumerator CreateMap(Action completed)
 	{
 		_map = new Tile[Width, Height];

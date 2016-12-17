@@ -43,6 +43,7 @@ public class MeshGenerator : MonoBehaviour
 
 		MessageHub.Instance.Publish(new MeshDestroyedEvent(null));
 	}
+
 	private IEnumerator GenerateMesh(Tile[,] map, Action completed)
 	{
 		var mapWidth = map.GetLength(0);

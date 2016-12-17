@@ -49,6 +49,39 @@ public class PathFinder : MonoBehaviour, IPathFinder
 
 		MessageHub.Instance.Publish(new PathNodesDestroyedEvent(null));
 	}
+
+	public void GetPath(Vector3 from, Vector3 to, Action<LinkedList<PathfindingNode>> completed)
+	{
+		var startNode = GetNodeCopy(from);
+		var endNode = GetNodeCopy(to);
+
+		if (!startNode.Walkable || !endNode.Walkable)
+		{
+			completed(new LinkedList<PathfindingNode>());
+			return;
+		}
+
+		StartCoroutine(GetPath(startNode, endNode, (lastNode) =>
+		{
+			completed(RevertPath(lastNode));
+		}));
+	}
+	public PathfindingNode GetNodeCopy(Vector3 worldPosition)
+	{
+		worldPosition /= Constants.TileSize;
+		var fromXFraction = worldPosition.x - (int)worldPosition.x;
+		var fromXNodeIndex = Mathf.RoundToInt((int)worldPosition.x * 2 + fromXFraction);
+		var fromYFraction = worldPosition.z - (int)worldPosition.z;
+		var fromYNodeIndex = Mathf.RoundToInt((int)worldPosition.z * 2 + fromYFraction);
+		var node = _nodes[fromXNodeIndex, fromYNodeIndex];
+
+		return new PathfindingNode(node);
+	}
+	public PathfindingNode GetRandomWalkableNode()
+	{
+		return _walkableNodes.GetRandomElement();
+	}
+
 	private IEnumerator CreatePathNodes(Tile[,] map, Action completed)
 	{
 		CreateNodes(map);
@@ -250,37 +283,5 @@ public class PathFinder : MonoBehaviour, IPathFinder
 		completed(closed.Last());
 
 		yield break;
-	}
-
-	public void GetPath(Vector3 from, Vector3 to, Action<LinkedList<PathfindingNode>> completed)
-	{
-		var startNode = GetNodeCopy(from);
-		var endNode = GetNodeCopy(to);
-
-		if (!startNode.Walkable || !endNode.Walkable)
-		{
-			completed(new LinkedList<PathfindingNode>());
-			return;
-		}
-
-		StartCoroutine(GetPath(startNode, endNode, (lastNode) =>
-		{
-			completed(RevertPath(lastNode));
-		}));
-	}
-	public PathfindingNode GetNodeCopy(Vector3 worldPosition)
-	{
-		worldPosition /= Constants.TileSize;
-		var fromXFraction = worldPosition.x - (int)worldPosition.x;
-		var fromXNodeIndex = Mathf.RoundToInt((int)worldPosition.x * 2 + fromXFraction);
-		var fromYFraction = worldPosition.z - (int)worldPosition.z;
-		var fromYNodeIndex = Mathf.RoundToInt((int)worldPosition.z * 2 + fromYFraction);
-		var node = _nodes[fromXNodeIndex, fromYNodeIndex];
-
-		return new PathfindingNode(node);
-	}
-	public PathfindingNode GetRandomWalkableNode()
-	{
-		return _walkableNodes.GetRandomElement();
 	}
 }

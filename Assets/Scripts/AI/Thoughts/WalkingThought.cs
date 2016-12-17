@@ -2,13 +2,13 @@
 
 public class WalkingThought : IThought
 {
-	private EnemyBrain _brain;
+	private IMover _mover;
 	private MoveData _data;
 	private float _updateTimer;
 
-	public WalkingThought(EnemyBrain brain, MoveData data)
+	public WalkingThought(IMover brain, MoveData data)
 	{
-		_brain = brain;
+		_mover = brain;
 		_data = data;
 	}
 
@@ -20,13 +20,13 @@ public class WalkingThought : IThought
 		if (_updateTimer > _data.PositionUpdateInterval)
 		{
 			_updateTimer = 0;
-			_brain.Move(_data, ServiceLocator<ICharacterHandler>.Instance.GetPlayer().GetTransformPosition());
+			_mover.Move(_data, ServiceLocator<ICharacterHandler>.Instance.GetPlayer().GetTransformPosition());
 		}
 
 		_updateTimer += Time.deltaTime;
 	}
 	public void Exit()
 	{
-		_brain.SmoothStop();
+		_mover.SmoothStop();
 	}
 }

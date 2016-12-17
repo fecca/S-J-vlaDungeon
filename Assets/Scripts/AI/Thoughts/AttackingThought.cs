@@ -2,13 +2,13 @@
 
 public class AttackingThought : IThought
 {
-	private EnemyBrain _brain;
+	private IAttacker _attacker;
 	private AttackData _data;
 	private float _updateTimer;
 
-	public AttackingThought(EnemyBrain brain, AttackData data)
+	public AttackingThought(IAttacker brain, AttackData data)
 	{
-		_brain = brain;
+		_attacker = brain;
 		_data = data;
 	}
 
@@ -20,7 +20,7 @@ public class AttackingThought : IThought
 		if (_updateTimer > _data.TimeBetweenAttacks)
 		{
 			_updateTimer = 0;
-			_brain.Attack(_data);
+			_attacker.Attack(_data, Vector3.zero);
 		}
 
 		_updateTimer += Time.deltaTime;

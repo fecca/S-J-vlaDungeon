@@ -1,7 +1,8 @@
 ﻿public interface IBrain
 {
-	void InitializeAttacker(AttackData attackData, IAttacker attacker);
-	void InitializeMover(MoveData moveData, IMover mover);
+	IPathFinderAgent Agent { get; }
+	void InitializePathfindingAgent();
+	void InitializeAttacker(AttackData attackData);
+	void InitializeMover(MoveData moveData);
 	void Think();
-	void SmoothStop();
 }

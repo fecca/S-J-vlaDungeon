@@ -1,43 +1,71 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
-public class PlayerBrain : IBrain
+public class PlayerBrain : IBrain, IAttacker, IMover
 {
 	private ICharacter _owner;
-	private IMover _mover;
-	private IAttacker _attacker;
+	private IPathFinderAgent _agent;
 	private AttackData _attackData;
 	private MoveData _moveData;
 	private float _mouseDragTimer;
 	private float _mouseDragUpdateInterval = 0.1f;
+
+	public IPathFinderAgent Agent
+	{
+		get
+		{
+			if (_agent == null)
+			{
+				_agent = _owner.GetGameObject().GetComponent<PathFinderAgent>();
+			}
+			return _agent;
+		}
+	}
 
 	public PlayerBrain(Player owner)
 	{
 		_owner = owner;
 	}
 
-	public void InitializeAttacker(AttackData attackData, IAttacker attacker)
+	public void InitializePathfindingAgent()
+	{
+		Agent.Initialize();
+	}
+	public void InitializeAttacker(AttackData attackData)
 	{
 		if (attackData != null)
 		{
 			_attackData = attackData;
-			_attacker = attacker;
 		}
 	}
-	public void InitializeMover(MoveData moveData, IMover mover)
+	public void InitializeMover(MoveData moveData)
 	{
 		if (moveData != null)
 		{
 			_moveData = moveData;
-			_mover = mover;
 		}
 	}
 	public void Think()
 	{
 		HandleInput();
 	}
+	public void Attack(AttackData data, Vector3 direction)
+	{
+		Agent.RotateAgent(direction);
+		Agent.SmoothStop();
+
+		var projectile = UnityEngine.Object.Instantiate(data.ProjectilePrefab);
+		projectile.GetComponent<Projectile>().Setup(_owner.GetTransformPosition(), direction, data.ProjectileSpeed);
+	}
+	public void Move(MoveData data, Vector3 targetPosition)
+	{
+		Agent.StartPathTo(targetPosition, data.MovementSpeed, () =>
+		{
+		});
+	}
 	public void SmoothStop()
 	{
-		_mover.SmoothStop();
+		Agent.SmoothStop();
 	}
 
 	private void HandleInput()
@@ -49,7 +77,7 @@ public class PlayerBrain : IBrain
 			{
 				if (hit.transform.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
 				{
-					_mover.Move(_moveData, hit.point);
+					Move(_moveData, hit.point);
 				}
 			}
 		}
@@ -65,7 +93,7 @@ public class PlayerBrain : IBrain
 				{
 					if (hit.transform.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
 					{
-						_mover.Move(_moveData, hit.point);
+						Move(_moveData, hit.point);
 					}
 				}
 			}
@@ -79,7 +107,7 @@ public class PlayerBrain : IBrain
 			{
 				var targetPosition = hit.point.WithY(_owner.GetTransformPosition().y);
 				var direction = _owner.GetTransformPosition().GetDirectionTo(targetPosition);
-				_attacker.Attack(_attackData, direction);
+				Attack(_attackData, direction);
 			}
 		}
 	}

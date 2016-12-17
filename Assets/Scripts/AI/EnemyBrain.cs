@@ -1,18 +1,29 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
-public class EnemyBrain : IBrain
+public class EnemyBrain : IBrain, IAttacker, IMover, IPerceiver
 {
 	private ICharacter _owner;
 	private ICharacter _target;
-	private IMover _mover;
-	private IAttacker _attacker;
-	private Perception _perception;
+	private IPathFinderAgent _agent;
 	private IThought _currentThought;
 	private IThought _attackingThought;
 	private IThought _idleThought;
 	private IThought _walkingThought;
+	private Perception _perception;
 	private float _perceptionTimer;
 
+	public IPathFinderAgent Agent
+	{
+		get
+		{
+			if (_agent == null)
+			{
+				_agent = _owner.GetGameObject().GetComponent<PathFinderAgent>();
+			}
+			return _agent;
+		}
+	}
 	public ThoughtType CurrentThoughtType { get; private set; }
 
 	public EnemyBrain(ICharacter owner)
@@ -22,19 +33,21 @@ public class EnemyBrain : IBrain
 		EnterThought(ThoughtType.Idle);
 	}
 
-	public void InitializeAttacker(AttackData attackData, IAttacker attacker)
+	public void InitializePathfindingAgent()
+	{
+		Agent.Initialize();
+	}
+	public void InitializeAttacker(AttackData attackData)
 	{
 		if (attackData != null)
 		{
-			_attacker = attacker;
 			_attackingThought = new AttackingThought(this, attackData);
 		}
 	}
-	public void InitializeMover(MoveData moveData, IMover mover)
+	public void InitializeMover(MoveData moveData)
 	{
 		if (moveData != null)
 		{
-			_mover = mover;
 			_walkingThought = new WalkingThought(this, moveData);
 		}
 	}
@@ -45,9 +58,14 @@ public class EnemyBrain : IBrain
 			_perception = new Perception(perceptionData);
 		}
 	}
+	public void InitializeTarget(ICharacter target)
+	{
+		_target = target;
+	}
 
 	public void Think()
 	{
+		CheckPerception();
 		if (_currentThought != null)
 		{
 			_currentThought.Think();
@@ -73,7 +91,7 @@ public class EnemyBrain : IBrain
 				nextThought = _attackingThought;
 				break;
 			default:
-				throw new System.NotImplementedException("ThoughtType not implemented: " + thoughtType);
+				throw new NotImplementedException("ThoughtType not implemented: " + thoughtType);
 		}
 
 		CurrentThoughtType = thoughtType;
@@ -90,26 +108,32 @@ public class EnemyBrain : IBrain
 		_currentThought = nextThought;
 		_currentThought.Enter();
 	}
-	public void SetTarget(ICharacter target)
+	public void Attack(AttackData data, Vector3 direction)
 	{
-		_target = target;
+		var targetPosition = _target.GetTransformPosition().WithY(_owner.GetTransformPosition().y);
+		direction = _owner.GetTransformPosition().GetDirectionTo(targetPosition);
+
+		Agent.RotateAgent(direction);
+		Agent.SmoothStop();
+
+		var projectile = UnityEngine.Object.Instantiate(data.ProjectilePrefab);
+		projectile.GetComponent<Projectile>().Setup(_owner.GetTransformPosition(), direction, data.ProjectileSpeed);
 	}
 	public void Move(MoveData data, Vector3 targetPosition)
 	{
-		_mover.Move(data, targetPosition);
+		Agent.StartPathTo(targetPosition, data.MovementSpeed, () =>
+		{
+		});
 	}
 	public void SmoothStop()
 	{
-		_mover.SmoothStop();
+		Agent.SmoothStop();
 	}
-	public void Attack(AttackData data)
+	public void ClearOccupiedAgentNodes()
 	{
-		var targetPosition = _target.GetTransformPosition().WithY(_owner.GetTransformPosition().y);
-		var direction = _owner.GetTransformPosition().GetDirectionTo(targetPosition);
-		_attacker.Attack(data, direction);
+		Agent.ClearOccupiedNodes();
 	}
-
-	public void Perceive()
+	public void CheckPerception()
 	{
 		if (_perception == null)
 		{

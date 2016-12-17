@@ -8,7 +8,7 @@ public class CharacterHandler : MonoBehaviour, ICharacterHandler
 	private int NumberOfEnemies = 1;
 
 	private CharacterFactory _characterFactory;
-	private ICharacter _player;
+	private Player _player;
 	private ICharacter[] _enemies;
 
 	private void Awake()
@@ -17,11 +17,6 @@ public class CharacterHandler : MonoBehaviour, ICharacterHandler
 		_characterFactory = new CharacterFactory();
 		MessageHub.Instance.Subscribe<PathNodesCreatedEvent>(OnPathNodesCreatedEvent);
 		MessageHub.Instance.Subscribe<DestroyGameEvent>(OnDestroyGameEvent);
-	}
-
-	public ICharacter GetPlayer()
-	{
-		return _player;
 	}
 
 	private void OnPathNodesCreatedEvent(PathNodesCreatedEvent pathNodesCreatedEvent)
@@ -41,6 +36,12 @@ public class CharacterHandler : MonoBehaviour, ICharacterHandler
 
 		MessageHub.Instance.Publish(new CharactersDestroyedEvent(null));
 	}
+
+	public Player GetPlayer()
+	{
+		return _player;
+	}
+
 	private void CreatePlayer()
 	{
 		_player = _characterFactory.CreatePlayer(CharacterPrefab);
