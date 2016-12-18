@@ -67,13 +67,17 @@ public class PlayerBrain : IBrain, IAttacker, IMover
 	{
 		Agent.SmoothStop();
 	}
+	public void ClearOccupiedAgentNodes()
+	{
+		Agent.ClearOccupiedNodes();
+	}
 
 	private void HandleInput()
 	{
 		if (Input.GetMouseButtonDown(0))
 		{
 			var hit = ServiceLocator<IInputHandler>.Instance.GetRaycastHit();
-			if (hit.transform)
+			if (hit.transform != null)
 			{
 				if (hit.transform.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
 				{
@@ -89,7 +93,7 @@ public class PlayerBrain : IBrain, IAttacker, IMover
 				_mouseDragTimer = 0f;
 
 				var hit = ServiceLocator<IInputHandler>.Instance.GetRaycastHit();
-				if (hit.transform)
+				if (hit.transform != null)
 				{
 					if (hit.transform.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
 					{

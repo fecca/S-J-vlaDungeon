@@ -81,11 +81,18 @@ public class PathFinder : MonoBehaviour, IPathFinder
 	{
 		return _walkableNodes.GetRandomElement();
 	}
+	public List<PathfindingNode> GetAvailableNeighouringNodes(Vector3 worldPosition)
+	{
+		var currentNode = GetNodeCopy(worldPosition);
+		var neighbours = GetNeighbours(currentNode);
+
+		return neighbours.Where(p => !p.Occupied).ToList();
+	}
 
 	private IEnumerator CreatePathNodes(Tile[,] map, Action completed)
 	{
 		CreateNodes(map);
-		GetNeighbours();
+		SetNeighbours();
 
 		completed();
 
@@ -94,7 +101,7 @@ public class PathFinder : MonoBehaviour, IPathFinder
 	private void CreateNodes(Tile[,] tiles)
 	{
 		_nodes = new PathfindingNode[tiles.GetLength(0) * 2, tiles.GetLength(1) * 2];
-		_walkableNodes = new List<PathfindingNode>();
+		_walkableNodes = new List<PathfindingNode>(_nodes.Length);
 		for (var x = 0; x < tiles.GetLength(0); x++)
 		{
 			for (var y = 0; y < tiles.GetLength(1); y++)
@@ -163,7 +170,7 @@ public class PathFinder : MonoBehaviour, IPathFinder
 			}
 		}
 	}
-	private void GetNeighbours()
+	private void SetNeighbours()
 	{
 		for (int x = 0; x < _nodes.GetLength(0); x++)
 		{
@@ -187,7 +194,7 @@ public class PathFinder : MonoBehaviour, IPathFinder
 	}
 	private List<PathfindingNode> GetNeighbours(PathfindingNode node)
 	{
-		var neighbours = new List<PathfindingNode>();
+		var neighbours = new List<PathfindingNode>(8);
 		for (var x = -1; x <= 1; x++)
 		{
 			for (var y = -1; y <= 1; y++)

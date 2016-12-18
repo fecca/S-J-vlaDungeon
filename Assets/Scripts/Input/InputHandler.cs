@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class InputHandler : MonoBehaviour, IInputHandler
 {
+	[SerializeField]
+	private LayerMask ClickLayers = 0;
+
 	private IDictionary<KeyCode, List<TinyMessageBase>> _keyboardBindings = new Dictionary<KeyCode, List<TinyMessageBase>>();
 
 	private void Awake()
@@ -30,7 +33,7 @@ public class InputHandler : MonoBehaviour, IInputHandler
 	{
 		var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
-		Physics.Raycast(ray, out hit, 500f);
+		Physics.Raycast(ray, out hit, 500f, ClickLayers);
 		return hit;
 	}
 

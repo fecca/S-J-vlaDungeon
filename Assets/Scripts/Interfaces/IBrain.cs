@@ -5,4 +5,5 @@
 	void InitializeAttacker(AttackData attackData);
 	void InitializeMover(MoveData moveData);
 	void Think();
+	void ClearOccupiedAgentNodes();
 }

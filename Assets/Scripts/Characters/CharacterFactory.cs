@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public class CharacterFactory : ICharacterFactory
+public class CharacterFactory
 {
 	public Player CreatePlayer(GameObject prefab)
 	{
@@ -15,6 +15,7 @@ public class CharacterFactory : ICharacterFactory
 		player.InitializeHealth(new HealthData(Constants.PLAYER_HEALTH));
 		player.InitializeAttacker(new AttackData(0, Constants.PLAYER_PROJECTILE_SPEED, "PlayerProjectile"));
 		player.InitializeMover(new MoveData(0, Constants.PLAYER_MOVEMENT_SPEED));
+		player.InitializeInventory();
 
 		return player;
 	}
@@ -36,6 +37,7 @@ public class CharacterFactory : ICharacterFactory
 		enemy.InitializeHealth(GetHealthData(healthType));
 		enemy.InitializeAttacker(GetAttackerData(attackerType));
 		enemy.InitializeMover(GetMoverData(moverType));
+		enemy.InitializeInventory();
 		enemy.InitializePerception(GetPerceptionData(perceptionType));
 		enemy.InitializeTarget(target);
 
@@ -47,21 +49,13 @@ public class CharacterFactory : ICharacterFactory
 	{
 		return CreateEnemy(
 			prefab,
-			GetRandomOfType<HealthType>(),
-			GetRandomOfType<AttackerType>(),
-			GetRandomOfType<MoverType>(),
-			GetRandomOfType<PerceptionType>(),
+			Util.GetRandomEnumValue<HealthType>(),
+			Util.GetRandomEnumValue<AttackerType>(),
+			Util.GetRandomEnumValue<MoverType>(),
+			Util.GetRandomEnumValue<PerceptionType>(),
 			target);
 	}
 
-	private T GetRandomOfType<T>()
-	{
-		var values = Enum.GetValues(typeof(T));
-		var random = UnityEngine.Random.Range(0, values.Length);
-		var value = values.GetValue(random);
-
-		return (T)value;
-	}
 	private HealthData GetHealthData(HealthType healthType)
 	{
 		switch (healthType)

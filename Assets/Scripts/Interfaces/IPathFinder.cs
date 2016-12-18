@@ -7,4 +7,5 @@ public interface IPathFinder
 	void GetPath(Vector3 from, Vector3 to, Action<LinkedList<PathfindingNode>> completed);
 	PathfindingNode GetNodeCopy(Vector3 worldPosition);
 	PathfindingNode GetRandomWalkableNode();
+	List<PathfindingNode> GetAvailableNeighouringNodes(Vector3 worldPosition);
 }

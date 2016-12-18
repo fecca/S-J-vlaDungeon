@@ -19,7 +19,7 @@ public class PathfindingNode : IHeapItem<PathfindingNode>
 	{
 		GridCoordinates = new Point(x, y);
 		WorldCoordinates = FindWorldCoordinates(x, y);
-		Neighbours = new List<PathfindingNode>();
+		Neighbours = new List<PathfindingNode>(8);
 	}
 	public PathfindingNode(PathfindingNode copy)
 	{

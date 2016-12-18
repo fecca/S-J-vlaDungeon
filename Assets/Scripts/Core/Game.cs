@@ -6,6 +6,7 @@
 [RequireComponent(typeof(MessageHub))]
 [RequireComponent(typeof(InputHandler))]
 [RequireComponent(typeof(CharacterHandler))]
+[RequireComponent(typeof(ItemHandler))]
 public class Game : MonoBehaviour
 {
 	private void Awake()

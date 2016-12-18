@@ -12,7 +12,7 @@ public class Perception
 	public PerceptionState GetPerceptionState(Vector3 ownerPosition, Vector3 targetPosition)
 	{
 		var ray = new Ray(ownerPosition, ownerPosition.GetDirectionTo(targetPosition));
-		var layerMask = (1 << 11) | (1 << 13) | (1 << 14);
+		var layerMask = (1 << 11) | (1 << 13) | (1 << 14) | (1 << 16);
 		layerMask = ~layerMask;
 		RaycastHit hit;
 		if (Physics.Raycast(ray, out hit, float.MaxValue, layerMask))
