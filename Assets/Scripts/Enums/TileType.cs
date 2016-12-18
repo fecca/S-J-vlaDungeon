@@ -1,6 +1,6 @@
 public enum TileType
 {
-	Floor,
+	Ground,
 	Wall,
 	Water
 }

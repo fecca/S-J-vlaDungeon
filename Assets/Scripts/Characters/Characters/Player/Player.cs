@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(PickUp))]
 public class Player : Character, ICharacter
 {
 	private Transform _cachedTransform;
@@ -47,7 +46,6 @@ public class Player : Character, ICharacter
 	{
 		Inventory = new Inventory();
 	}
-
 	public override void TakeDamage()
 	{
 		HealthData.CurrentHealth--;

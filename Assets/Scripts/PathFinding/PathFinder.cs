@@ -153,7 +153,7 @@ public class PathFinder : MonoBehaviour, IPathFinder
 				_nodes[xIndex + 1, yIndex] = bottomRightNode;
 				_nodes[xIndex, yIndex] = bottomLeftNode;
 
-				if (tile.Type == TileType.Floor)
+				if (tile.Type == TileType.Ground)
 				{
 					topLeftNode.Walkable = true;
 					_walkableNodes.Add(topLeftNode);

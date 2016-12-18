@@ -120,7 +120,7 @@ public class MapGenerator : MonoBehaviour
 				}
 				else
 				{
-					var tileType = rng.Next(0, 100) < RoomFillPercentage ? TileType.Floor : TileType.Wall;
+					var tileType = rng.Next(0, 100) < RoomFillPercentage ? TileType.Ground : TileType.Wall;
 					_map[x, y] = new Tile(x, y, tileType);
 				}
 			}
@@ -136,7 +136,7 @@ public class MapGenerator : MonoBehaviour
 				{
 					if (GetNumberOfNeighbouringTiles(x, y) > 4)
 					{
-						_map[x, y].Type = TileType.Floor;
+						_map[x, y].Type = TileType.Ground;
 					}
 					else if (GetNumberOfNeighbouringTiles(x, y) < 4)
 					{
@@ -156,7 +156,7 @@ public class MapGenerator : MonoBehaviour
 			{
 				for (var j = 0; j < wallRegion.Count; j++)
 				{
-					_map[wallRegion[j].GridCoordinates.X, wallRegion[j].GridCoordinates.Y].Type = TileType.Floor;
+					_map[wallRegion[j].GridCoordinates.X, wallRegion[j].GridCoordinates.Y].Type = TileType.Ground;
 				}
 			}
 		}
@@ -165,7 +165,7 @@ public class MapGenerator : MonoBehaviour
 	{
 		_survivingRooms = new List<Room>(128);
 
-		var roomRegions = GetRegions(TileType.Floor);
+		var roomRegions = GetRegions(TileType.Ground);
 		for (var i = 0; i < roomRegions.Count; i++)
 		{
 			var roomRegion = roomRegions[i];
@@ -308,7 +308,7 @@ public class MapGenerator : MonoBehaviour
 					var drawY = c.Y + y;
 					if (IsInMapRange(drawX, drawY))
 					{
-						_map[drawX, drawY].Type = TileType.Floor;
+						_map[drawX, drawY].Type = TileType.Ground;
 					}
 				}
 			}
@@ -324,7 +324,7 @@ public class MapGenerator : MonoBehaviour
 			for (var j = 0; j < room.Tiles.Count; j++)
 			{
 				var tile = room.Tiles[j];
-				if (tile.Type == TileType.Floor)
+				if (tile.Type == TileType.Ground)
 				{
 					_map[tile.GridCoordinates.X, tile.GridCoordinates.Y].Type = TileType.Water;
 					waterTiles++;
@@ -392,7 +392,7 @@ public class MapGenerator : MonoBehaviour
 			for (var y = 0; y < Height; y++)
 			{
 				var tile = _map[x, y];
-				if (tile.Type == TileType.Floor)
+				if (tile.Type == TileType.Ground)
 				{
 					_walkableTiles.Add(tile);
 				}
@@ -414,7 +414,7 @@ public class MapGenerator : MonoBehaviour
 				{
 					if (x != xPosition || y != yPosition)
 					{
-						neighbouringTiles += _map[x, y].Type == TileType.Floor ? 1 : 0;
+						neighbouringTiles += _map[x, y].Type == TileType.Ground ? 1 : 0;
 					}
 				}
 			}

@@ -1,9 +1,8 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerBrain : IBrain, IAttacker, IMover
 {
-	private ICharacter _owner;
+	private Player _owner;
 	private IPathFinderAgent _agent;
 	private AttackData _attackData;
 	private MoveData _moveData;
@@ -79,9 +78,18 @@ public class PlayerBrain : IBrain, IAttacker, IMover
 			var hit = ServiceLocator<IInputHandler>.Instance.GetRaycastHit();
 			if (hit.transform != null)
 			{
-				if (hit.transform.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
+				if (hit.transform.CompareTag("Ground"))
 				{
 					Move(_moveData, hit.point);
+					return;
+				}
+
+				if (hit.transform.CompareTag("Item"))
+				{
+					var itemContainer = hit.transform.GetComponent<ItemContainer>();
+					_owner.Inventory.AddItem(itemContainer.Item);
+					Object.Destroy(itemContainer.gameObject);
+					return;
 				}
 			}
 		}
@@ -95,7 +103,7 @@ public class PlayerBrain : IBrain, IAttacker, IMover
 				var hit = ServiceLocator<IInputHandler>.Instance.GetRaycastHit();
 				if (hit.transform != null)
 				{
-					if (hit.transform.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
+					if (hit.transform.CompareTag("Ground"))
 					{
 						Move(_moveData, hit.point);
 					}

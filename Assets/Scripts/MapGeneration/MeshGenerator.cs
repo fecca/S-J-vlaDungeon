@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class MeshGenerator : MonoBehaviour
 {
-	private readonly List<Vector3> _floorVertices = new List<Vector3>(16184);
-	private readonly List<int> _floorTriangles = new List<int>(32768);
-	private readonly List<Vector3> _WallVertices = new List<Vector3>(16184);
-	private readonly List<int> _WallTriangles = new List<int>(32768);
+	private readonly List<Vector3> _groundVertices = new List<Vector3>(16184);
+	private readonly List<int> _groundTriangles = new List<int>(32768);
+	private readonly List<Vector3> _wallVertices = new List<Vector3>(16184);
+	private readonly List<int> _wallTriangles = new List<int>(32768);
 	private readonly List<Vector3> _waterVertices = new List<Vector3>(16184);
 	private readonly List<int> _waterTriangles = new List<int>(32768);
 
@@ -30,14 +30,14 @@ public class MeshGenerator : MonoBehaviour
 	}
 	private void OnPathNodesDestroyedEvent(PathNodesDestroyedEvent pathNodesDestroyedEvent)
 	{
-		_floorVertices.Clear();
-		_floorTriangles.Clear();
-		_WallVertices.Clear();
-		_WallTriangles.Clear();
+		_groundVertices.Clear();
+		_groundTriangles.Clear();
+		_wallVertices.Clear();
+		_wallTriangles.Clear();
 		_waterVertices.Clear();
 		_waterTriangles.Clear();
 
-		Destroy(GameObject.Find("Floor"));
+		Destroy(GameObject.Find("Ground"));
 		Destroy(GameObject.Find("Wall"));
 		Destroy(GameObject.Find("Water"));
 
@@ -56,7 +56,7 @@ public class MeshGenerator : MonoBehaviour
 			}
 		}
 		CreateWallMesh();
-		CreateFloorMesh();
+		CreateGroundMesh();
 		CreateWaterMesh();
 
 		completed();
@@ -93,9 +93,9 @@ public class MeshGenerator : MonoBehaviour
 		{
 			topTriangleType = TileType.Wall;
 		}
-		else if (tile.Type == TileType.Floor || topTile.Type == TileType.Floor || topRightTile.Type == TileType.Floor)
+		else if (tile.Type == TileType.Ground || topTile.Type == TileType.Ground || topRightTile.Type == TileType.Ground)
 		{
-			topTriangleType = TileType.Floor;
+			topTriangleType = TileType.Ground;
 		}
 		else
 		{
@@ -106,9 +106,9 @@ public class MeshGenerator : MonoBehaviour
 		{
 			bottomTriangleType = TileType.Wall;
 		}
-		else if (tile.Type == TileType.Floor || topRightTile.Type == TileType.Floor || rightTile.Type == TileType.Floor)
+		else if (tile.Type == TileType.Ground || topRightTile.Type == TileType.Ground || rightTile.Type == TileType.Ground)
 		{
-			bottomTriangleType = TileType.Floor;
+			bottomTriangleType = TileType.Ground;
 		}
 		else
 		{
@@ -120,7 +120,7 @@ public class MeshGenerator : MonoBehaviour
 			case TileType.Wall:
 				break;
 
-			case TileType.Floor:
+			case TileType.Ground:
 				if (topTile.Type == TileType.Wall || topRightTile.Type == TileType.Wall || rightTile.Type == TileType.Wall)
 				{
 					tile.Type = TileType.Wall;
@@ -153,23 +153,23 @@ public class MeshGenerator : MonoBehaviour
 	{
 		switch (type)
 		{
-			case TileType.Floor:
-				_floorVertices.Add(a);
-				_floorVertices.Add(b);
-				_floorVertices.Add(c);
+			case TileType.Ground:
+				_groundVertices.Add(a);
+				_groundVertices.Add(b);
+				_groundVertices.Add(c);
 
-				_floorTriangles.Add(_floorVertices.Count - 3);
-				_floorTriangles.Add(_floorVertices.Count - 2);
-				_floorTriangles.Add(_floorVertices.Count - 1);
+				_groundTriangles.Add(_groundVertices.Count - 3);
+				_groundTriangles.Add(_groundVertices.Count - 2);
+				_groundTriangles.Add(_groundVertices.Count - 1);
 				break;
 			case TileType.Wall:
-				_WallVertices.Add(a);
-				_WallVertices.Add(b);
-				_WallVertices.Add(c);
+				_wallVertices.Add(a);
+				_wallVertices.Add(b);
+				_wallVertices.Add(c);
 
-				_WallTriangles.Add(_WallVertices.Count - 3);
-				_WallTriangles.Add(_WallVertices.Count - 2);
-				_WallTriangles.Add(_WallVertices.Count - 1);
+				_wallTriangles.Add(_wallVertices.Count - 3);
+				_wallTriangles.Add(_wallVertices.Count - 2);
+				_wallTriangles.Add(_wallVertices.Count - 1);
 				break;
 			case TileType.Water:
 				_waterVertices.Add(a);
@@ -187,46 +187,49 @@ public class MeshGenerator : MonoBehaviour
 	}
 	private void CreateWallMesh()
 	{
-		var WallGameObject = new GameObject("Wall");
-		WallGameObject.layer = LayerMask.NameToLayer("Wall");
+		var wallGameObject = new GameObject("Wall");
+		wallGameObject.layer = LayerMask.NameToLayer("Wall");
+		wallGameObject.tag = "Wall";
 
-		var meshRenderer = WallGameObject.GetOrAddComponent<MeshRenderer>();
+		var meshRenderer = wallGameObject.GetOrAddComponent<MeshRenderer>();
 		meshRenderer.sharedMaterial = Resources.Load<Material>("Materials/WallMaterial");
 
 		var mesh = new Mesh();
-		mesh.SetVertices(_WallVertices);
-		mesh.SetTriangles(_WallTriangles, 0);
+		mesh.SetVertices(_wallVertices);
+		mesh.SetTriangles(_wallTriangles, 0);
 		mesh.RecalculateNormals();
 
-		var meshFilter = WallGameObject.GetOrAddComponent<MeshFilter>();
+		var meshFilter = wallGameObject.GetOrAddComponent<MeshFilter>();
 		meshFilter.mesh = mesh;
 
-		var meshCollider = WallGameObject.GetOrAddComponent<MeshCollider>();
+		var meshCollider = wallGameObject.GetOrAddComponent<MeshCollider>();
 		meshCollider.sharedMesh = mesh;
 	}
-	private void CreateFloorMesh()
+	private void CreateGroundMesh()
 	{
-		var floorGameObject = new GameObject("Floor");
-		floorGameObject.layer = LayerMask.NameToLayer("Ground");
+		var groundGameObject = new GameObject("Ground");
+		groundGameObject.layer = LayerMask.NameToLayer("Ground");
+		groundGameObject.tag = "Ground";
 
-		var meshRenderer = floorGameObject.GetOrAddComponent<MeshRenderer>();
-		meshRenderer.sharedMaterial = Resources.Load<Material>("Materials/FloorMaterial");
+		var meshRenderer = groundGameObject.GetOrAddComponent<MeshRenderer>();
+		meshRenderer.sharedMaterial = Resources.Load<Material>("Materials/GroundMaterial");
 
 		var mesh = new Mesh();
-		mesh.SetVertices(_floorVertices);
-		mesh.SetTriangles(_floorTriangles, 0);
+		mesh.SetVertices(_groundVertices);
+		mesh.SetTriangles(_groundTriangles, 0);
 		mesh.RecalculateNormals();
 
-		var meshFilter = floorGameObject.GetOrAddComponent<MeshFilter>();
+		var meshFilter = groundGameObject.GetOrAddComponent<MeshFilter>();
 		meshFilter.mesh = mesh;
 
-		var meshCollider = floorGameObject.GetOrAddComponent<MeshCollider>();
+		var meshCollider = groundGameObject.GetOrAddComponent<MeshCollider>();
 		meshCollider.sharedMesh = mesh;
 	}
 	private void CreateWaterMesh()
 	{
 		var waterGameObject = new GameObject("Water");
 		waterGameObject.layer = LayerMask.NameToLayer("Water");
+		waterGameObject.tag = "Water";
 
 		var meshRenderer = waterGameObject.GetOrAddComponent<MeshRenderer>();
 		meshRenderer.sharedMaterial = Resources.Load<Material>("Materials/WaterMaterial");
