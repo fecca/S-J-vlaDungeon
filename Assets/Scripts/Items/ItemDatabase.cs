@@ -6,8 +6,8 @@ public class ItemDatabase
 
 	public ItemDatabase()
 	{
-		_itemTemplates.Add(ItemType.Pistol, new PistolTemplate());
-		_itemTemplates.Add(ItemType.Rifle, new RifleTemplate());
+		_itemTemplates.Add(ItemType.Wand, new WandTemplate());
+		_itemTemplates.Add(ItemType.Staff, new StaffTemplate());
 	}
 
 	public ItemTemplate GetTemplate(ItemType itemType)

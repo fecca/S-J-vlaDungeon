@@ -1,14 +1,14 @@
 Interfaces:	IItem
 			IWeapon
 			IProjectileWeapon
-			IRifle
+			IStaff
 
 Classes:	Item
 			Weapon
 			ProjectileWeapon
-			Rifle
+			Staff
 
 Templates:	ItemTemplate
 			WeaponTemplate
 			ProjectileWeaponTemplate
-			RifleTemplate
+			StaffTemplate

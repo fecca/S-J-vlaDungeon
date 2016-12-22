@@ -35,6 +35,6 @@ public abstract class ProjectileWeapon : Weapon, IProjectileWeapon
 
 	public override string ToString()
 	{
-		return "[Type:" + GetType() + "] [Name:" + GetName() + "] [Weight:" + GetWeight() + "] [Damage:" + GetDamage() + "] [Range:" + GetRange() + "]";
+		return "[ Type: " + GetType() + "	| Weight: " + GetWeight() + "	| Damage: " + GetDamage() + "	| Range: " + GetRange() + " ]";
 	}
 }

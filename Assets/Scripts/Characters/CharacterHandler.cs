@@ -56,7 +56,6 @@ public class CharacterHandler : MonoBehaviour, ICharacterHandler
 		for (var i = 0; i < numberOfEnemies; i++)
 		{
 			_enemies[i] = _characterFactory.CreateEnemy(EnemyPrefab, HealthType.Low, AttackerType.Medium, MoverType.Medium, PerceptionType.Medium, _player);
-			//_enemies[i] = _characterFactory.CreateRandomEnemy(EnemyPrefab, _player);
 		}
 	}
 }

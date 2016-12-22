@@ -1,5 +1,5 @@
 ﻿public enum ItemType
 {
-	Rifle,
-	Pistol
+	Staff,
+	Wand
 }

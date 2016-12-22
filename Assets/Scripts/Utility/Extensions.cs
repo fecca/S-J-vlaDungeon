@@ -45,7 +45,7 @@ public static class Extensions
 	{
 		return (to - from).normalized;
 	}
-	public static bool IsEmpty<T>(this IList<T> collection)
+	public static bool IsEmpty<T>(this ICollection<T> collection)
 	{
 		return collection.Count <= 0;
 	}

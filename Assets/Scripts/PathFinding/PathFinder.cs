@@ -110,40 +110,6 @@ public class PathFinder : MonoBehaviour, IPathFinder
 				var xIndex = x * 2;
 				var yIndex = y * 2;
 				var tile = tiles[x, y];
-				//var topLeftWalkable = false;
-				//var topRightWalkable = false;
-				//var bottomRightWalkable = false;
-				//var bottomLeftWalkable = false;
-
-				//if (tile.ConfigurationSquare != null)
-				//{
-				//	switch (tile.ConfigurationSquare.Configuration)
-				//	{
-				//		case 13:
-				//			topLeftWalkable = true;
-				//			break;
-
-				//		case 11:
-				//			bottomLeftWalkable = true;
-				//			break;
-
-				//		case 7:
-				//			bottomRightWalkable = true;
-				//			break;
-
-				//		case 14:
-				//			topRightWalkable = true;
-				//			break;
-
-				//		case 15:
-				//			topLeftWalkable = true;
-				//			topRightWalkable = true;
-				//			bottomRightWalkable = true;
-				//			bottomLeftWalkable = true;
-				//			break;
-				//	}
-				//}
-
 				var topLeftNode = new PathfindingNode(xIndex, yIndex + 1);
 				var topRightNode = new PathfindingNode(xIndex + 1, yIndex + 1);
 				var bottomRightNode = new PathfindingNode(xIndex + 1, yIndex);

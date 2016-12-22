@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Enemy : Character, ICharacter
 {
 	private Transform _cachedTransform;
 	private EnemyBrain _brain;
-	private List<ItemType> _loot;
+	private Dictionary<ItemType, int> _loot;
 
 	private void Awake()
 	{
@@ -50,7 +51,7 @@ public class Enemy : Character, ICharacter
 	}
 	public void InitializeLoot()
 	{
-		_loot = new List<ItemType>();
+		_loot = new Dictionary<ItemType, int>();
 		AddLoot();
 	}
 	public void InitializePerception(PerceptionData perceptionData)
@@ -96,12 +97,16 @@ public class Enemy : Character, ICharacter
 
 		for (var i = 0; i < _loot.Count; i++)
 		{
-			var item = ServiceLocator<IItemHandler>.Instance.CreateItem(_loot[i]);
-			var randomNeighbour = availableNeighbouringNodes.GetRandomElement();
-			ServiceLocator<IItemHandler>.Instance.CreatePhysicalItem(randomNeighbour.WorldCoordinates, item);
-			availableNeighbouringNodes.Remove(randomNeighbour);
+			var loot = _loot.ElementAt(i);
+			for (int j = 0; j < loot.Value; j++)
+			{
+				var item = ServiceLocator<IItemHandler>.Instance.CreateItem(loot.Key);
+				var randomNeighbour = availableNeighbouringNodes.GetRandomElement();
+				ServiceLocator<IItemHandler>.Instance.CreatePhysicalItem(randomNeighbour.WorldCoordinates, item);
+				availableNeighbouringNodes.Remove(randomNeighbour);
 
-			Debug.Log("Dropped: " + item);
+				Debug.Log("Dropped: " + item);
+			}
 		}
 
 		_loot.Clear();
@@ -109,8 +114,7 @@ public class Enemy : Character, ICharacter
 	private void AddLoot()
 	{
 		var numberOfItems = 0;
-		var randomNumber = UnityEngine.Random.Range(0, 10);
-		switch (randomNumber)
+		switch (UnityEngine.Random.Range(0, 10))
 		{
 			case 9:
 				numberOfItems = 2;
@@ -129,7 +133,18 @@ public class Enemy : Character, ICharacter
 				numberOfItems = 0;
 				break;
 		}
+
 		var items = ServiceLocator<IItemHandler>.Instance.CreateRandomItemTypes(numberOfItems);
-		_loot.AddRange(items);
+		for (var i = 0; i < items.Count; i++)
+		{
+			if (_loot.ContainsKey(items[i]))
+			{
+				_loot[items[i]]++;
+			}
+			else
+			{
+				_loot.Add(items[i], 1);
+			}
+		}
 	}
 }

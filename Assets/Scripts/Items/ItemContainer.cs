@@ -3,9 +3,9 @@
 public class ItemContainer : MonoBehaviour
 {
 	[SerializeField]
-	private GameObject PistolObject = null;
+	private GameObject WandObject = null;
 	[SerializeField]
-	private GameObject RifleObject = null;
+	private GameObject StaffObject = null;
 
 	private GameObject _activeObject;
 
@@ -35,13 +35,13 @@ public class ItemContainer : MonoBehaviour
 	public void SetItem(IItem item)
 	{
 		Item = item;
-		if (item is Rifle)
+		if (item is Staff)
 		{
-			_activeObject = RifleObject;
+			_activeObject = StaffObject;
 		}
 		else
 		{
-			_activeObject = PistolObject;
+			_activeObject = WandObject;
 		}
 		_activeObject.SetActive(true);
 	}

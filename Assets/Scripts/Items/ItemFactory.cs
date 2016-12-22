@@ -14,10 +14,10 @@ public class ItemFactory
 		var template = _itemDatabase.GetTemplate(itemType);
 		switch (itemType)
 		{
-			case ItemType.Rifle:
-				return new Rifle((RifleTemplate)template);
-			case ItemType.Pistol:
-				return new Pistol((PistolTemplate)template);
+			case ItemType.Staff:
+				return new Staff((StaffTemplate)template);
+			case ItemType.Wand:
+				return new Wand((WandTemplate)template);
 			default:
 				throw new NotImplementedException("ItemType not implemented: " + itemType);
 		}

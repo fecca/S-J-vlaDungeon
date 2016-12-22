@@ -1,4 +1,4 @@
-﻿public class RifleTemplate : ProjectileWeaponTemplate
+﻿public class StaffTemplate : ProjectileWeaponTemplate
 {
 	public override float MinimumWeight { get { return 1.8f; } }
 	public override float MaximumWeight { get { return 2.2f; } }
