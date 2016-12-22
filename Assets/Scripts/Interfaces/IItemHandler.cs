@@ -3,7 +3,10 @@ using UnityEngine;
 
 public interface IItemHandler
 {
+	IItem CreateItem(ItemType itemType);
 	IItem CreateRandomItem();
-	void CreatePhysicalItem(Vector3 position, IItem item);
+	ItemType CreateRandomItemType();
 	List<IItem> CreateRandomItems(int count);
+	List<ItemType> CreateRandomItemTypes(int count);
+	void CreatePhysicalItem(Vector3 position, IItem item);
 }

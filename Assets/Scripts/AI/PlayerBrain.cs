@@ -87,7 +87,7 @@ public class PlayerBrain : IBrain, IAttacker, IMover
 				if (hit.transform.CompareTag("Item"))
 				{
 					var itemContainer = hit.transform.GetComponent<ItemContainer>();
-					_owner.Inventory.AddItem(itemContainer.Item);
+					_owner.AddItemToInventory(itemContainer.Item);
 					Object.Destroy(itemContainer.gameObject);
 					return;
 				}

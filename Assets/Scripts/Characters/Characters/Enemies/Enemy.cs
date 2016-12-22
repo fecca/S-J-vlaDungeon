@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : Character, ICharacter
 {
 	private Transform _cachedTransform;
 	private EnemyBrain _brain;
+	private List<ItemType> _loot;
 
 	private void Awake()
 	{
@@ -46,9 +48,9 @@ public class Enemy : Character, ICharacter
 	{
 		_brain.InitializeMover(moveData);
 	}
-	public override void InitializeInventory()
+	public void InitializeLoot()
 	{
-		Inventory = new Inventory();
+		_loot = new List<ItemType>();
 		AddLoot();
 	}
 	public void InitializePerception(PerceptionData perceptionData)
@@ -81,28 +83,28 @@ public class Enemy : Character, ICharacter
 
 	private void DropItems()
 	{
-		if (!Inventory.HasItems())
+		if (_loot.IsEmpty())
 		{
 			return;
 		}
 
-		var items = Inventory.GetItems();
 		var availableNeighbouringNodes = ServiceLocator<IPathFinder>.Instance.GetAvailableNeighouringNodes(_cachedTransform.position);
-		if (availableNeighbouringNodes.Count < items.Count)
+		if (availableNeighbouringNodes.Count < _loot.Count)
 		{
 			throw new ArgumentException("Not enough available nodes to drop items on");
 		}
 
-		for (var i = 0; i < items.Count; i++)
+		for (var i = 0; i < _loot.Count; i++)
 		{
+			var item = ServiceLocator<IItemHandler>.Instance.CreateItem(_loot[i]);
 			var randomNeighbour = availableNeighbouringNodes.GetRandomElement();
-			ServiceLocator<IItemHandler>.Instance.CreatePhysicalItem(randomNeighbour.WorldCoordinates, items[i]);
+			ServiceLocator<IItemHandler>.Instance.CreatePhysicalItem(randomNeighbour.WorldCoordinates, item);
 			availableNeighbouringNodes.Remove(randomNeighbour);
 
-			Debug.Log("Dropped: " + items[i]);
+			Debug.Log("Dropped: " + item);
 		}
 
-		Inventory.RemoveAllItems();
+		_loot.Clear();
 	}
 	private void AddLoot()
 	{
@@ -111,15 +113,15 @@ public class Enemy : Character, ICharacter
 		switch (randomNumber)
 		{
 			case 9:
-			case 8:
 				numberOfItems = 2;
 				break;
+			case 8:
 			case 7:
 			case 6:
 			case 5:
-			case 4:
 				numberOfItems = 1;
 				break;
+			case 4:
 			case 3:
 			case 2:
 			case 1:
@@ -127,7 +129,7 @@ public class Enemy : Character, ICharacter
 				numberOfItems = 0;
 				break;
 		}
-		var items = ServiceLocator<IItemHandler>.Instance.CreateRandomItems(numberOfItems);
-		Inventory.AddItems(items);
+		var items = ServiceLocator<IItemHandler>.Instance.CreateRandomItemTypes(numberOfItems);
+		_loot.AddRange(items);
 	}
 }

@@ -4,6 +4,7 @@ public class Player : Character, ICharacter
 {
 	private Transform _cachedTransform;
 	private PlayerBrain _brain;
+	private Inventory _inventory;
 
 	private void Awake()
 	{
@@ -45,10 +46,6 @@ public class Player : Character, ICharacter
 	{
 		_brain.InitializeMover(moveData);
 	}
-	public override void InitializeInventory()
-	{
-		Inventory = new Inventory();
-	}
 	public override void TakeDamage()
 	{
 		HealthData.CurrentHealth--;
@@ -64,5 +61,14 @@ public class Player : Character, ICharacter
 	public override Vector3 GetTransformPosition()
 	{
 		return _cachedTransform.position;
+	}
+
+	public void InitializeInventory()
+	{
+		_inventory = new Inventory();
+	}
+	public void AddItemToInventory(IItem item)
+	{
+		_inventory.AddItem(item);
 	}
 }

@@ -10,6 +10,5 @@ public interface ICharacter
 	void InitializeAttacker(AttackData attackData);
 	void InitializeMover(MoveData moveData);
 	void InitializeHealth(HealthData healthData);
-	void InitializeInventory();
 	void TakeDamage();
 }

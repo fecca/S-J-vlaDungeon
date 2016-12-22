@@ -2,9 +2,16 @@
 
 public class ItemFactory
 {
-	public IItem CreateItem(ItemDatabase itemDatabase, ItemType itemType)
+	private ItemDatabase _itemDatabase;
+
+	public ItemFactory()
 	{
-		var template = itemDatabase.GetTemplate(itemType);
+		_itemDatabase = new ItemDatabase();
+	}
+
+	public IItem CreateItem(ItemType itemType)
+	{
+		var template = _itemDatabase.GetTemplate(itemType);
 		switch (itemType)
 		{
 			case ItemType.Rifle:
@@ -15,8 +22,8 @@ public class ItemFactory
 				throw new NotImplementedException("ItemType not implemented: " + itemType);
 		}
 	}
-	public IItem CreateRandomItem(ItemDatabase itemDatabase)
+	public IItem CreateRandomItem()
 	{
-		return CreateItem(itemDatabase, Util.GetRandomEnumValue<ItemType>());
+		return CreateItem(Util.GetRandomEnumValue<ItemType>());
 	}
 }
