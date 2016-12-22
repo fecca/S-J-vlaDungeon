@@ -7,24 +7,26 @@ public class ItemHandler : MonoBehaviour, IItemHandler
 	private GameObject ItemPrefab = null;
 
 	private ItemFactory _itemFactory;
+	private ItemDatabase _itemDatabase;
 
 	private void Awake()
 	{
 		ServiceLocator<IItemHandler>.Instance = this;
 
 		_itemFactory = new ItemFactory();
+		_itemDatabase = new ItemDatabase();
 	}
 
 	public IItem CreateRandomItem()
 	{
-		return _itemFactory.CreateRandomItem();
+		return _itemFactory.CreateRandomItem(_itemDatabase);
 	}
 	public List<IItem> CreateRandomItems(int count)
 	{
 		var items = new List<IItem>(count);
 		for (var i = 0; i < count; i++)
 		{
-			items.Add(_itemFactory.CreateRandomItem());
+			items.Add(_itemFactory.CreateRandomItem(_itemDatabase));
 		}
 
 		return items;

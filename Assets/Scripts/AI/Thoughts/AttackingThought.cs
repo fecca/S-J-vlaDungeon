@@ -6,9 +6,9 @@ public class AttackingThought : IThought
 	private AttackData _data;
 	private float _updateTimer;
 
-	public AttackingThought(IAttacker brain, AttackData data)
+	public AttackingThought(IAttacker attacker, AttackData data)
 	{
-		_attacker = brain;
+		_attacker = attacker;
 		_data = data;
 	}
 

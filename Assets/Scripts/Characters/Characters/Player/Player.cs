@@ -15,10 +15,13 @@ public class Player : Character, ICharacter
 		{
 			_brain.Think();
 		}
-
-		if (Input.GetKeyDown(KeyCode.L))
+	}
+	private void OnTriggerEnter(Collider collider)
+	{
+		var projectile = collider.gameObject.GetComponent<Projectile>();
+		if (projectile != null)
 		{
-			Debug.Log(Inventory.GetItems().Count + " items in your inventory");
+			TakeDamage();
 		}
 	}
 

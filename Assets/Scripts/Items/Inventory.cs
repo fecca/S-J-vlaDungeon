@@ -25,6 +25,10 @@ public class Inventory
 	{
 		_items.Clear();
 	}
+	public bool HasItems()
+	{
+		return _items != null && _items.Count > 0;
+	}
 	public List<IItem> GetItems()
 	{
 		return new List<IItem>(_items);

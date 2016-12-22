@@ -1,0 +1,14 @@
+Interfaces:	IItem
+			IWeapon
+			IProjectileWeapon
+			IRifle
+
+Classes:	Item
+			Weapon
+			ProjectileWeapon
+			Rifle
+
+Templates:	ItemTemplate
+			WeaponTemplate
+			ProjectileWeaponTemplate
+			RifleTemplate

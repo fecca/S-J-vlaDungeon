@@ -20,11 +20,6 @@ public class Projectile : MonoBehaviour
 	private void OnTriggerEnter(Collider collider)
 	{
 		Destroy(gameObject);
-		var enemy = collider.gameObject.GetComponent<Enemy>();
-		if (enemy != null)
-		{
-			enemy.TakeDamage();
-		}
 	}
 
 	public void Setup(Vector3 spawnPosition, Vector3 direction, float speed)

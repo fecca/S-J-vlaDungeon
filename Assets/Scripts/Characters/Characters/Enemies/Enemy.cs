@@ -17,6 +17,14 @@ public class Enemy : Character, ICharacter
 			_brain.Think();
 		}
 	}
+	private void OnTriggerEnter(Collider collider)
+	{
+		var projectile = collider.gameObject.GetComponent<Projectile>();
+		if (projectile != null)
+		{
+			TakeDamage();
+		}
+	}
 
 	public override void InitializeBrain()
 	{
@@ -73,9 +81,13 @@ public class Enemy : Character, ICharacter
 
 	private void DropItems()
 	{
-		var availableNeighbouringNodes = ServiceLocator<IPathFinder>.Instance.GetAvailableNeighouringNodes(_cachedTransform.position);
-		var items = Inventory.GetItems();
+		if (!Inventory.HasItems())
+		{
+			return;
+		}
 
+		var items = Inventory.GetItems();
+		var availableNeighbouringNodes = ServiceLocator<IPathFinder>.Instance.GetAvailableNeighouringNodes(_cachedTransform.position);
 		if (availableNeighbouringNodes.Count < items.Count)
 		{
 			throw new ArgumentException("Not enough available nodes to drop items on");
@@ -86,6 +98,8 @@ public class Enemy : Character, ICharacter
 			var randomNeighbour = availableNeighbouringNodes.GetRandomElement();
 			ServiceLocator<IItemHandler>.Instance.CreatePhysicalItem(randomNeighbour.WorldCoordinates, items[i]);
 			availableNeighbouringNodes.Remove(randomNeighbour);
+
+			Debug.Log("Dropped: " + items[i]);
 		}
 
 		Inventory.RemoveAllItems();
@@ -97,15 +111,15 @@ public class Enemy : Character, ICharacter
 		switch (randomNumber)
 		{
 			case 9:
+			case 8:
 				numberOfItems = 2;
 				break;
-			case 8:
 			case 7:
 			case 6:
-				numberOfItems = 1;
-				break;
 			case 5:
 			case 4:
+				numberOfItems = 1;
+				break;
 			case 3:
 			case 2:
 			case 1:

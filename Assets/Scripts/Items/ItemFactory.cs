@@ -2,29 +2,21 @@
 
 public class ItemFactory
 {
-	public IItem CreateItem(ItemType itemType)
+	public IItem CreateItem(ItemDatabase itemDatabase, ItemType itemType)
 	{
+		var template = itemDatabase.GetTemplate(itemType);
 		switch (itemType)
 		{
 			case ItemType.Rifle:
-				return new Rifle();
+				return new Rifle((RifleTemplate)template);
 			case ItemType.Pistol:
-				return new Pistol();
+				return new Pistol((PistolTemplate)template);
 			default:
 				throw new NotImplementedException("ItemType not implemented: " + itemType);
 		}
 	}
-	public IItem CreateRandomItem()
+	public IItem CreateRandomItem(ItemDatabase itemDatabase)
 	{
-		var itemType = Util.GetRandomEnumValue<ItemType>();
-		switch (itemType)
-		{
-			case ItemType.Rifle:
-				return new Rifle();
-			case ItemType.Pistol:
-				return new Pistol();
-			default:
-				throw new NotImplementedException("ItemType not implemented: " + itemType);
-		}
+		return CreateItem(itemDatabase, Util.GetRandomEnumValue<ItemType>());
 	}
 }

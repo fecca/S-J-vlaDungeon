@@ -85,6 +85,7 @@ public class PathFinder : MonoBehaviour, IPathFinder
 	{
 		var currentNode = GetNodeCopy(worldPosition);
 		var neighbours = GetNeighbours(currentNode);
+		neighbours.Add(currentNode);
 
 		return neighbours.Where(p => !p.Occupied).ToList();
 	}

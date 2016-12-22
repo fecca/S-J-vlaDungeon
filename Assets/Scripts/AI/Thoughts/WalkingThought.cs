@@ -6,9 +6,9 @@ public class WalkingThought : IThought
 	private MoveData _data;
 	private float _updateTimer;
 
-	public WalkingThought(IMover brain, MoveData data)
+	public WalkingThought(IMover mover, MoveData data)
 	{
-		_mover = brain;
+		_mover = mover;
 		_data = data;
 	}
 
