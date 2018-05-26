@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class MapGenerator : MonoBehaviour
@@ -17,6 +16,10 @@ public class MapGenerator : MonoBehaviour
 	[SerializeField]
 	private int Height = 64;
 	[SerializeField]
+	private float WallHeight = 1f;
+	[SerializeField]
+	private float WaterDepth = 1f;
+	[SerializeField]
 	[Range(45, 55)]
 	private int RoomFillPercentage = 50;
 	[SerializeField]
@@ -30,39 +33,25 @@ public class MapGenerator : MonoBehaviour
 	[SerializeField]
 	private bool RandomizeVertexPositionsX = false;
 	[SerializeField]
-	[Range(0f, 0.2f)]
 	private float VertexOffsetX = 0f;
 	[SerializeField]
 	private bool RandomizeVertexPositionsY = false;
 	[SerializeField]
-	[Range(0f, 0.2f)]
 	private float VertexOffsetY = 0f;
 	[SerializeField]
 	private bool RandomizeVertexPositionsZ = false;
 	[SerializeField]
-	[Range(0f, 0.2f)]
 	private float VertexOffsetZ = 0f;
+	[SerializeField]
+	private int MaximumWaterTiles = 100;
 
 	private Tile[,] _map;
 	private List<Room> _survivingRooms;
-	private List<Tile> _walkableTiles;
 
 	private void Awake()
 	{
 		MessageHub.Instance.Subscribe<CreateGameEvent>(OnCreateGameEvent);
 		MessageHub.Instance.Subscribe<MeshDestroyedEvent>(OnMeshDestroyedEvent);
-	}
-	private void OnDrawGizmos()
-	{
-		if (!DrawGizmos)
-		{
-			return;
-		}
-
-		if (_survivingRooms == null)
-		{
-			return;
-		}
 	}
 
 	private void OnCreateGameEvent(CreateGameEvent createGameEvent)
@@ -79,7 +68,6 @@ public class MapGenerator : MonoBehaviour
 	{
 		_map = null;
 		_survivingRooms.Clear();
-		_walkableTiles.Clear();
 
 		MessageHub.Instance.Publish(new MapDestroyedEvent(null));
 	}
@@ -87,7 +75,6 @@ public class MapGenerator : MonoBehaviour
 	private IEnumerator CreateMap(Action completed)
 	{
 		_map = new Tile[Width, Height];
-		_walkableTiles = new List<Tile>(_map.Length);
 
 		RandomFillMap();
 		GenerateClusters();
@@ -96,7 +83,6 @@ public class MapGenerator : MonoBehaviour
 		ConnectClosestRooms();
 		CreateWater();
 		ConfigureTiles();
-		RegisterWalkableTiles();
 
 		completed();
 
@@ -109,7 +95,7 @@ public class MapGenerator : MonoBehaviour
 			Seed = UnityEngine.Random.Range(int.MinValue, int.MaxValue).ToString();
 		}
 
-		System.Random rng = new System.Random(Seed.GetHashCode());
+		var rng = new System.Random(Seed.GetHashCode());
 		for (var x = 0; x < Width; x++)
 		{
 			for (var y = 0; y < Height; y++)
@@ -319,7 +305,6 @@ public class MapGenerator : MonoBehaviour
 		for (var i = 0; i < _survivingRooms.Count; i++)
 		{
 			var room = _survivingRooms[i];
-			var maximumWaterTiles = 100;
 			var waterTiles = 0;
 			for (var j = 0; j < room.Tiles.Count; j++)
 			{
@@ -330,7 +315,7 @@ public class MapGenerator : MonoBehaviour
 					waterTiles++;
 				}
 
-				if (waterTiles >= maximumWaterTiles || waterTiles >= room.Tiles.Count * 0.5f)
+				if (waterTiles >= MaximumWaterTiles || waterTiles >= room.Tiles.Count * 0.5f)
 				{
 					break;
 				}
@@ -342,9 +327,9 @@ public class MapGenerator : MonoBehaviour
 		var mapWidth = _map.GetLength(0);
 		var mapHeight = _map.GetLength(1);
 
-		for (int x = 0; x < mapWidth; x++)
+		for (var x = 0; x < mapWidth; x++)
 		{
-			for (int y = 0; y < mapHeight; y++)
+			for (var y = 0; y < mapHeight; y++)
 			{
 				var tile = _map[x, y];
 
@@ -364,9 +349,9 @@ public class MapGenerator : MonoBehaviour
 					leftNeighbourIndex >= 0 ? _map[leftNeighbourIndex, y] : null);
 
 				var typeOffset = tile.Type == TileType.Wall ?
-					Vector3.up * Constants.WallHeight :
+					Vector3.up * WallHeight :
 					tile.Type == TileType.Water ?
-					-Vector3.up * Constants.WaterDepth :
+					-Vector3.up * WaterDepth :
 					Vector3.zero;
 				tile.WorldCoordinates += typeOffset;
 
@@ -381,20 +366,6 @@ public class MapGenerator : MonoBehaviour
 				if (RandomizeVertexPositionsZ)
 				{
 					tile.WorldCoordinates += Vector3.forward * Constants.TileSize * UnityEngine.Random.Range(-VertexOffsetZ, VertexOffsetZ);
-				}
-			}
-		}
-	}
-	private void RegisterWalkableTiles()
-	{
-		for (var x = 0; x < Width; x++)
-		{
-			for (var y = 0; y < Height; y++)
-			{
-				var tile = _map[x, y];
-				if (tile.Type == TileType.Ground)
-				{
-					_walkableTiles.Add(tile);
 				}
 			}
 		}

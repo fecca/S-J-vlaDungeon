@@ -12,3 +12,7 @@ Templates:	ItemTemplate
 			WeaponTemplate
 			ProjectileWeaponTemplate
 			StaffTemplate
+
+Stats:		Weight
+			Damage
+			Range

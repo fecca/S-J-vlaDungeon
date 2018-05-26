@@ -11,7 +11,6 @@ public class ItemHandler : MonoBehaviour, IItemHandler
 	private void Awake()
 	{
 		ServiceLocator<IItemHandler>.Instance = this;
-
 		_itemFactory = new ItemFactory();
 	}
 

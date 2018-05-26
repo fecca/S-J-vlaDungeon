@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Enemy : Character, ICharacter
+public class Enemy : Character
 {
 	private Transform _cachedTransform;
 	private EnemyBrain _brain;

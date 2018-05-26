@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Player : Character, ICharacter
+public class Player : Character
 {
 	private Transform _cachedTransform;
 	private PlayerBrain _brain;

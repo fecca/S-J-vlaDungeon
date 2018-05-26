@@ -50,7 +50,7 @@ public class PlayerBrain : IBrain, IAttacker, IMover
 	}
 	public void Attack(AttackData data, Vector3 direction)
 	{
-		Agent.RotateAgent(direction);
+		//Agent.RotateAgent(direction);
 		Agent.SmoothStop();
 
 		var projectile = UnityEngine.Object.Instantiate(data.ProjectilePrefab);

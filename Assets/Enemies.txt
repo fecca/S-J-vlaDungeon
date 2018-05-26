@@ -1,0 +1,13 @@
+Interfaces:	ICharacter
+			IEnemy
+			IRangedEnemy
+			IWizard
+
+Classes:	Character
+			Enemy
+			RangedEnemy
+			Wizard
+
+Templates:	EnemyTemplate
+			RangedEnemyTemplate
+			WizardTemplate
